@@ -1,0 +1,17 @@
+**/*.DS_Store
+**/__pycache__
+**/.vscode
+**/.idea
+**/dist
+**/build
+**/local/Debug
+**/qutrunk/sim/local/Debug
+**/qutrunk/sim/local/Release
+**/qutrunk_tutorial/_build
+**/poetry.lock
+**/qutrunk/document
+**/qutrunk/qml/data/
+**/example/*.csv
+**/*.out
+**/data
+**/venv

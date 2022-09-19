@@ -1,0 +1,12 @@
+{
+  "result_path": "result.json",
+  "version": 1.0,
+  "qubit": 2,
+  "gates": ["H", "CNOT", "Measure"],
+  "cmd": [
+    "H | qr[0]",
+    "CNOT | (qr[0], qr[1])",
+    "Measure | qr[0]",
+    "Measure | qr[1]"
+  ]
+}

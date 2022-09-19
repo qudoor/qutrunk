@@ -1,92 +1,194 @@
-# qutrunk
+## QuTrunk
 
-qubox仓库分离出来使用
+[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://developer.queco.cn/qutrunk_api/)
+[![Release](https://img.shields.io/badge/release-v0.1.9-blue.svg)](https://github.com/PaddlePaddle/Paddle/releases)
+[![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
+[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/Angel-ML/angel/archive/refs/heads/branch-3.2.0.zip)
 
-## Getting started
+[English](./README.md) | 简体中文
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### **概述**
+---
+* QuTrunk 是启科量子自主研发的一款免费、开源、跨平台的量子计算编程框架，包括量子编程API、量子命令转译、量子计算后端接口等。
+* QuTrunk 使用 Python 作为宿主语言，利用 Python 的语法特性实现针对量子程序的 DSL (领域专用语言)，所有使用 Python 编程的 IDE 均可使用安装。
+* QuTrunk 基于量子逻辑门、量子线路等概念提供量子编程所需各类 API，这些 API 由相应的模块实现。例如 QCircuit 实现量子线路，Qubit 实现量子比特，Qureg 实现量子寄存器，Command 实现每个量子门操作的指令，Backend 实现运行量子线路的后端模块，gate 模块实现各类基础量子门操作。
+* QuTrunk 还可以作为其他上层量子计算应用的基础，例如：量子算法、量子可视化编程、量子机器学习等。
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
-## Add your files
+### 核心特点
+---
+* 基于量子逻辑门、量子线路实现量子编程。
+* 提供 QuSL 量子汇编指令标准，QuSL 量子汇编与 Python 代码完全兼容。
+* 设备独立，在不同的量子后端（例如：BackendLocalCpp, BackendLocalPy, BackendQuSprout, BackendIBM等）上运行同一个量子电路。
+* 本地量子计算后端提供全振幅量子模拟计算，量子云服务提供：OMP 多线程、多点并行 MPI、GPU 等计算加速，同时预留了接口对接离子阱量子计算机。
+* 兼容 OpenQASM 2.0 标准。
+* 支持量子可视化编程（需要配合启科量子研发的量子集成开发环境 QuBranch）。
+* 在经典计算机上模拟量子程序，提供全振幅计算。
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
 
-```
-cd existing_repo
-git remote add origin http://192.168.170.196/qudoor/qutrunk.git
-git branch -M main
-git push -uf origin main
-```
+### **核心模块**
+---
+* QCircuit
+  量子线路，维护对所有量子比特的各种门操作及操作时序，代表了整个量子算法的实现。
+* Qubit
+  代表单个量子比特，是量子门操作的对象。
+* Qureg
+ 维护若干个量子比特，用于实现一个具体的量子算法。
+* Command
+  每个量子门操作其背后都会转换成一个基础指令，这些指令按照时间顺序存放在QCircuit中，当整个算法结束或者需要计算当前量子线路的某种状态取值时，这些指令会被发送到指定的后端去执行。
+* Backend
+  量子计算后端模块，用于执行量子线路，支持Python和C++两种本地后端，QuSprout后端以及第三方后端(目前支持IBM)等。
+* Gate
+  量子算法基本组成单元，提供各类量子门操作，包括:*H*, *X*, *Y*, *Z*，*P*, *R*, *Rx*, *Ry*, *Rz*, *S*, *Sdg*, *T*, *Tdg*, *CNOT*, *Toffoli*, *Swap*等。
 
-## Integrate with your tools
+>**注意**:
+>  QuTrunk默认只提供Python版本的量子计算模拟器，如果用户需要更高性能的模拟器，可以尝试从: https://pypi.org/project/qutrunk/ 获取QuTrunk源码包进行安装，具体安装步骤可以参考后续的安装章节。
 
-- [ ] [Set up project integrations](http://192.168.170.196/qudoor/qutrunk/-/settings/integrations)
 
-## Collaborate with your team
+### **下载和安装**
+---
+#### QuTrunk最新版本: [v0.1.9]()
+* #### **pip安装** 
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+   QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
+注意在正式使用 QuTurnk 之前，您需要先安装 Python（版本 3.7+）。
 
-## Test and Deploy
+  ```python
+  pip install qutrunk
+  ```
 
-Use the built-in continuous integration in GitLab.
+* #### **源码安装**  
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+  #### **Windows**
 
-***
+  安装 C++ 编译器：
 
-# Editing this README
+  ```
+  下载visual studio community 2019, 在安装界面勾选`使用C++的桌面开发`进行安装
+  ```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+  然后再安装 cmake，使用命令行执行：
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+  ```python
+  pip install cmake
+  ```
 
-## Name
-Choose a self-explaining name for your project.
+  最后编译安装，解压下载的源码安装包，进入到解压目录下，执行:
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+  ```python
+  python setup.py install
+  ```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+  #### **MacOS**
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+  安装之前，确认已下载 QuTrunk（可于PyPI官网下载）
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+  确认安装 C/C++ 编译器（一般 MacOS 已默认安装）
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+  ```
+  执行 gcc –version 命令查询是否已经安装
+  ```
+  
+  安装 cmake，在终端执行：
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+  ```python
+  pip install cmake
+  ```
+  
+  编译依赖安装完成后，再切换到下载目录，解压并开始编译安装QuTrunk：
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+  ```python
+  tar -zxvf qutrunk-0.1.9.tar.gz
+  cd qutrunk-0.1.9
+  python setup.py install
+  ```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+  #### **Ubuntu**
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+  首先安装 C/C++ 编译器
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+  ```python
+  sudo apt install build-essential
+  ```
+  
+  然后安装cmake编译工具
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+  ```python
+  sudo apt install cmake
+  ```
+  
+  最后编译安装 QuTrunk
 
-## License
-For open source projects, say how it is licensed.
+  ```python
+  tar -zxvf qutrunk-0.1.9.tar.gz
+  cd qutrunk-0.1.9
+  python setup.py install
+  ```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+
+### **示例代码**
+---
+以下示例展示了利用 QuTrunk 运行 bell-pair 量子算法：
+
+  ```python
+  # import package
+  from qutrunk.circuit import QCircuit
+  from qutrunk.circuit.gates import H, CNOT, Measure, All
+
+  # allocate resource
+  qc = QCircuit()
+  qr = qc.allocate(2) 
+
+  # apply quantum gates
+  H * qr[0]   
+  CNOT * (qr[0], qr[1])
+  All(Measure) * qr
+
+  # print circuit
+  qc.print(qc)   
+  # run circuit
+  res = qc.run(shots=1024) 
+  # print result
+  print(res.get_counts()) 
+  # draw circuit
+  qc.draw()
+  ```
+
+运行结果：
+
+  ```
+  qreg q[2]
+  creg c[2]
+  H * q[0]
+  MCX * (q[0], q[1])
+  Measure * q[0]
+  Measure * q[1]
+  [{"00":519},{"11":505}]
+        ┌───┐      ┌─┐   
+  q[0]: ┤ H ├──■───┤M├───
+        └───┘┌─┴──┐└╥┘┌─┐
+  q[1]: ─────┤ CX ├─╫─┤M├
+             └────┘ ║ └╥┘
+   c: 2/════════════╩══╩═
+                    0  1 
+  ```
+
+### **文档**
+---
+* [QuTrunk 快速上手教程](http://developer.queco.cn/learn/doc/detail?id=12)
+* [QuTrunk API](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
+
+
+## 如何参与开发
+
+1. 阅读源代码，了解我们当前的开发方向
+2. 找到自己感兴趣的功能或模块
+3. 进行开发，开发完成后自测功能是否正确
+4. Fork代码库，将修复代码提交到fork的代码库
+5. 发起pull request
+6. 更多详情请参见[链接](http://192.168.170.196/qudoor/qubox/-/blob/dev_ll/CONTRIBUTING.md)
+
+
+### **许可证**
+---
+QuTrunk是自由和开源的，在Apache 2.0许可证版本下发布。

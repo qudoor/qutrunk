@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "qutrunk"
+version = "0.1.10"
+description = "qutrunk is an open source library for quantum computing."
+authors = ["qudoorzh2022 <qudoorzh2022@163.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "http://www.qudoor.com/"
+# repository = "项目仓库地址"
+# documentation  = "项目文档地址"
+exclude = ["qutrunk/doc/coding_style.md"]
+keywords = ["qutrunk", "quantum", "sdk"]
+classifiers = [
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: Apache Software License"
+]
+
+# 以后支持c++本地模拟器再开放
+build = "build.py"
+
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pyyaml = "^6.0"
+thrift = "^0.15.0"
+numpy = "^1.22.3"
+ply = "^3.11"
+requests = "^2.27.1"
+networkx = "^2.8"
+retworkx = "^0.11.0"
+thriftpy2 = "^0.4.14"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "douban"
+url = "https://pypi.doubanio.com/simple"
