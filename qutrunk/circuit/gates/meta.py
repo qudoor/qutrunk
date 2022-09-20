@@ -5,6 +5,7 @@ from typing import Union
 from .basicgate import BasicGate
 from qutrunk.circuit import QuBit, Qureg
 
+
 class All(BasicGate):
     """Meta operator, provides unified operation of multiple qubits.
 
@@ -32,7 +33,7 @@ class All(BasicGate):
 
                 All(H) * qureg
                 All(Measure) * qureg
-            """
+        """
         for q in qureg:
             self.gate * q
 
@@ -40,6 +41,7 @@ class All(BasicGate):
         """Overwrite * operator to achieve quantum logic gate operation, \
             reuse __or__ operator implement."""
         self.__or__(qureg)
+
 
 class Power(BasicGate):
     """Power Gate.
@@ -53,6 +55,7 @@ class Power(BasicGate):
 
             Power(2, gate) * q[0]
     """
+
     def __init__(self, power, gate):
         self.power = power
         self.gate = gate
@@ -61,19 +64,20 @@ class Power(BasicGate):
         """Quantum logic gate operation."""
         if self.power < 0:
             raise ValueError("power should >= 0")
+
         if not isinstance(qubits, (QuBit, Qureg, tuple)):
-            raise TypeError("qubits should be type of QuBit, Qureg or tuple")
-        
-        for i in range(self.power):
+            raise TypeError("qubits should be type of QuBit, Qureg or tuple.")
+
+        for _ in range(self.power):
             self.gate * qubits
 
     def __mul__(self, qubits: Union[QuBit, Qureg, tuple]):
         self.__or__(qubits)
 
- 
+
 class gate(BasicGate):
     """Definition of custom gate.
-    
+
     Implement by composing some basic logic gates.
 
     Example:
@@ -91,6 +95,7 @@ class gate(BasicGate):
             res = circuit.run(shots=100)
             print(res.get_counts())
     """
+
     def __init__(self, func):
         self.compose_gate = True
         self.callable = func

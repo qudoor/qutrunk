@@ -38,11 +38,11 @@ class QCircuit:
     prefix = "circuit"
 
     def __init__(
-            self,
-            backend=None,
-            density=False,
-            name: Optional[str] = None,
-            resource: Optional[bool] = False,
+        self,
+        backend=None,
+        density=False,
+        name: Optional[str] = None,
+        resource: Optional[bool] = False,
     ):
         self.qreg = None
         self.creg = None
@@ -88,17 +88,18 @@ class QCircuit:
         """Allocate qubit in quantum circuit.
 
         Args:
-            qubits: int: The umber of qubit allocated in circuit.\
+            qubits: int: The number of qubit allocated in circuit.\
                     list: The sum of list is the umber of qubit allocated in circuit,\
                     and each value item represents the size of corresponding subqureg.
 
         Returns:
+            # TODO: update description and demo
             qreg: The register of quantum.
         """
-        if type(qubits) != int and type(qubits) != list:
-            raise TypeError("qubits parameter should be type of int or list")
+        if not isinstance(qubits, (int, list)):
+            raise TypeError("qubits parameter should be type of int or list.")
 
-        size = qubits if type(qubits) == int else sum(qubits)
+        size = qubits if isinstance(qubits, int) else sum(qubits)
         self.qreg = Qureg(circuit=self, size=size)
         self.creg = CReg(circuit=self, size=size)
 
@@ -109,11 +110,10 @@ class QCircuit:
             self.qubit_indices[QuBit(self.qreg, index)] = index
             self.cbit_indices[CBit(self.creg, index)] = index
 
-        if type(qubits) == int:
+        if isinstance(qubits, int):
             return self.qreg
-        elif type(qubits) == list:
+        elif isinstance(qubits, list):
             return self.qreg.split(qubits)
-
 
     def set_cmds(self, cmds):
         """Set cmds to circuit.
@@ -267,6 +267,7 @@ class QCircuit:
         self.backend.send_circuit(self)
         return self.backend.get_prob_outcome(qubit, outcome)
 
+    # TODO:Get the maximum possible value of a qubit.
     def get_prob_all_outcome(self, qubits):
         """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
 
@@ -467,7 +468,10 @@ class QCircuit:
             if f is not sys.stdout:
                 f.close()
 
-    def depth(self, counted_gate: Optional[callable] = lambda x: not isinstance(x, BarrierGate)) -> int:
+    def depth(
+        self,
+        counted_gate: Optional[callable] = lambda x: not isinstance(x, BarrierGate),
+    ) -> int:
         """Return circuit depth (i.e., max length of critical path).
 
         Args:
@@ -583,7 +587,7 @@ class Result:
     """
 
     def __init__(
-            self, num_qubits, res, backend, arguments, task_id=None, status="success"
+        self, num_qubits, res, backend, arguments, task_id=None, status="success"
     ):
         self.states = []
         self.values = []
