@@ -111,6 +111,7 @@ class Qureg:
         Returns:
             The tuple contains all subqureg.
         """
+        # TODO: need to improve.
         if type(sections) != list:
             raise TypeError("sections parameter should be a list")
         if sum(sections) != len(self.qubits):
