@@ -18,7 +18,7 @@ def run_bell_pair(backend=None):
     Measure * qr[1]
 
     # print circuit
-    qc.print()
+    qc.print(file="bell_pair.qusl")
 
     # run circuit
     res = qc.run(shots=100)
@@ -27,6 +27,7 @@ def run_bell_pair(backend=None):
     print(res.get_measure())
     print(res.get_counts())
     print(res.excute_info())
+
     return qc
 
 
