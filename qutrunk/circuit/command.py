@@ -1,5 +1,6 @@
 """Command Module."""
 
+from qutrunk.circuit.parameter import Parameter
 
 class Command:
     """Converts the quantum gate operation into a specific command.
@@ -28,6 +29,13 @@ class Command:
         self.targets = targets
         self.cmd_ver = "1.0"
         self.inverse = inverse
+
+        self.parameters = {}
+        for i, r in enumerate(self.rotation):
+            if isinstance(r, Parameter):
+                # map index to parameter
+                self.parameters[i] = r
+                r.set_host(self)
 
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""
@@ -67,9 +75,8 @@ class Command:
             name = name.replace("c", "c" + str(ctrl_cnt), 1)
 
         angles_str = ""
-        angles = self.gate.angles()
-        if angles:
-            angles_str = "(" + ",".join([str(ag) for ag in angles]) + ")"
+        if len(self.rotation) > 0:
+            angles_str = "(" + ",".join([str(ag) for ag in self.rotation]) + ")"
 
         qubits_index = self.controls + self.targets
         qubits_str = ",".join([f"q[{qi}]" for qi in qubits_index])
@@ -86,9 +93,8 @@ class Command:
         if ctrl_cnt > 1:
             params.append(ctrl_cnt)
 
-        angles = self.gate.angles()
-        if angles:
-            params += angles
+        if len(self.rotation) > 0:
+            params += self.rotation
 
         if params:
             param_str = "(" + ", ".join([str(param) for param in params]) + ")"
@@ -111,3 +117,15 @@ class Command:
     def num_qubits(self) -> int:
         """Return the number of qubits."""
         return len(self.controls) + len(self.targets)
+
+    def update_parameter(self, param):
+        """Update command parameter.
+
+        Usually, parameter is the angle of rotation gate
+
+        Args:
+            param: Parameter object holds parameter's name and value.
+        """
+        for k, v in self.parameters.items():
+            if v == param:
+                self.rotation[k] = v.value

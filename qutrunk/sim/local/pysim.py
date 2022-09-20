@@ -1275,11 +1275,11 @@ class Simulator:
             work_imag[i] = self.imag[i]
         for pauli_op in pauli_prod_list:
             op_type = pauli_op["oper_type"]
-            if op_type == PauliOpType.PAULI_X:
+            if op_type == PauliOpType.PAULI_X.value:
                 self.paulix_local(work_real, work_imag, pauli_op["target"])
-            elif op_type == PauliOpType.PAULI_Y:
-                self.pauliy_local(work_real, work_imag, pauli_op["target"])
-            elif op_type == PauliOpType.PAULI_Z:
+            elif op_type == PauliOpType.PAULI_Y.value:
+                self.pauliy_local(work_real, work_imag, pauli_op["target"], 1)
+            elif op_type == PauliOpType.PAULI_Z.value:
                 self.pauliz_local(work_real, work_imag, pauli_op["target"])
 
         real, imag = self.calc_inner_product_local(

@@ -51,8 +51,9 @@ class XGate(BasicGate, Observable):
         """Access to the matrix property of this gate."""
         return np.matrix([[0, 1], [1, 0]])
 
-    def obs(self, target):
-        """Get Observable data.
+    def __call__(self, target):
+        """
+        Get Observable data.
 
         Args:
             target: The observed qubit.

@@ -7,6 +7,7 @@ from typing import List, Optional, Union
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
 from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable
+from qutrunk.circuit.parameter import Parameter
 
 
 class QCircuit:
@@ -56,6 +57,9 @@ class QCircuit:
 
         self.qubit_indices = {}
         self.cbit_indices = {}
+
+        # 参数字典表 {Parameter: value}
+        self.parameters = {}
 
         # use local backend(default)
         if backend is None:
@@ -305,6 +309,71 @@ class QCircuit:
         except KeyError:
             raise Exception(f"Could not locate provided bit:{bit}")
 
+    def parameter(self, name):
+        """
+        get a new object of Parameter.
+
+        Args:
+            name(str): Parameter name.
+
+        Returns:
+            p: Parameter object
+        """
+        p = Parameter(name)
+        self.parameters[name] = p
+        return p
+
+    def get_parameter(self, name):
+        """get the object of Parameter.
+
+        Args:
+            name(str): Parameter name.
+        """
+        return self.parameters[name]
+
+    def bind_parameters(self, params):
+        """
+        Assign numeric parameters to parameters.
+
+        Args:
+            params (dict): {parameter: value, ...}.
+
+        Raises:
+            ValueError: parameters variable contains parameters not present in the circuit.
+
+        Returns:
+            QCircuit:Quantum circuit
+        """
+        if not isinstance(params, dict):
+            raise ValueError("parameters must be dictionary.")
+        # 1 参数是否在参数表中
+        parameters_table_key = self.parameters.keys()
+        params_not_in_circuit = [
+            param_key
+            for param_key in params.keys()
+            if param_key not in parameters_table_key
+        ]
+        if len(params_not_in_circuit) > 0:
+            raise ValueError(f"Cannot bind parameters ({', '.join(map(str, params_not_in_circuit))}) "
+                             f"not present in the circuit.")
+
+        # update parameter
+        for k, v in params.items():
+            param = self.parameters[k]
+            param.update(v)
+
+    def get_parameter_value(self, name):
+        """get the value of Parameter.
+
+        Args:
+            name(str): Parameter name.
+        """
+        for k, v in self.parameters.items():
+            if name == k:
+                return v.value
+
+        return None
+
     def inverse(self):
         """Invert this circuit.
 
@@ -376,7 +445,7 @@ class QCircuit:
             The expected value of a product of Pauli operators.
         """
         self.backend.send_circuit(self)
-        expect = self.backend.get_expec_pauli_prod(obs_data())
+        expect = self.backend.get_expec_pauli_prod(obs_data)
         return expect
 
     def expval_sum(self, pauli_coeffi: Observable, qubitnum=0):
@@ -644,6 +713,14 @@ class Result:
             res.append({out.bitstr: out.count})
         return json.dumps(res)
 
+    def get_states(self):
+        """Get all states"""
+        return self.states
+
+    def get_values(self):
+        """Get all values"""
+        return self.values
+        
     def excute_info(self):
         result = {
             "backend": self.backend.backend_type(),

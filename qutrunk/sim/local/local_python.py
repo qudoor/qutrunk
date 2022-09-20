@@ -202,7 +202,7 @@ class BackendLocalPython:
         Returns:
             the expected value of a product of Pauli operators.
         """
-        self.sim.get_expec_pauli_prod(pauli_prod_list)
+        return self.sim.get_expec_pauli_prod(pauli_prod_list)
 
     @timefn
     def get_expec_pauli_sum(self, oper_type_list, term_coeff_list):
