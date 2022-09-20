@@ -1,5 +1,6 @@
-import yaml
 import os
+
+import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -10,6 +11,3 @@ def get_qubox_setting():
     with open(yaml_file) as f:
         yaml_content = yaml.load(f, Loader=yaml.FullLoader)
         return "{ip}:{port}".format(ip=yaml_content["ip"], port=yaml_content["port"])
-
-        
-print(get_qubox_setting())

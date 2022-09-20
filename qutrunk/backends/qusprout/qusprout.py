@@ -1,8 +1,8 @@
 from enum import Enum
 
 from qutrunk.backends.backend import Backend
-from qutrunk.backends.qusprout.rpcclient import QuSproutApiServer, qusproutdata
 from qutrunk.tools.read_qubox import get_qubox_setting
+from .rpcclient import QuSproutApiServer, qusproutdata
 
 
 class ExecType(Enum):
