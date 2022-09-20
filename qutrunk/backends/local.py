@@ -72,6 +72,8 @@ class BackendLocal(Backend):
             )
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
+            if self.circuit.init_amp_reals or self.circuit.init_amp_imags:
+                self._local_impl.set_amplitudes(self.circuit.init_amp_reals, self.circuit.init_amp_imags)
 
         res, elapsed = self._local_impl.send_circuit(circuit, final)
         if self.circuit.counter:

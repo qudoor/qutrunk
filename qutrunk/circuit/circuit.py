@@ -80,6 +80,11 @@ class QCircuit:
         if resource:
             self.counter = Counter(self)
 
+        #Initial value for state-vector amp
+        self.init_amp_reals = []
+        self.init_amp_imags = []
+
+
     def __iter__(self):
         """Used to iterate commands in quantum circuits."""
         return QCircuitIter(self.cmds)

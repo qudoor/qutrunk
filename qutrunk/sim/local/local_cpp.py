@@ -15,6 +15,10 @@ class BackendLocalCpp:
         return simulator.init(qubits, show)
 
     @timefn
+    def set_amplitudes(self, reals, imags):
+        return simulator.set_amplitudes(reals, imags)
+        
+    @timefn
     def send_circuit(self, circuit, final):
         """
         Send the quantum circuit to local backend

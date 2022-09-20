@@ -96,6 +96,13 @@ class Simulator:
         self.real[0] = 1.0
         self.imag[0] = 0.0
 
+    def set_amplitudes(self, reals, imags):
+        """Init amplitudes state"""
+        
+        for index in range(len(reals)):
+            self.real[index] = reals[index]
+            self.imag[index] = imags[index]
+
     # TODO:need to improve.
     def hadamard(self, target):
         """

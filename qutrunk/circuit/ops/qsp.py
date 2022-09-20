@@ -11,7 +11,7 @@ from qutrunk.circuit.gates import X, All, H
 class QSP(Operator):
     """Quantum state preparation Operator.
 
-    Init the quantum state to specific state, currently support: Plus state, Classical state.
+    Init the quantum state to specific state, currently support: Plus state, Classical state, amplitude state.
 
     Args:
         state: The target state of circuit initialized to.
@@ -29,13 +29,18 @@ class QSP(Operator):
             print(circuit.get_all_state())
     """
 
-    def __init__(self, state: Union[str, int]):
+    def __init__(self, state: Union[str, int], classicvector: list = None):
         super().__init__()
         self.state = state
+        self.classicvector = classicvector
 
     def _check_state(self, qureg: Qureg):
         if self.state == "+":
             return True
+
+        if self.state == "AMP":
+            if 0 <= len(self.classicvector) < 2 ** len(qureg):
+                return True
 
         if isinstance(self.state, str):
             val = int(self.state, base=2)
@@ -62,10 +67,26 @@ class QSP(Operator):
         with OperatorContext(qureg.circuit) as oc:
             if self.state == "+":
                 self._process_plus_state(qureg)
+            elif self.state == "AMP":
+                self._process_amp_state(qureg)
             else:
                 self._process_classical_state(qureg)
 
-        qureg.circuit.append_statement(f"QSP('{self.state}') * q")
+        if self.state == "AMP":
+            qureg.circuit.append_statement(f"QSP('{self.state}', '{self.classicvector}') * q")
+        else:
+            qureg.circuit.append_statement(f"QSP('{self.state}') * q")
+
+    def _process_amp_state(self, qureg: Qureg):
+        """Process amp state."""
+        if (len(self.classicvector) <= 0):
+            return
+
+        listsum = sum(self.classicvector)
+        for element in self.classicvector:
+            normalized_element = complex(element / listsum)
+            qureg.circuit.init_amp_real.append(normalized_element.real)
+            qureg.circuit.init_amp_imag.append(normalized_element.imag)
 
     def _process_plus_state(self, qureg: Qureg):
         """Process plus state."""
