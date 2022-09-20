@@ -444,6 +444,37 @@ class QCircuit:
             if f is not sys.stdout:
                 f.close()
 
+    def dump(self, file=None, unroll=True):
+        """Serialize Quantum circuit as a JSON formatted stream to file.
+
+        Args:
+            unroll: True: Dump the detailed instructions, especially, \
+                if the instruction contains an operator, the operator will be expanded.
+                False: Dump the brief instructions, the operator will not be expanded.
+            file: Dump the qutrunk instruction to file(json format).
+        """
+        if file is None:
+            raise Exception("file argument need to be supplied.")
+
+        with open(file, "w", encoding="utf-8") as f:
+            qusl_data = {}
+            qusl_data["target"] = "QuSL"
+            qusl_data["version"] = "1.0"
+
+            meta = {"circuit_name": self.name, "qubits": str(len(self.qreg))}
+            qusl_data["meta"] = meta
+
+            inst = []
+            if unroll:
+                for c in self:
+                    inst.append(c.qusl() + "\n")
+            else:
+                for stm in self.statements:
+                    inst.append(stm + "\n")
+
+            qusl_data["code"] = inst
+            f.write(json.dumps(qusl_data))
+
     def print_qasm(self, file=None):
         """Convert circuit and dump to file/stdout.
 
