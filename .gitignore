@@ -15,3 +15,4 @@
 **/*.out
 **/data
 **/venv
+**/qutrunk.egg-info

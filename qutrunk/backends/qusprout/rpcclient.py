@@ -1,10 +1,9 @@
 import uuid
 from functools import partial
 from os import path
-import locale
-from thriftpy2.parser import parser
 
 import thriftpy2
+from thriftpy2.parser import parser
 from thriftpy2.protocol import TBinaryProtocolFactory, TMultiplexedProtocolFactory
 from thriftpy2.rpc import make_client
 
