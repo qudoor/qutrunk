@@ -1,3 +1,5 @@
+"""The S gate."""
+
 import numpy as np
 
 from .basicgate import BasicGate

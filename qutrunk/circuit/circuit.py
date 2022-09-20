@@ -444,6 +444,7 @@ class QCircuit:
             if f is not sys.stdout:
                 f.close()
 
+    # TODO: file to circuit string
     def dump(self, file=None, unroll=True):
         """Serialize Quantum circuit as a JSON formatted stream to file.
 

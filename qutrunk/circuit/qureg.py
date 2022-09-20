@@ -34,6 +34,7 @@ class SubQureg:
 
         return res
 
+
 class Qureg:
     """Register, maintains a set of qubits.
 

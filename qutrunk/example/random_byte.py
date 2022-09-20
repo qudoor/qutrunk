@@ -1,3 +1,5 @@
+"""Quantum random number generator."""
+
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, Measure, All
 from qutrunk.backends import BackendQuSprout
