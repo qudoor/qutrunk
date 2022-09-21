@@ -126,8 +126,8 @@ class AstInterpreter:
         else:
             raise QuTrunkError(
                 "internal error undefined gate:",
-                "line=%s" % node.line,
-                "file=%s" % node.file,
+                f"line={node.line}",
+                f"file={node.file}",
             )
 
     def _process_u(self, node):
@@ -191,10 +191,11 @@ class AstInterpreter:
         id1 = self._process_bit_id(node.children[1])
         if not (len(id0) == len(id1) or len(id0) == 1 or len(id1) == 1):
             raise QuTrunkError(
-                "internal error: qreg size mismatch",
-                "line=%s" % node.line,
-                "file=%s" % node.file,
+                "internal error: qreg size mismatch:",
+                f"line={node.line}",
+                f"file={node.file}",
             )
+
         maxidx = max([len(id0), len(id1)])
         for idx in range(maxidx):
             cx_gate = MCX()
@@ -211,10 +212,11 @@ class AstInterpreter:
         id1 = self._process_bit_id(node.children[1])
         if len(id0) != len(id1):
             raise QuTrunkError(
-                "internal error: reg size mismatch",
-                "line=%s" % node.line,
-                "file=%s" % node.file,
+                "internal error: reg size mismatch:",
+                f"line={node.line}",
+                f"file={node.file}",
             )
+
         for idx, idy in zip(id0, id1):
             meas_gate = MeasureGate()
             meas_gate.name = "measure"
@@ -321,11 +323,11 @@ class AstInterpreter:
 
         else:
             raise QuTrunkError(
-                "internal error: undefined node type",
-                node.type,
-                "line=%s" % node.line,
-                "file=%s" % node.file,
+                "internal error: undefined node type:",
+                f"line={node.line}",
+                f"file={node.file}",
             )
+
         return None
 
     def _gate_rules_to_qutrunk_circuit(self, node, params):
@@ -384,7 +386,7 @@ class AstInterpreter:
                     self.gates[name], params=params
                 )
         else:
-            raise QuTrunkError("unknown operation for ast node name %s" % name)
+            raise QuTrunkError(f"unknown operation for ast node name {name}.")
         return op
 
 
