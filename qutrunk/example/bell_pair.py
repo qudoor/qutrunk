@@ -19,7 +19,7 @@ def run_bell_pair(backend=None):
 
     # print circuit
     qc.print()
-
+    qc.print_qasm(file="a.qasm")
     # run circuit
     res = qc.run(shots=100)
 

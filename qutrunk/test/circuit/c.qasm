@@ -1,0 +1,1 @@
+{"target": "QuSL", "version": "1.0", "meta": {"circuit_name": "circuit-2894", "qubits": "2"}, "code": ["H * q[0]\n", "MCX * (q[0], q[1])\n"]}

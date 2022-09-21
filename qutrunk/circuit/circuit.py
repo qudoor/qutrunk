@@ -352,7 +352,7 @@ class QCircuit:
 
     @staticmethod
     def from_qusl_file(file):
-        """Pase QuSL file and generate quantum circuit.
+        """Parse QuSL file and generate quantum circuit.
 
         Args:
             file: The input QuSL file(json format).
