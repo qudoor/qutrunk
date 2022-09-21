@@ -18,7 +18,7 @@ class SubQureg:
 
     def append(self, qubit: QuBit):
         """Append QuBit to SubQureg.
-        
+
         Args:
             qubit: The target qubit append to SubQureg.
         """
@@ -91,7 +91,7 @@ class Qureg:
         """Find the index of the provided qubit within this register.
 
         Args:
-            qubit: The qubit to get index. 
+            qubit: The qubit to get index.
         """
         return self.qubits.index(qubit)
 
@@ -129,5 +129,3 @@ class Qureg:
             start_index += sec
 
         return tuple(res)
-
-

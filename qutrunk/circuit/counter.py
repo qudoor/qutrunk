@@ -8,6 +8,7 @@ class Counter:
     Args:
         circuit: A quantum circuit to statistics the used resource.
     """
+
     def __init__(self, circuit):
         self.circuit = circuit
         self.qubits = 0
@@ -30,7 +31,7 @@ class Counter:
         self.total_time = time.time() - self.start_time
         self.qutrunk_time = self.total_time - self.backend_time
         self.quantum_gates = self.circuit.gates_len
-    
+
     def __repr__(self):
         return f"Counter(quit={self.qubits})"
 

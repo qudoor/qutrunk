@@ -2,7 +2,6 @@
 
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import CX, Measure, H, Barrier, All
-from qutrunk.backends import BackendQuSprout
 
 
 def run_ghz(qubits=5, backend=None):

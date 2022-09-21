@@ -48,4 +48,3 @@ def test_y1_inverse_gate():
 if __name__ == "__main__":
     """运行test文件"""
     pytest.main(["-v", "-s", "./test_y1_gate.py"])
-

@@ -47,7 +47,17 @@ class QasmParser:
         self.global_symtab = {}  # global symtab
         self.current_symtab = self.global_symtab  # top of symbol stack
         self.symbols = []  # symbol stack
-        self.external_functions = ["sin", "cos", "tan", "exp", "ln", "sqrt", "acos", "atan", "asin"]
+        self.external_functions = [
+            "sin",
+            "cos",
+            "tan",
+            "exp",
+            "ln",
+            "sqrt",
+            "acos",
+            "atan",
+            "asin",
+        ]
 
     def __enter__(self):
         return self
@@ -309,7 +319,9 @@ class QasmParser:
             else:
                 raise QasmError("internal error, verify_distinct")
         if len(bit_list) != len(set(bit_list)):
-            raise QasmError("duplicate identifiers at line %d file %s" % (line_number, filename))
+            raise QasmError(
+                "duplicate identifiers at line %d file %s" % (line_number, filename)
+            )
 
     def pop_scope(self):
         """Return to the previous scope."""
@@ -363,7 +375,8 @@ class QasmParser:
         if len(program) > 2:
             if program[2] != ";":
                 raise QasmError(
-                    "Missing ';' at end of statement; " + "received", str(program[2].value)
+                    "Missing ';' at end of statement; " + "received",
+                    str(program[2].value),
                 )
         program[0] = program[1]
 
@@ -404,9 +417,13 @@ class QasmParser:
                    | id '[' error
         """
         if len(program) == 4:
-            raise QasmError("Expecting an integer index; received", str(program[3].value))
+            raise QasmError(
+                "Expecting an integer index; received", str(program[3].value)
+            )
         if program[4] != "]":
-            raise QasmError("Missing ']' in indexed ID; received", str(program[4].value))
+            raise QasmError(
+                "Missing ']' in indexed ID; received", str(program[4].value)
+            )
         program[0] = node.IndexedId([program[1], node.Int(program[3])])
 
     # ----------------------------------------
@@ -525,7 +542,10 @@ class QasmParser:
         program[0] = node.Qreg([program[2]])
         if program[2].name in self.external_functions:
             raise QasmError(
-                "QREG names cannot be reserved words. " + "Received '" + program[2].name + "'"
+                "QREG names cannot be reserved words. "
+                + "Received '"
+                + program[2].name
+                + "'"
             )
         if program[2].index == 0:
             raise QasmError("QREG size must be positive")
@@ -536,7 +556,8 @@ class QasmParser:
         qreg_decl : QREG error
         """
         raise QasmError(
-            "Expecting indexed id (ID[int]) in QREG" + " declaration; received", program[2].value
+            "Expecting indexed id (ID[int]) in QREG" + " declaration; received",
+            program[2].value,
         )
 
     # ----------------------------------------
@@ -549,7 +570,10 @@ class QasmParser:
         program[0] = node.Creg([program[2]])
         if program[2].name in self.external_functions:
             raise QasmError(
-                "CREG names cannot be reserved words. " + "Received '" + program[2].name + "'"
+                "CREG names cannot be reserved words. "
+                + "Received '"
+                + program[2].name
+                + "'"
             )
         if program[2].index == 0:
             raise QasmError("CREG size must be positive")
@@ -560,7 +584,8 @@ class QasmParser:
         creg_decl : CREG error
         """
         raise QasmError(
-            "Expecting indexed id (ID[int]) in CREG" + " declaration; received", program[2].value
+            "Expecting indexed id (ID[int]) in CREG" + " declaration; received",
+            program[2].value,
         )
 
     # Gate_body will throw if there are errors, so we don't need to cover
@@ -580,7 +605,10 @@ class QasmParser:
         program[0] = node.Gate([program[2], program[4], program[5]])
         if program[2].name in self.external_functions:
             raise QasmError(
-                "GATE names cannot be reserved words. " + "Received '" + program[2].name + "'"
+                "GATE names cannot be reserved words. "
+                + "Received '"
+                + program[2].name
+                + "'"
             )
         self.pop_scope()
         self.update_symtab(program[0])
@@ -592,7 +620,10 @@ class QasmParser:
         program[0] = node.Gate([program[2], program[6], program[7]])
         if program[2].name in self.external_functions:
             raise QasmError(
-                "GATE names cannot be reserved words. " + "Received '" + program[2].name + "'"
+                "GATE names cannot be reserved words. "
+                + "Received '"
+                + program[2].name
+                + "'"
             )
         self.pop_scope()
         self.update_symtab(program[0])
@@ -604,7 +635,10 @@ class QasmParser:
         program[0] = node.Gate([program[2], program[5], program[7], program[8]])
         if program[2].name in self.external_functions:
             raise QasmError(
-                "GATE names cannot be reserved words. " + "Received '" + program[2].name + "'"
+                "GATE names cannot be reserved words. "
+                + "Received '"
+                + program[2].name
+                + "'"
             )
         self.pop_scope()
         self.update_symtab(program[0])
@@ -631,7 +665,9 @@ class QasmParser:
         """
         if program[2] != "}":
             raise QasmError(
-                "Missing '}' in gate definition; received'" + str(program[2].value) + "'"
+                "Missing '}' in gate definition; received'"
+                + str(program[2].value)
+                + "'"
             )
         program[0] = node.GateBody(None)
 
@@ -861,7 +897,10 @@ class QasmParser:
         program[0] = node.Opaque([program[2], program[4]])
         if program[2].name in self.external_functions:
             raise QasmError(
-                "OPAQUE names cannot be reserved words. " + "Received '" + program[2].name + "'"
+                "OPAQUE names cannot be reserved words. "
+                + "Received '"
+                + program[2].name
+                + "'"
             )
         self.pop_scope()
         self.update_symtab(program[0])
@@ -881,7 +920,10 @@ class QasmParser:
         program[0] = node.Opaque([program[2], program[5], program[7]])
         if program[2].name in self.external_functions:
             raise QasmError(
-                "OPAQUE names cannot be reserved words. " + "Received '" + program[2].name + "'"
+                "OPAQUE names cannot be reserved words. "
+                + "Received '"
+                + program[2].name
+                + "'"
             )
         self.pop_scope()
         self.update_symtab(program[0])
@@ -947,7 +989,9 @@ class QasmParser:
             raise QasmError("Ill-formed IF statement. Perhaps a" + " missing '('?")
         if len(program) == 5:
             raise QasmError(
-                "Ill-formed IF statement.  Expected '==', " + "received '" + str(program[4].value)
+                "Ill-formed IF statement.  Expected '==', "
+                + "received '"
+                + str(program[4].value)
             )
         if len(program) == 6:
             raise QasmError(
@@ -1054,7 +1098,9 @@ class QasmParser:
                     | expression '-' expression
                     | expression '^' expression
         """
-        program[0] = node.BinaryOp([node.BinaryOperator(program[2]), program[1], program[3]])
+        program[0] = node.BinaryOp(
+            [node.BinaryOperator(program[2]), program[1], program[3]]
+        )
 
     def p_expression_2(self, program):
         """
@@ -1128,13 +1174,17 @@ class QasmParser:
         elif val is False:
             self.parse_deb = False
         else:
-            raise QasmError("Illegal debug value '" + str(val) + "' must be True or False.")
+            raise QasmError(
+                "Illegal debug value '" + str(val) + "' must be True or False."
+            )
 
     def parse(self, data):
         """Parse some data."""
         self.parser.parse(data, lexer=self.lexer, debug=self.parse_deb)
         if self.qasm is None:
-            raise QasmError("Uncaught exception in parser; " + "see previous messages for details.")
+            raise QasmError(
+                "Uncaught exception in parser; " + "see previous messages for details."
+            )
         return self.qasm
 
     def print_tree(self):

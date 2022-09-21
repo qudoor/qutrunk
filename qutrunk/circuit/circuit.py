@@ -17,7 +17,7 @@ class QCircuit:
         density: Creates a density matrix Qureg object representing a set of \
             qubits which can enter noisy and mixed states.
         name: The circuit name.
-        resource: Enable the resource statistics function.
+        resource: Whether enable the resource statistics function, default: False.
 
     Example: 
         .. code-block:: python

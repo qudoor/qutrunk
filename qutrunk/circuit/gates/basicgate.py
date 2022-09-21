@@ -76,4 +76,3 @@ class PauliType(Enum):
     POT_PAULI_X = 1
     POT_PAULI_Y = 2
     POT_PAULI_Z = 3
-

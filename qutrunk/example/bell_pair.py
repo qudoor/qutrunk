@@ -1,6 +1,4 @@
-"""
-Bell state example.
-"""
+"""Bell state example."""
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, CNOT, Measure
 
@@ -8,7 +6,6 @@ from qutrunk.circuit.gates import H, CNOT, Measure
 def run_bell_pair(backend=None):
     # allocate
     qc = QCircuit(backend=backend)
-
     qr = qc.allocate(2)
 
     # apply gate
