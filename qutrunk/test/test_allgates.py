@@ -3,38 +3,7 @@ import math
 
 import numpy as np
 
-from qutrunk.circuit.gates import (
-    CP,
-    CRx,
-    CRy,
-    CRz,
-    CX,
-    CY,
-    CZ,
-    H,
-    NOT,
-    P,
-    R,
-    Rx,
-    Rxx,
-    Ry,
-    Ryy,
-    Rz,
-    Rzz,
-    S,
-    Sdg,
-    SqrtSwap,
-    SqrtX,
-    Swap,
-    T,
-    Tdg,
-    U1,
-    U2,
-    U3,
-    X,
-    Y,
-    Z,
-)
+from qutrunk.circuit.gates import *
 
 
 def test_gate_matrix():
