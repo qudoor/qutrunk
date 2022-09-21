@@ -121,8 +121,8 @@ class Qureg:
         res = []
         start_index = 0
         for sec in sections:
+            slices = SubQureg(self.circuit)
             for i in range(sec):
-                slices = SubQureg(self.circuit)
                 # note: share the same QuBit
                 slices.append(self.qubits[start_index + i])
             res.append(slices)
