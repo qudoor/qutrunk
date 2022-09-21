@@ -1,8 +1,10 @@
 import sys
-sys.path.append("D:/code/qike/qubox/src") 
+
+sys.path.append("D:/code/qike/qubox/src")
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, Measure, All, X1, Y1, Z1
 from qutrunk.backends import BackendQuSprout, ExecType
+
 
 def testx1(backend=None):
     # allocate
@@ -11,7 +13,7 @@ def testx1(backend=None):
     H | qureg[0]
     X1 | qureg[0]
 
-    #qc, qureg = qc.inverse()
+    # qc, qureg = qc.inverse()
 
     All(Measure) | qureg
     qc.print()
@@ -19,6 +21,7 @@ def testx1(backend=None):
 
     print("执行X1，测量得到的结果是：", result.get_measure()[0])
     return qc
+
 
 def testy1(backend=None):
     # allocate
@@ -63,5 +66,3 @@ if __name__ == "__main__":
 
     qcz = testz1()
     qcz.draw()
-
-

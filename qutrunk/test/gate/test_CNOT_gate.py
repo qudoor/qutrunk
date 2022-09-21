@@ -6,6 +6,7 @@ from qutrunk.backends import BackendQuSprout
 from check_all_state import check_all_state
 from check_all_state_inverse import check_all_state_inverse
 
+
 def test_cnot_gate():
     """测试C_NOT门"""
     # 使用本地量子计算模拟器
