@@ -1,4 +1,5 @@
 """Grover's search algorithm."""
+
 import math
 import random
 
