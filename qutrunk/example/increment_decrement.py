@@ -8,10 +8,13 @@ def increment(num_qubits, init_value):
     qr = circuit.allocate(num_qubits)
 
     QSP(init_value) * qr
+    ctrl = []
+    for i in range(num_qubits, 1, -1):
+        for j in range(i-1):
+            ctrl.append(qr[j])
+        MCX(i-1) * (*ctrl, qr[i-1])
+        ctrl = []
 
-    MCX(3) * (qr[0], qr[1], qr[2], qr[3])
-    Toffoli * (qr[0], qr[1], qr[2])
-    CNOT * (qr[0], qr[1])
     X * qr[0]
 
     All(Measure) * qr
