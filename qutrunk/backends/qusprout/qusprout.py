@@ -136,6 +136,8 @@ class BackendQuSprout(Backend):
                 self.exectype.value)
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
+            if self.circuit.init_amp_reals or self.circuit.init_amp_imags:
+                self._api_server.set_amplitudes(self.circuit.init_amp_reals, self.circuit.init_amp_imags)
 
         if len(cmds) == 0 and (not final):
             return

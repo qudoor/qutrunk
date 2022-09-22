@@ -6,6 +6,9 @@ service QuSproutServer {
     //qubit初始化
     qusproutdata.InitQubitsResp initQubits(1:qusproutdata.InitQubitsReq req)
 
+    //设置振幅
+    qusproutdata.SetAmplitudesResp setAmplitudes(1:qusproutdata.SetAmplitudesReq req)
+
     //发送任务
     qusproutdata.SendCircuitCmdResp sendCircuitCmd(1:qusproutdata.SendCircuitCmdReq req)
 

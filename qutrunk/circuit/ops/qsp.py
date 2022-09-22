@@ -1,5 +1,6 @@
 """Quantum state preparation Operator."""
 
+import cmath
 from typing import Union
 
 from qutrunk.exceptions import QuTrunkError
@@ -39,7 +40,7 @@ class QSP(Operator):
             return True
 
         if self.state == "AMP":
-            if 0 <= len(self.classicvector) < 2 ** len(qureg):
+            if 0 <= len(self.classicvector) <= 2 ** len(qureg):
                 return True
 
         if isinstance(self.state, str):
@@ -84,9 +85,9 @@ class QSP(Operator):
 
         listsum = sum(self.classicvector)
         for element in self.classicvector:
-            normalized_element = complex(element / listsum)
-            qureg.circuit.init_amp_real.append(normalized_element.real)
-            qureg.circuit.init_amp_imag.append(normalized_element.imag)
+            normalized_element = cmath.sqrt(complex(element / listsum))
+            qureg.circuit.init_amp_reals.append(normalized_element.real)
+            qureg.circuit.init_amp_imags.append(normalized_element.imag)
 
     def _process_plus_state(self, qureg: Qureg):
         """Process plus state."""

@@ -1227,13 +1227,7 @@ void release() {
 
 void set_amplitudes(const std::vector<double>& reals, const std::vector<double>& imags)
 {
-    auto temp_reals = make_unique<double[]>(reals.size());
-    copy(reals.begin(), reals.end(), temp_reals.get());
-
-    auto temp_imags = make_unique<double[]>(imags.size());
-    copy(imags.begin(), imags.end(), temp_imags.get());
-
-    setAmps(g_qureg, 0, temp_reals, temp_imags, len(reals));
+    setAmps(g_qureg, 0, (double*)reals.data(), (double*)imags.data(), reals.size());
 }
 
 // todo: 直接传cmd
@@ -1461,7 +1455,7 @@ PYBIND11_MODULE(simulator, m) {
     m.doc() = "simulator plugin"; // optional module docstring
 
     m.def("init", &init, "init sim envirement", py::arg("qubits"), py::arg("showquantumgate"));
-    m.def("set_amplitudes", &set_amplitudes, "set initial amplitudes", py::arg("reals"), py::arg("imags"));
+    m.def("set_amplitudes", &set_amplitudes, "set_amplitudes", py::arg("reals"), py::arg("imags"));
     // m.def("release", &release, "release resource");
     // m.def("execCmd", &execCmd, "execute circuit", py::arg("gate"), py::arg("targets"), py::arg("controls"), py::arg("rotation"), py::arg("desc"));
     m.def("getProbOfAmp", &getProbOfAmp, "getProbOfAmp", py::arg("index"));

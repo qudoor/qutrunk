@@ -87,6 +87,23 @@ struct InitQubitsResp {
     1: required ecode.BaseCode base
 }
 
+//设置振幅
+struct SetAmplitudesReq {
+    //任务id
+    1: required string id
+
+    //振幅实部
+    2: required list<double> reals
+
+    //振幅虚部
+    3: required list<double> imags
+}
+
+struct SetAmplitudesResp {
+    //返回码
+    1: required ecode.BaseCode base
+}
+
 //发送任务
 struct SendCircuitCmdReq {
     //任务id
