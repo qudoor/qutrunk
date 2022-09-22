@@ -1,11 +1,9 @@
 ## QuTrunk
 
 [![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://developer.queco.cn/qutrunk_api/)
-[![Release](https://img.shields.io/badge/release-v0.1.9-blue.svg)](https://github.com/PaddlePaddle/Paddle/releases)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/Angel-ML/angel/archive/refs/heads/branch-3.2.0.zip)
+[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/queco-quantum/qutrunk/archive/refs/heads/main.zip)
 
-[English](./README.md) | 简体中文
 
 ### **概述**
 ---
@@ -186,7 +184,7 @@ qutrunk.run_check()
   ```
 
 ### **量子可视化编程**  
-
+---
 QuBranch是由启科量子基于vscode开发的量子编程集成开发环境。  
 QuTrunk与QuBranch相互配合可以实现量子可视化编程，
 具体步骤参见[量子可视化编程](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
@@ -197,8 +195,8 @@ QuTrunk与QuBranch相互配合可以实现量子可视化编程，
 * [QuTrunk API](http://developer.queco.cn/qutrunk_api/)
 
 
-## 如何参与开发
-
+### **如何参与开发**
+---
 1. 阅读源代码，了解我们当前的开发方向
 2. 找到自己感兴趣的功能或模块
 3. 进行开发，开发完成后自测功能是否正确
