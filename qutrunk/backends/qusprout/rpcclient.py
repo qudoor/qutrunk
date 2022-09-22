@@ -14,7 +14,7 @@ PARENT_DIR = path.dirname(__file__)
 # open in thriftpy2 doesn't support encoding, replace open with default encoding utf8
 # refer to issue https://github.com/Thriftpy/thriftpy2/issues/172
 # and pull request https://github.com/Thriftpy/thriftpy2/pull/173
-parser.open = partial(open, encoding='utf8')
+parser.open = partial(open, encoding="utf8")
 
 qusprout = thriftpy2.load(path.join(PARENT_DIR, "idl/qusprout.thrift"))
 qusproutdata = thriftpy2.load(path.join(PARENT_DIR, "idl/qusproutdata.thrift"))
@@ -32,10 +32,12 @@ class QuSproutApiServer:
         port: port, default: 9090.
     """
 
-    def __init__(self, ip='localhost', port=9090):
+    def __init__(self, ip="localhost", port=9090):
         proto_fac = TBinaryProtocolFactory()
         proto_fac = TMultiplexedProtocolFactory(proto_fac, "QuSproutServer")
-        self._client = make_client(qusprout.QuSproutServer, ip, port, proto_factory=proto_fac)
+        self._client = make_client(
+            qusprout.QuSproutServer, ip, port, proto_factory=proto_fac
+        )
         self._taskid = uuid.uuid4().hex
 
     def close(self):
@@ -151,8 +153,7 @@ class QuSproutApiServer:
 
     @timefn
     def cancel_cmd(self):
-        """Cancel current job.
-        """
+        """Cancel current job."""
         req = qusproutdata.CancelCmdReq(self._taskid)
         return self._client.cancelCmd(req)
 
@@ -199,6 +200,8 @@ class QuSproutApiServer:
         Returns:
             the expected value of a sum of products of Pauli operators.
         """
-        req = qusproutdata.GetExpecPauliSumReq(self._taskid, oper_type_list, term_coeff_list)
+        req = qusproutdata.GetExpecPauliSumReq(
+            self._taskid, oper_type_list, term_coeff_list
+        )
         res = self._client.getExpecPauliSum(req)
         return res.expect

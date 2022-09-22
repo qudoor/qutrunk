@@ -58,7 +58,7 @@ class Simulator:
             num_qubits: number of qubits
         """
         self.qubits = num_qubits
-        num_amps = 2 ** num_qubits
+        num_amps = 2**num_qubits
         self.total_num_amps = num_amps
         self.real = [0] * num_amps
         self.imag = [0] * num_amps
@@ -111,7 +111,7 @@ class Simulator:
         Args:
             target: target qubit.
         """
-        size_half_block = 2 ** target
+        size_half_block = 2**target
         size_block = size_half_block * 2
         num_task = self.total_num_amps // 2
 
@@ -220,7 +220,7 @@ class Simulator:
     def control_not(self, ctrl, target):
         """Control not gate"""
         num_task = self.total_num_amps // 2
-        size_half_block = 2 ** target
+        size_half_block = 2**target
         size_block = size_half_block * 2
 
         for this_task in range(num_task):
@@ -269,12 +269,14 @@ class Simulator:
             self.imag[ind10] = im01
 
     def cswap(self, control_bit, target_bit0, targetbi_bit1, ureal, uimage):
-        self.controlled_two_qubit_unitary(control_bit, target_bit0, targetbi_bit1, ureal, uimage)
+        self.controlled_two_qubit_unitary(
+            control_bit, target_bit0, targetbi_bit1, ureal, uimage
+        )
 
     def cy(self, control_bit, target_bit):
         conj_fac = 1
         num_task = self.total_num_amps >> 1
-        size_half_block = 2 ** target_bit
+        size_half_block = 2**target_bit
         size_block = size_half_block * 2
         for this_task in range(num_task):
             this_block = this_task // size_half_block
@@ -311,7 +313,7 @@ class Simulator:
 
     def unitary(self, target_bit, ureal, uimag):
         num_task = self.total_num_amps >> 1
-        size_half_block = 2 ** target_bit
+        size_half_block = 2**target_bit
         size_block = size_half_block * 2
 
         for this_task in range(num_task):
@@ -327,29 +329,29 @@ class Simulator:
             state_imag_lo = self.imag[index_lo]
 
             self.real[index_up] = (
-                    ureal[0][0] * state_real_up
-                    - uimag[0][0] * state_imag_up
-                    + ureal[0][1] * state_real_lo
-                    - uimag[0][1] * state_imag_lo
+                ureal[0][0] * state_real_up
+                - uimag[0][0] * state_imag_up
+                + ureal[0][1] * state_real_lo
+                - uimag[0][1] * state_imag_lo
             )
             self.imag[index_up] = (
-                    ureal[0][0] * state_imag_up
-                    + uimag[0][0] * state_real_up
-                    + ureal[0][1] * state_imag_lo
-                    + uimag[0][1] * state_real_lo
+                ureal[0][0] * state_imag_up
+                + uimag[0][0] * state_real_up
+                + ureal[0][1] * state_imag_lo
+                + uimag[0][1] * state_real_lo
             )
 
             self.real[index_lo] = (
-                    ureal[1][0] * state_real_up
-                    - uimag[1][0] * state_imag_up
-                    + ureal[1][1] * state_real_lo
-                    - uimag[1][1] * state_imag_lo
+                ureal[1][0] * state_real_up
+                - uimag[1][0] * state_imag_up
+                + ureal[1][1] * state_real_lo
+                - uimag[1][1] * state_imag_lo
             )
             self.imag[index_lo] = (
-                    ureal[1][0] * state_imag_up
-                    + uimag[1][0] * state_real_up
-                    + ureal[1][1] * state_imag_lo
-                    + uimag[1][1] * state_real_lo
+                ureal[1][0] * state_imag_up
+                + uimag[1][0] * state_real_up
+                + ureal[1][1] * state_imag_lo
+                + uimag[1][1] * state_real_lo
             )
 
     def crx(self, control_bit, target_bit, angle):
@@ -378,7 +380,7 @@ class Simulator:
         beta_imag = -math.sin(angle / 2.0) * unit_vec[0]
 
         num_task = self.total_num_amps >> 1
-        size_half_block = 2 ** target_bit
+        size_half_block = 2**target_bit
         size_block = size_half_block * 2
         for this_task in range(num_task):
             this_block = this_task // size_half_block
@@ -395,29 +397,29 @@ class Simulator:
                 state_imag_lo = self.imag[index_lo]
 
                 self.real[index_up] = (
-                        alpha_real * state_real_up
-                        - alpha_imag * state_imag_up
-                        - beta_real * state_real_lo
-                        - beta_imag * state_imag_lo
+                    alpha_real * state_real_up
+                    - alpha_imag * state_imag_up
+                    - beta_real * state_real_lo
+                    - beta_imag * state_imag_lo
                 )
                 self.imag[index_up] = (
-                        alpha_real * state_imag_up
-                        + alpha_imag * state_real_up
-                        - beta_real * state_imag_lo
-                        + beta_imag * state_real_lo
+                    alpha_real * state_imag_up
+                    + alpha_imag * state_real_up
+                    - beta_real * state_imag_lo
+                    + beta_imag * state_real_lo
                 )
 
                 self.real[index_lo] = (
-                        beta_real * state_real_up
-                        - beta_imag * state_imag_up
-                        + alpha_real * state_real_lo
-                        + alpha_imag * state_imag_lo
+                    beta_real * state_real_up
+                    - beta_imag * state_imag_up
+                    + alpha_real * state_real_lo
+                    + alpha_imag * state_imag_lo
                 )
                 self.imag[index_lo] = (
-                        beta_real * state_imag_up
-                        + beta_imag * state_real_up
-                        + alpha_real * state_imag_lo
-                        - alpha_imag * state_real_lo
+                    beta_real * state_imag_up
+                    + beta_imag * state_real_up
+                    + alpha_real * state_imag_lo
+                    - alpha_imag * state_real_lo
                 )
 
     def rotate_around_axis(self, target_bit, angle, unit_axis):
@@ -434,7 +436,7 @@ class Simulator:
         beta_imag = -math.sin(angle / 2.0) * unit_vec[0]
 
         num_task = self.total_num_amps >> 1
-        size_half_block = 2 ** target_bit
+        size_half_block = 2**target_bit
         size_block = size_half_block * 2
         for this_task in range(num_task):
             this_block = this_task // size_half_block
@@ -449,29 +451,29 @@ class Simulator:
             state_imag_lo = self.imag[index_lo]
 
             self.real[index_up] = (
-                    alpha_real * state_real_up
-                    - alpha_imag * state_imag_up
-                    - beta_real * state_real_lo
-                    - beta_imag * state_imag_lo
+                alpha_real * state_real_up
+                - alpha_imag * state_imag_up
+                - beta_real * state_real_lo
+                - beta_imag * state_imag_lo
             )
             self.imag[index_up] = (
-                    alpha_real * state_imag_up
-                    + alpha_imag * state_real_up
-                    - beta_real * state_imag_lo
-                    + beta_imag * state_real_lo
+                alpha_real * state_imag_up
+                + alpha_imag * state_real_up
+                - beta_real * state_imag_lo
+                + beta_imag * state_real_lo
             )
 
             self.real[index_lo] = (
-                    beta_real * state_real_up
-                    - beta_imag * state_imag_up
-                    + alpha_real * state_real_lo
-                    + alpha_imag * state_imag_lo
+                beta_real * state_real_up
+                - beta_imag * state_imag_up
+                + alpha_real * state_real_lo
+                + alpha_imag * state_imag_lo
             )
             self.imag[index_lo] = (
-                    beta_real * state_imag_up
-                    + beta_imag * state_real_up
-                    + alpha_real * state_imag_lo
-                    - alpha_imag * state_real_lo
+                beta_real * state_imag_up
+                + beta_imag * state_real_up
+                + alpha_real * state_imag_lo
+                - alpha_imag * state_real_lo
             )
 
     def x1(self, target, ureal, uimag):
@@ -488,10 +490,10 @@ class Simulator:
 
     def sqrtxdg(self, target, ureal, uimag):
         self.apply_matrix2(target, ureal, uimag)
-    
+
     def csqrtx(self, control_bit, target_bit, ureal, uimage):
         self.controlled_unitary(control_bit, target_bit, ureal, uimage)
-        
+
     def cu1(self, target_bit0, target_bit1, ureal, uimag):
         self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
 
@@ -516,7 +518,7 @@ class Simulator:
 
     def apply_matrix2(self, target, ureal, uimag):
         num_task = self.total_num_amps // 2
-        size_half_block = 2 ** target
+        size_half_block = 2**target
         size_block = size_half_block * 2
         for this_task in range(num_task):
             this_block = this_task // size_half_block
@@ -530,28 +532,28 @@ class Simulator:
             state_imag_lo = self.imag[index_lo]
 
             self.real[index_up] = (
-                    ureal[0][0] * state_real_up
-                    - uimag[0][0] * state_imag_up
-                    + ureal[0][1] * state_real_lo
-                    - uimag[0][1] * state_imag_lo
+                ureal[0][0] * state_real_up
+                - uimag[0][0] * state_imag_up
+                + ureal[0][1] * state_real_lo
+                - uimag[0][1] * state_imag_lo
             )
             self.imag[index_up] = (
-                    ureal[0][0] * state_imag_up
-                    + uimag[0][0] * state_real_up
-                    + ureal[0][1] * state_imag_lo
-                    + uimag[0][1] * state_real_lo
+                ureal[0][0] * state_imag_up
+                + uimag[0][0] * state_real_up
+                + ureal[0][1] * state_imag_lo
+                + uimag[0][1] * state_real_lo
             )
             self.real[index_lo] = (
-                    ureal[1][0] * state_real_up
-                    - uimag[1][0] * state_imag_up
-                    + ureal[1][1] * state_real_lo
-                    - uimag[1][1] * state_imag_lo
+                ureal[1][0] * state_real_up
+                - uimag[1][0] * state_imag_up
+                + ureal[1][1] * state_real_lo
+                - uimag[1][1] * state_imag_lo
             )
             self.imag[index_lo] = (
-                    ureal[1][0] * state_imag_up
-                    + uimag[1][0] * state_real_up
-                    + ureal[1][1] * state_imag_lo
-                    + uimag[1][1] * state_real_lo
+                ureal[1][0] * state_imag_up
+                + uimag[1][0] * state_real_up
+                + ureal[1][1] * state_imag_lo
+                + uimag[1][1] * state_real_lo
             )
 
     def apply_matrix4(self, target0, target1, ureal, uimag):
@@ -581,87 +583,87 @@ class Simulator:
 
             # apply u * {amp00, amp01, amp10, amp11}
             self.real[ind00] = (
-                    ureal[0][0] * re00
-                    - uimag[0][0] * im00
-                    + ureal[0][1] * re01
-                    - uimag[0][1] * im01
-                    + ureal[0][2] * re10
-                    - uimag[0][2] * im10
-                    + ureal[0][3] * re11
-                    - uimag[0][3] * im11
+                ureal[0][0] * re00
+                - uimag[0][0] * im00
+                + ureal[0][1] * re01
+                - uimag[0][1] * im01
+                + ureal[0][2] * re10
+                - uimag[0][2] * im10
+                + ureal[0][3] * re11
+                - uimag[0][3] * im11
             )
             self.imag[ind00] = (
-                    uimag[0][0] * re00
-                    + ureal[0][0] * im00
-                    + uimag[0][1] * re01
-                    + ureal[0][1] * im01
-                    + uimag[0][2] * re10
-                    + ureal[0][2] * im10
-                    + uimag[0][3] * re11
-                    + ureal[0][3] * im11
+                uimag[0][0] * re00
+                + ureal[0][0] * im00
+                + uimag[0][1] * re01
+                + ureal[0][1] * im01
+                + uimag[0][2] * re10
+                + ureal[0][2] * im10
+                + uimag[0][3] * re11
+                + ureal[0][3] * im11
             )
 
             self.real[ind01] = (
-                    ureal[1][0] * re00
-                    - uimag[1][0] * im00
-                    + ureal[1][1] * re01
-                    - uimag[1][1] * im01
-                    + ureal[1][2] * re10
-                    - uimag[1][2] * im10
-                    + ureal[1][3] * re11
-                    - uimag[1][3] * im11
+                ureal[1][0] * re00
+                - uimag[1][0] * im00
+                + ureal[1][1] * re01
+                - uimag[1][1] * im01
+                + ureal[1][2] * re10
+                - uimag[1][2] * im10
+                + ureal[1][3] * re11
+                - uimag[1][3] * im11
             )
             self.imag[ind01] = (
-                    uimag[1][0] * re00
-                    + ureal[1][0] * im00
-                    + uimag[1][1] * re01
-                    + ureal[1][1] * im01
-                    + uimag[1][2] * re10
-                    + ureal[1][2] * im10
-                    + uimag[1][3] * re11
-                    + ureal[1][3] * im11
+                uimag[1][0] * re00
+                + ureal[1][0] * im00
+                + uimag[1][1] * re01
+                + ureal[1][1] * im01
+                + uimag[1][2] * re10
+                + ureal[1][2] * im10
+                + uimag[1][3] * re11
+                + ureal[1][3] * im11
             )
 
             self.real[ind10] = (
-                    ureal[2][0] * re00
-                    - uimag[2][0] * im00
-                    + ureal[2][1] * re01
-                    - uimag[2][1] * im01
-                    + ureal[2][2] * re10
-                    - uimag[2][2] * im10
-                    + ureal[2][3] * re11
-                    - uimag[2][3] * im11
+                ureal[2][0] * re00
+                - uimag[2][0] * im00
+                + ureal[2][1] * re01
+                - uimag[2][1] * im01
+                + ureal[2][2] * re10
+                - uimag[2][2] * im10
+                + ureal[2][3] * re11
+                - uimag[2][3] * im11
             )
             self.imag[ind10] = (
-                    uimag[2][0] * re00
-                    + ureal[2][0] * im00
-                    + uimag[2][1] * re01
-                    + ureal[2][1] * im01
-                    + uimag[2][2] * re10
-                    + ureal[2][2] * im10
-                    + uimag[2][3] * re11
-                    + ureal[2][3] * im11
+                uimag[2][0] * re00
+                + ureal[2][0] * im00
+                + uimag[2][1] * re01
+                + ureal[2][1] * im01
+                + uimag[2][2] * re10
+                + ureal[2][2] * im10
+                + uimag[2][3] * re11
+                + ureal[2][3] * im11
             )
 
             self.real[ind11] = (
-                    ureal[3][0] * re00
-                    - uimag[3][0] * im00
-                    + ureal[3][1] * re01
-                    - uimag[3][1] * im01
-                    + ureal[3][2] * re10
-                    - uimag[3][2] * im10
-                    + ureal[3][3] * re11
-                    - uimag[3][3] * im11
+                ureal[3][0] * re00
+                - uimag[3][0] * im00
+                + ureal[3][1] * re01
+                - uimag[3][1] * im01
+                + ureal[3][2] * re10
+                - uimag[3][2] * im10
+                + ureal[3][3] * re11
+                - uimag[3][3] * im11
             )
             self.imag[ind11] = (
-                    uimag[3][0] * re00
-                    + ureal[3][0] * im00
-                    + uimag[3][1] * re01
-                    + ureal[3][1] * im01
-                    + uimag[3][2] * re10
-                    + ureal[3][2] * im10
-                    + uimag[3][3] * re11
-                    + ureal[3][3] * im11
+                uimag[3][0] * re00
+                + ureal[3][0] * im00
+                + uimag[3][1] * re01
+                + ureal[3][1] * im01
+                + uimag[3][2] * re10
+                + ureal[3][2] * im10
+                + uimag[3][3] * re11
+                + ureal[3][3] * im11
             )
 
     def controlled_unitary(self, control_bit, target_bit, ureal, uimag):
@@ -675,7 +677,7 @@ class Simulator:
             index_lo = index_up + size_half_block
 
             control_bit = self.extract_bit(control_bit, index_up)
-            if (control_bit):
+            if control_bit:
                 # store current state vector values in temp variables.
                 state_real_up = self.real[index_up]
                 state_imag_up = self.imag[index_up]
@@ -683,15 +685,31 @@ class Simulator:
                 state_real_lo = self.real[index_lo]
                 state_imag_lo = self.imag[index_lo]
 
-                self.real[index_up] = ureal[0][0]*state_real_up - uimag[0][0]*state_imag_up \
-                    + ureal[0][1]*state_real_lo - uimag[0][1]*state_imag_lo
-                self.imag[index_up] = ureal[0][0]*state_imag_up + uimag[0][0]*state_real_up \
-                    + ureal[0][1]*state_imag_lo + uimag[0][1]*state_real_lo
+                self.real[index_up] = (
+                    ureal[0][0] * state_real_up
+                    - uimag[0][0] * state_imag_up
+                    + ureal[0][1] * state_real_lo
+                    - uimag[0][1] * state_imag_lo
+                )
+                self.imag[index_up] = (
+                    ureal[0][0] * state_imag_up
+                    + uimag[0][0] * state_real_up
+                    + ureal[0][1] * state_imag_lo
+                    + uimag[0][1] * state_real_lo
+                )
 
-                self.real[index_lo] = ureal[1][0]*state_real_up  - uimag[1][0]*state_imag_up \
-                    + ureal[1][1]*state_real_lo  -  uimag[1][1]*state_imag_lo
-                self.imag[index_lo] = ureal[1][0]*state_imag_up + uimag[1][0]*state_real_up \
-                    + ureal[1][1]*state_imag_lo + uimag[1][1]*state_real_lo 
+                self.real[index_lo] = (
+                    ureal[1][0] * state_real_up
+                    - uimag[1][0] * state_imag_up
+                    + ureal[1][1] * state_real_lo
+                    - uimag[1][1] * state_imag_lo
+                )
+                self.imag[index_lo] = (
+                    ureal[1][0] * state_imag_up
+                    + uimag[1][0] * state_real_up
+                    + ureal[1][1] * state_imag_lo
+                    + uimag[1][1] * state_real_lo
+                )
 
     def insert_two_zero_bits(self, number, bit1, bit2):
         small = bit1 if bit1 < bit2 else bit2
@@ -707,9 +725,11 @@ class Simulator:
         return number ^ (1 << bit_ind)
 
     def extract_bit(self, ctrl, index):
-        return (index & (2 ** ctrl)) // (2 ** ctrl)
+        return (index & (2**ctrl)) // (2**ctrl)
 
-    def multi_controlled_multi_qubit_not(self, control_bits, num_control_bits, target_bits, num_target_bits):
+    def multi_controlled_multi_qubit_not(
+        self, control_bits, num_control_bits, target_bits, num_target_bits
+    ):
         ctrl_mask = self.get_qubit_bit_mask(control_bits, num_control_bits)
         targ_mask = self.get_qubit_bit_mask(target_bits, num_target_bits)
 
@@ -727,13 +747,13 @@ class Simulator:
             global_ind = amp_ind
 
             # // modify amplitude only if control qubits are 1 for this state
-            if (ctrl_mask and ((ctrl_mask & global_ind) != ctrl_mask)):
+            if ctrl_mask and ((ctrl_mask & global_ind) != ctrl_mask):
                 continue
 
             mate_ind = amp_ind ^ targ_mask
 
             # // if the mate is behind, it was already processed
-            if (mate_ind < amp_ind):
+            if mate_ind < amp_ind:
                 continue
 
             mate_re = self.real[mate_ind]
@@ -745,73 +765,118 @@ class Simulator:
             self.real[amp_ind] = mate_re
             self.imag[amp_ind] = mate_im
 
-    def controlled_two_qubit_unitary(self, control_bit, target_bit0, targetbi_bit1, ureal, uimag):
+    def controlled_two_qubit_unitary(
+        self, control_bit, target_bit0, targetbi_bit1, ureal, uimag
+    ):
         num_task = self.total_num_amps >> 2
         for this_task in range(num_task):
             #  determine ind00 of |..0..0..>.
             ind00 = self.insert_two_zero_bits(this_task, target_bit0, targetbi_bit1)
-            
+
             #  skip amplitude if controls aren't in 1 state (overloaded for speed).
             this_global_ind00 = ind00
-            if (control_bit and ((control_bit & this_global_ind00) != control_bit)):
+            if control_bit and ((control_bit & this_global_ind00) != control_bit):
                 continue
-            
+
             #  inds of |..0..1..>, |..1..0..> and |..1..1..>.
             ind01 = self.flip_bit(ind00, target_bit0)
             ind10 = self.flip_bit(ind00, targetbi_bit1)
             ind11 = self.flip_bit(ind01, targetbi_bit1)
 
-            #  extract statevec amplitudes 
-            re00 = self.real[ind00]; im00 = self.imag[ind00]
-            re01 = self.real[ind01]; im01 = self.imag[ind01]
-            re10 = self.real[ind10]; im10 = self.imag[ind10]
-            re11 = self.real[ind11]; im11 = self.imag[ind11]
+            #  extract statevec amplitudes
+            re00 = self.real[ind00]
+            im00 = self.imag[ind00]
+            re01 = self.real[ind01]
+            im01 = self.imag[ind01]
+            re10 = self.real[ind10]
+            im10 = self.imag[ind10]
+            re11 = self.real[ind11]
+            im11 = self.imag[ind11]
 
             #  apply u * {amp00, amp01, amp10, amp11}.
-            self.real[ind00] = \
-                ureal[0][0]*re00 - uimag[0][0]*im00 +\
-                ureal[0][1]*re01 - uimag[0][1]*im01 +\
-                ureal[0][2]*re10 - uimag[0][2]*im10 +\
-                ureal[0][3]*re11 - uimag[0][3]*im11
-            self.imag[ind00] =\
-                uimag[0][0]*re00 + ureal[0][0]*im00 +\
-                uimag[0][1]*re01 + ureal[0][1]*im01 +\
-                uimag[0][2]*re10 + ureal[0][2]*im10 +\
-                uimag[0][3]*re11 + ureal[0][3]*im11
-                
-            self.real[ind01] = \
-                ureal[1][0]*re00 - uimag[1][0]*im00 +\
-                ureal[1][1]*re01 - uimag[1][1]*im01 +\
-                ureal[1][2]*re10 - uimag[1][2]*im10 +\
-                ureal[1][3]*re11 - uimag[1][3]*im11
-            self.imag[ind01] =\
-                uimag[1][0]*re00 + ureal[1][0]*im00 +\
-                uimag[1][1]*re01 + ureal[1][1]*im01 +\
-                uimag[1][2]*re10 + ureal[1][2]*im10 +\
-                uimag[1][3]*re11 + ureal[1][3]*im11
-                
-            self.real[ind10] = \
-                ureal[2][0]*re00 - uimag[2][0]*im00 +\
-                ureal[2][1]*re01 - uimag[2][1]*im01 +\
-                ureal[2][2]*re10 - uimag[2][2]*im10 +\
-                ureal[2][3]*re11 - uimag[2][3]*im11
-            self.imag[ind10] =\
-                uimag[2][0]*re00 + ureal[2][0]*im00 +\
-                uimag[2][1]*re01 + ureal[2][1]*im01 +\
-                uimag[2][2]*re10 + ureal[2][2]*im10 +\
-                uimag[2][3]*re11 + ureal[2][3]*im11
-                
-            self.real[ind11] = \
-                ureal[3][0]*re00 - uimag[3][0]*im00 +\
-                ureal[3][1]*re01 - uimag[3][1]*im01 +\
-                ureal[3][2]*re10 - uimag[3][2]*im10 +\
-                ureal[3][3]*re11 - uimag[3][3]*im11
-            self.imag[ind11] =\
-                uimag[3][0]*re00 + ureal[3][0]*im00 +\
-                uimag[3][1]*re01 + ureal[3][1]*im01 +\
-                uimag[3][2]*re10 + ureal[3][2]*im10 +\
-                uimag[3][3]*re11 + ureal[3][3]*im11 
+            self.real[ind00] = (
+                ureal[0][0] * re00
+                - uimag[0][0] * im00
+                + ureal[0][1] * re01
+                - uimag[0][1] * im01
+                + ureal[0][2] * re10
+                - uimag[0][2] * im10
+                + ureal[0][3] * re11
+                - uimag[0][3] * im11
+            )
+            self.imag[ind00] = (
+                uimag[0][0] * re00
+                + ureal[0][0] * im00
+                + uimag[0][1] * re01
+                + ureal[0][1] * im01
+                + uimag[0][2] * re10
+                + ureal[0][2] * im10
+                + uimag[0][3] * re11
+                + ureal[0][3] * im11
+            )
 
+            self.real[ind01] = (
+                ureal[1][0] * re00
+                - uimag[1][0] * im00
+                + ureal[1][1] * re01
+                - uimag[1][1] * im01
+                + ureal[1][2] * re10
+                - uimag[1][2] * im10
+                + ureal[1][3] * re11
+                - uimag[1][3] * im11
+            )
+            self.imag[ind01] = (
+                uimag[1][0] * re00
+                + ureal[1][0] * im00
+                + uimag[1][1] * re01
+                + ureal[1][1] * im01
+                + uimag[1][2] * re10
+                + ureal[1][2] * im10
+                + uimag[1][3] * re11
+                + ureal[1][3] * im11
+            )
+
+            self.real[ind10] = (
+                ureal[2][0] * re00
+                - uimag[2][0] * im00
+                + ureal[2][1] * re01
+                - uimag[2][1] * im01
+                + ureal[2][2] * re10
+                - uimag[2][2] * im10
+                + ureal[2][3] * re11
+                - uimag[2][3] * im11
+            )
+            self.imag[ind10] = (
+                uimag[2][0] * re00
+                + ureal[2][0] * im00
+                + uimag[2][1] * re01
+                + ureal[2][1] * im01
+                + uimag[2][2] * re10
+                + ureal[2][2] * im10
+                + uimag[2][3] * re11
+                + ureal[2][3] * im11
+            )
+
+            self.real[ind11] = (
+                ureal[3][0] * re00
+                - uimag[3][0] * im00
+                + ureal[3][1] * re01
+                - uimag[3][1] * im01
+                + ureal[3][2] * re10
+                - uimag[3][2] * im10
+                + ureal[3][3] * re11
+                - uimag[3][3] * im11
+            )
+            self.imag[ind11] = (
+                uimag[3][0] * re00
+                + ureal[3][0] * im00
+                + uimag[3][1] * re01
+                + ureal[3][1] * im01
+                + uimag[3][2] * re10
+                + ureal[3][2] * im10
+                + uimag[3][3] * re11
+                + ureal[3][3] * im11
+            )
 
     def measure(self, target):
         zero_prob = self.calc_prob_of_outcome(target, 0)
@@ -833,7 +898,7 @@ class Simulator:
 
     def collapse_to_know_prob_outcome(self, target, outcome, outcome_prob):
         num_task = self.total_num_amps // 2
-        size_half_block = 2 ** target
+        size_half_block = 2**target
         size_block = 2 * size_half_block
 
         renorm = 1 / math.sqrt(outcome_prob)
@@ -856,10 +921,10 @@ class Simulator:
                 self.imag[index] = 0
 
                 self.real[index + size_half_block] = (
-                        self.real[index + size_half_block] * renorm
+                    self.real[index + size_half_block] * renorm
                 )
                 self.imag[index + size_half_block] = (
-                        self.imag[index + size_half_block] * renorm
+                    self.imag[index + size_half_block] * renorm
                 )
 
     def calc_prob_of_outcome(self, target, outcome):
@@ -870,7 +935,7 @@ class Simulator:
 
     def find_prob_of_zero(self, target):
         num_task = self.total_num_amps // 2
-        size_half_block = 2 ** target
+        size_half_block = 2**target
         size_block = size_half_block * 2
         total_prob = 0.0
 
@@ -879,8 +944,8 @@ class Simulator:
             index = this_block * size_block + this_task % size_half_block
 
             total_prob += (
-                    self.real[index] * self.real[index]
-                    + self.imag[index] * self.imag[index]
+                self.real[index] * self.real[index]
+                + self.imag[index] * self.imag[index]
             )
 
         return total_prob
@@ -911,7 +976,7 @@ class Simulator:
             outcome: the qubit measure result(0 or 1)
 
         Returns:
-            the probability of target qubit 
+            the probability of target qubit
         """
         outcome_prob = self.find_prob_of_zero(qubit)
         if outcome == 1:
@@ -929,11 +994,11 @@ class Simulator:
             An array contains probability of target qubits
         """
         num_outcome_probs = len(qubits)
-        outcome_probs = [0] * (2 ** num_outcome_probs)
+        outcome_probs = [0] * (2**num_outcome_probs)
         for i in range(self.total_num_amps):
             outcome_ind = 0
             for q in range(num_outcome_probs):
-                outcome_ind += self.extract_bit(qubits[q], i) * (2 ** q)
+                outcome_ind += self.extract_bit(qubits[q], i) * (2**q)
 
             real = self.real[i]
             imag = self.imag[i]
@@ -956,17 +1021,17 @@ class Simulator:
         return state_list
 
     def apply_param_named_phase(
-            self,
-            qubits,
-            num_qubits_per_reg,
-            num_regs,
-            encoding,
-            phase_func_name,
-            params,
-            override_inds,
-            override_phases,
-            num_overrides,
-            conj,
+        self,
+        qubits,
+        num_qubits_per_reg,
+        num_regs,
+        encoding,
+        phase_func_name,
+        params,
+        override_inds,
+        override_phases,
+        num_overrides,
+        conj,
     ):
         i = 0
         max_num_regs_apply_arbitrary_phase = 100
@@ -977,11 +1042,15 @@ class Simulator:
                 phase_inds[r] = 0
                 if encoding == BitEncoding.UNSIGNED:
                     for q in range(num_qubits_per_reg[r]):
-                        phase_inds[r] += (2 ** q) * self.extract_bit(qubits[flat_ind], index)
+                        phase_inds[r] += (2**q) * self.extract_bit(
+                            qubits[flat_ind], index
+                        )
                         flat_ind += 1
                 elif encoding == BitEncoding.TWOS_COMPLEMENT:
                     for q in range(num_qubits_per_reg[r] - 1):
-                        phase_inds[r] += (2 ** q) * self.extract_bit(qubits[flat_ind], index)
+                        phase_inds[r] += (2**q) * self.extract_bit(
+                            qubits[flat_ind], index
+                        )
                         flat_ind += 1
                     if self.extract_bit(qubits[flat_ind], index) == 1:
                         phase_inds[r] -= 2 ** (num_qubits_per_reg[r] - 1)
@@ -1001,17 +1070,17 @@ class Simulator:
                 phase = override_phases[i]
             else:
                 if (
-                        phase_func_name == PhaseFunc.NORM
-                        or phase_func_name == PhaseFunc.INVERSE_NORM
-                        or phase_func_name == PhaseFunc.SCALED_NORM
-                        or phase_func_name == PhaseFunc.SCALED_INVERSE_NORM
-                        or phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_NORM
+                    phase_func_name == PhaseFunc.NORM
+                    or phase_func_name == PhaseFunc.INVERSE_NORM
+                    or phase_func_name == PhaseFunc.SCALED_NORM
+                    or phase_func_name == PhaseFunc.SCALED_INVERSE_NORM
+                    or phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_NORM
                 ):
                     norm = 0
                     if phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_NORM:
                         for r in range(num_regs):
                             norm += (phase_inds[r] - params[2 + r]) * (
-                                    phase_inds[r] - params[2 + r]
+                                phase_inds[r] - params[2 + r]
                             )
                     else:
                         for r in range(num_regs):
@@ -1028,18 +1097,18 @@ class Simulator:
                     elif phase_func_name == PhaseFunc.SCALED_NORM:
                         phase = params[0] * norm
                     elif (
-                            phase_func_name == PhaseFunc.SCALED_INVERSE_NORM
-                            or phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_NORM
+                        phase_func_name == PhaseFunc.SCALED_INVERSE_NORM
+                        or phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_NORM
                     ):
                         if norm <= REAL_EPS:
                             phase = params[1]
                         else:
                             phase = params[0] // norm
                 elif (
-                        phase_func_name == PhaseFunc.PRODUCT
-                        or phase_func_name == PhaseFunc.INVERSE_PRODUCT
-                        or phase_func_name == PhaseFunc.SCALED_PRODUCT
-                        or phase_func_name == PhaseFunc.SCALED_INVERSE_PRODUCT
+                    phase_func_name == PhaseFunc.PRODUCT
+                    or phase_func_name == PhaseFunc.INVERSE_PRODUCT
+                    or phase_func_name == PhaseFunc.SCALED_PRODUCT
+                    or phase_func_name == PhaseFunc.SCALED_INVERSE_PRODUCT
                 ):
                     prod = 1
                     for r in range(num_regs):
@@ -1060,22 +1129,22 @@ class Simulator:
                         else:
                             phase = params[0] // prod
                 elif (
-                        phase_func_name == PhaseFunc.DISTANCE
-                        or phase_func_name == PhaseFunc.INVERSE_DISTANCE
-                        or phase_func_name == PhaseFunc.SCALED_DISTANCE
-                        or phase_func_name == PhaseFunc.SCALED_INVERSE_DISTANCE
-                        or phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_DISTANCE
+                    phase_func_name == PhaseFunc.DISTANCE
+                    or phase_func_name == PhaseFunc.INVERSE_DISTANCE
+                    or phase_func_name == PhaseFunc.SCALED_DISTANCE
+                    or phase_func_name == PhaseFunc.SCALED_INVERSE_DISTANCE
+                    or phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_DISTANCE
                 ):
                     dist = 0
                     if phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_DISTANCE:
                         for r in range(0, num_regs, 2):
                             dist += (
-                                            phase_inds[r] - phase_inds[r + 1] - params[2 + r / 2]
-                                    ) * (phase_inds[r] - phase_inds[r + 1] - params[2 + r / 2])
+                                phase_inds[r] - phase_inds[r + 1] - params[2 + r / 2]
+                            ) * (phase_inds[r] - phase_inds[r + 1] - params[2 + r / 2])
                     else:
                         for r in range(0, num_regs, 2):
                             dist += (phase_inds[r + 1] - phase_inds[r]) * (
-                                    phase_inds[r + 1] - phase_inds[r]
+                                phase_inds[r + 1] - phase_inds[r]
                             )
                     dist = math.sqrt(dist)
 
@@ -1089,8 +1158,8 @@ class Simulator:
                     elif phase_func_name == PhaseFunc.SCALED_DISTANCE:
                         phase = params[0] * dist
                     elif (
-                            phase_func_name == PhaseFunc.SCALED_INVERSE_DISTANCE
-                            or phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_DISTANCE
+                        phase_func_name == PhaseFunc.SCALED_INVERSE_DISTANCE
+                        or phase_func_name == PhaseFunc.SCALED_INVERSE_SHIFTED_DISTANCE
                     ):
                         if dist <= REAL_EPS:
                             phase = params[1]
@@ -1161,7 +1230,7 @@ class Simulator:
             for i in range(q + 1):
                 regs[i] = qubits[i]
 
-            params = [math.pi / (2 ** q)]
+            params = [math.pi / (2**q)]
 
             self.apply_param_named_phase(
                 regs,
@@ -1194,7 +1263,7 @@ class Simulator:
     def paulix_local(self, work_real, work_imag, target_qubit):
         """pauli-X"""
         # jpaulix_local(target_qubit, self.total_num_amps, List(work_real), List(work_imag))
-        size_half_block = 2 ** target_qubit
+        size_half_block = 2**target_qubit
         size_block = 2 * size_half_block
 
         num_task = self.total_num_amps // 2
@@ -1214,7 +1283,7 @@ class Simulator:
 
     def pauliy_local(self, work_real, work_imag, target_qubit, conj_fac):
         """pauli-Y"""
-        size_half_block = 2 ** target_qubit
+        size_half_block = 2**target_qubit
         size_block = 2 * size_half_block
 
         num_task = self.total_num_amps // 2

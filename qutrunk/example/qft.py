@@ -1,4 +1,5 @@
 """Quantum Fourier Transform examples."""
+
 import math
 
 from qutrunk.circuit import QCircuit

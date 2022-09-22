@@ -4,6 +4,7 @@ from qutrunk.backends.backend import Backend
 
 from qutrunk.tools.read_qubox import get_qulocalbox_setting
 
+
 class BackendLocalType(Enum):
     """Backend Local Type.
 
@@ -17,12 +18,16 @@ class BackendLocalType(Enum):
     PYTHON = 1
     UNKNOWN = 2
 
+
 try:
     from qutrunk.sim.local.local_cpp import BackendLocalCpp as BackendLocalImpl
+
     local_type = BackendLocalType.CPP
 except ImportError:
     from qutrunk.sim.local.local_python import BackendLocalPython as BackendLocalImpl
+
     local_type = BackendLocalType.PYTHON
+
 
 class BackendLocal(Backend):
     """
@@ -144,7 +149,7 @@ class BackendLocal(Backend):
     def get_all_state(self):
         """Get the current state vector of probability amplitudes for entire qubits.
 
-        Returns: 
+        Returns:
             Array contains all amplitudes of state vector
         """
         res, elapsed = self._local_impl.get_all_state()

@@ -18,9 +18,7 @@ import re
 from collections import OrderedDict
 
 from qutrunk.circuit import CReg, Qureg
-from qutrunk.circuit.gates import (
-    BasicGate, MeasureGate, BarrierGate, MCX
-)
+from qutrunk.circuit.gates import BasicGate, MeasureGate, BarrierGate, MCX
 from qutrunk.converters.mapping import qutrunk_standard_gate
 from qutrunk.dagcircuit import DAGCircuit
 from qutrunk.exceptions import QuTrunkError
@@ -84,7 +82,9 @@ class AstInterpreter:
             reg = self.dag.cregs[node.name]
         else:
             raise QuTrunkError(
-                "expected qreg or creg name:", "line=%s" % node.line, "file=%s" % node.file
+                "expected qreg or creg name:",
+                "line=%s" % node.line,
+                "file=%s" % node.file,
             )
 
         if node.type == "indexed_id":
@@ -100,7 +100,9 @@ class AstInterpreter:
                 if node.name in self.bit_stack[-1]:
                     return [self.bit_stack[-1][node.name]]
                 raise QuTrunkError(
-                    "expected local bit name:", "line=%s" % node.line, "file=%s" % node.file
+                    "expected local bit name:",
+                    "line=%s" % node.line,
+                    "file=%s" % node.file,
                 )
         return None
 
@@ -115,26 +117,28 @@ class AstInterpreter:
             args = self._process_node(node.arguments)
         else:
             args = []
-        bits = [self._process_bit_id(node_element) for node_element in node.bitlist.children]
+        bits = [
+            self._process_bit_id(node_element) for node_element in node.bitlist.children
+        ]
 
         if name in self.gates:
             self._arguments(name, bits, args)
         else:
             raise QuTrunkError(
-                "internal error undefined gate:", "line=%s" % node.line, "file=%s" % node.file
+                "internal error undefined gate:",
+                f"line={node.line}",
+                f"file={node.file}",
             )
 
     def _process_u(self, node):
-        """Process a U gate node.
-        """
+        """Process a U gate node."""
         args = self._process_node(node.arguments)
         bits = [self._process_bit_id(node.bitlist)]
 
         self._arguments("u", bits, args)
 
     def _arguments(self, name, bits, args):
-        """Gate arguments.
-        """
+        """Gate arguments."""
         gargs = self.gates[name]["args"]
         gbits = self.gates[name]["bits"]
 
@@ -143,7 +147,9 @@ class AstInterpreter:
             self.arg_stack.append({gargs[j]: args[j] for j in range(len(gargs))})
             # Only index into register arguments.
             element = [idx * x for x in [len(bits[j]) > 1 for j in range(len(bits))]]
-            self.bit_stack.append({gbits[j]: bits[j][element[j]] for j in range(len(gbits))})
+            self.bit_stack.append(
+                {gbits[j]: bits[j][element[j]] for j in range(len(gbits))}
+            )
             self._create_dag_op(
                 name,
                 [self.arg_stack[-1][s].sym() for s in gargs],
@@ -185,8 +191,11 @@ class AstInterpreter:
         id1 = self._process_bit_id(node.children[1])
         if not (len(id0) == len(id1) or len(id0) == 1 or len(id1) == 1):
             raise QuTrunkError(
-                "internal error: qreg size mismatch", "line=%s" % node.line, "file=%s" % node.file
+                "internal error: qreg size mismatch:",
+                f"line={node.line}",
+                f"file={node.file}",
             )
+
         maxidx = max([len(id0), len(id1)])
         for idx in range(maxidx):
             cx_gate = MCX()
@@ -203,8 +212,11 @@ class AstInterpreter:
         id1 = self._process_bit_id(node.children[1])
         if len(id0) != len(id1):
             raise QuTrunkError(
-                "internal error: reg size mismatch", "line=%s" % node.line, "file=%s" % node.file
+                "internal error: reg size mismatch:",
+                f"line={node.line}",
+                f"file={node.file}",
             )
+
         for idx, idy in zip(id0, id1):
             meas_gate = MeasureGate()
             meas_gate.name = "measure"
@@ -251,7 +263,9 @@ class AstInterpreter:
 
         elif node.type == "id_list":
             # We process id_list nodes when they are leaves of barriers.
-            return [self._process_bit_id(node_children) for node_children in node.children]
+            return [
+                self._process_bit_id(node_children) for node_children in node.children
+            ]
 
         elif node.type == "primary_list":
             # We should only be called for a barrier.
@@ -309,16 +323,15 @@ class AstInterpreter:
 
         else:
             raise QuTrunkError(
-                "internal error: undefined node type",
-                node.type,
-                "line=%s" % node.line,
-                "file=%s" % node.file,
+                "internal error: undefined node type:",
+                f"line={node.line}",
+                f"file={node.file}",
             )
+
         return None
 
     def _gate_rules_to_qutrunk_circuit(self, node, params):
-        """From a gate definition in qasm, to a QCircuit format.
-        """
+        """From a gate definition in qasm, to a QCircuit format."""
         rules = []
         qreg = Qureg(size=node["n_bits"])
         bit_args = {node["bits"][i]: q for i, q in enumerate(qreg)}
@@ -369,9 +382,11 @@ class AstInterpreter:
             op.name = name
             if not self.gates[name]["opaque"]:
                 # call a custom gate (otherwise, opaque)
-                op.definition = self._gate_rules_to_qutrunk_circuit(self.gates[name], params=params)
+                op.definition = self._gate_rules_to_qutrunk_circuit(
+                    self.gates[name], params=params
+                )
         else:
-            raise QuTrunkError("unknown operation for ast node name %s" % name)
+            raise QuTrunkError(f"unknown operation for ast node name {name}.")
         return op
 
 
@@ -389,14 +404,13 @@ def count_ctrl(name):
         cnt (int): Control bits count.
     """
     cnt = 0
-    multi_ctrl_reg = r'c(c|\d+)'
+    multi_ctrl_reg = r"c(c|\d+)"
     match = re.match(multi_ctrl_reg, name)
     if match:
         cnt_str = match.group(1)
-        if cnt_str == 'c':
+        if cnt_str == "c":
             cnt = 2
         else:
             cnt = int(cnt_str)
-        name = re.sub(multi_ctrl_reg, 'mc', name)
+        name = re.sub(multi_ctrl_reg, "mc", name)
     return name, cnt
-

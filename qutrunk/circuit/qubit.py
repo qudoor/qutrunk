@@ -2,7 +2,7 @@ from .bit import Bit
 
 
 class QuBit(Bit):
-    """ A quantum bit.
+    """A quantum bit.
 
     Args:
         circuit: A quantum circuit.

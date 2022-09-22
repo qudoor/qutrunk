@@ -12,6 +12,7 @@ class ExecType(Enum):
         ExecBySingleProcess: Execute by single process.
         ExecByMpi: Execute by multiple processes.
     """
+
     SingleProcess = 1
     Mpi = 2
 
@@ -31,7 +32,7 @@ class BackendQuSprout(Backend):
             from qutrunk.backends import BackendQuSprout
             from qutrunk.circuit.gates import H, CNOT, Measure
 
-            # use BackendQuSprout 
+            # use BackendQuSprout
             qc = QCircuit(backend=BackendQuSprout())
             qr = qc.allocate(2)
 
@@ -53,7 +54,9 @@ class BackendQuSprout(Backend):
         self.circuit = None
         self.exectype = exectype
         box_config = get_qubox_setting()
-        self._api_server = QuSproutApiServer(ip=box_config.get('ip'), port=box_config.get('port'))
+        self._api_server = QuSproutApiServer(
+            ip=box_config.get("ip"), port=box_config.get("port")
+        )
 
     def get_prob_amp(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
@@ -123,7 +126,14 @@ class BackendQuSprout(Backend):
 
         for idx in range(start, stop):
             cmd = circuit.cmds[idx]
-            c = qusproutdata.Cmd(str(cmd.gate), cmd.targets, cmd.controls, cmd.rotation, cmd.qasm(), cmd.inverse)
+            c = qusproutdata.Cmd(
+                str(cmd.gate),
+                cmd.targets,
+                cmd.controls,
+                cmd.rotation,
+                cmd.qasm(),
+                cmd.inverse,
+            )
             cmds.append(c)
 
         circuit.forward(stop - start)
@@ -131,9 +141,8 @@ class BackendQuSprout(Backend):
         # 服务端初始化
         if start == 0:
             res, elapsed = self._api_server.init(
-                circuit.qubits_len,
-                circuit.density,
-                self.exectype.value)
+                circuit.qubits_len, circuit.density, self.exectype.value
+            )
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
             if self.circuit.init_amp_reals or self.circuit.init_amp_imags:
@@ -142,7 +151,7 @@ class BackendQuSprout(Backend):
         if len(cmds) == 0 and (not final):
             return
 
-        # 发送至服务        
+        # 发送至服务
         res, elapsed = self._api_server.send_circuit(qusproutdata.Circuit(cmds), final)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
@@ -152,7 +161,7 @@ class BackendQuSprout(Backend):
 
         Args:
             shots: Circuit run times, for sampling, default: 1.
-        
+
         Returns:
             result: The Result object contain circuit running outcome.
         """
@@ -189,7 +198,9 @@ class BackendQuSprout(Backend):
         """
         puali_list = []
         for temp in pauli_prod_list:
-            puali_list.append(qusproutdata.PauliProdInfo(temp['oper_type'], temp['target']))
+            puali_list.append(
+                qusproutdata.PauliProdInfo(temp["oper_type"], temp["target"])
+            )
 
         res, elapsed = self._api_server.get_expec_pauli_prod(puali_list)
         if self.circuit.counter:
@@ -208,7 +219,9 @@ class BackendQuSprout(Backend):
         Returns:
             The expected value of a sum of products of Pauli operators.
         """
-        res, elapsed = self._api_server.get_expec_pauli_sum(oper_type_list, term_coeff_list)
+        res, elapsed = self._api_server.get_expec_pauli_sum(
+            oper_type_list, term_coeff_list
+        )
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res

@@ -13,13 +13,13 @@ def test_crx_gate():
     # 使用本地量子计算模拟器
     circuit = QCircuit()
     qr = circuit.allocate(2)
-    CRx(pi/2) * (qr[0], qr[1])
+    CRx(pi / 2) * (qr[0], qr[1])
     res = circuit.get_all_state()
 
     # 使用BackendQuSprout量子计算模拟器
     circuit_box = QCircuit(backend=BackendQuSprout())
     qr_box = circuit_box.allocate(2)
-    CRx(pi/2) * (qr_box[0], qr_box[1])
+    CRx(pi / 2) * (qr_box[0], qr_box[1])
     res_box = circuit_box.get_all_state()
 
     # 检查数据是否一致
