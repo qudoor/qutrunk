@@ -6,7 +6,7 @@ from qutrunk.circuit.ops import QSP
 def increment(num_qubits, initvalue):
     circuit = QCircuit()
     qr = circuit.allocate(num_qubits)
-    
+
     QSP(initvalue) * qr
 
     MCX(3) * (qr[0], qr[1], qr[2], qr[3])
@@ -28,16 +28,21 @@ def decrement(num_qubits, initvalue):
     QSP(initvalue) * qr
 
     X * qr[0]
-    CNOT * (qr[0], qr[1])
-    Toffoli * (qr[0], qr[1], qr[2])
-    MCX(3) * (qr[0], qr[1], qr[2], qr[3])
+    ctrl = []
+    for i in range(1, num_qubits+1, 1):
+        for j in range(i - 1):
+            ctrl.append(qr[j])
+        if i > 1:
+            MCX(i-1) * (*ctrl, qr[i-1])
+        ctrl = []
 
     All(Measure) * qr
     res = circuit.run()
     print(res.get_outcome())
+
     return circuit
 
 
 if __name__ == "__main__":
-    circuit = increment(4, 0)
+    circuit = decrement(4, 0)
     circuit.draw()
