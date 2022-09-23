@@ -74,7 +74,7 @@ class QSP(Operator):
                 self._process_classical_state(qureg)
 
         if self.state == "AMP":
-            qureg.circuit.append_statement(f"QSP('{self.state}', '{self.classicvector}') * q")
+            qureg.circuit.append_statement(f"QSP('{self.state}', {self.classicvector}) * q")
         else:
             qureg.circuit.append_statement(f"QSP('{self.state}') * q")
 
