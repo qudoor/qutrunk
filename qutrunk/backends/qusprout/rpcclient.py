@@ -1,26 +1,12 @@
+import os
 import uuid
-from functools import partial
-from os import path
 
-import thriftpy2
-from thriftpy2.parser import parser
-from thriftpy2.protocol import TBinaryProtocolFactory, TMultiplexedProtocolFactory
-from thriftpy2.rpc import make_client
+from thrift.protocol import TBinaryProtocol, TMultiplexedProtocol
+from thrift.transport import TSocket, TTransport
 
+from qutrunk.sim.qusprout.qusprout import QuSproutServer
+from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
 from qutrunk.tools.function_time import timefn
-
-PARENT_DIR = path.dirname(__file__)
-
-# open in thriftpy2 doesn't support encoding, replace open with default encoding utf8
-# refer to issue https://github.com/Thriftpy/thriftpy2/issues/172
-# and pull request https://github.com/Thriftpy/thriftpy2/pull/173
-parser.open = partial(open, encoding="utf8")
-
-qusprout = thriftpy2.load(path.join(PARENT_DIR, "idl/qusprout.thrift"))
-qusproutdata = thriftpy2.load(path.join(PARENT_DIR, "idl/qusproutdata.thrift"))
-
-# reset parser.open to default open
-parser.open = open
 
 
 class QuSproutApiServer:
@@ -32,16 +18,21 @@ class QuSproutApiServer:
         port: port, default: 9090.
     """
 
-    def __init__(self, ip="localhost", port=9090):
-        proto_fac = TBinaryProtocolFactory()
-        proto_fac = TMultiplexedProtocolFactory(proto_fac, "QuSproutServer")
-        self._client = make_client(
-            qusprout.QuSproutServer, ip, port, proto_factory=proto_fac
-        )
+    def __init__(self, ip='localhost', port=9090):
+        socket = TSocket.TSocket(ip, port)
+        self._transport = TTransport.TBufferedTransport(socket)
+        protocol = TBinaryProtocol.TBinaryProtocol(self._transport)
+        quest = TMultiplexedProtocol.TMultiplexedProtocol(protocol, "QuSproutServer")
+        self._client = QuSproutServer.Client(quest)
         self._taskid = uuid.uuid4().hex
+        try:
+            self._transport.open()
+        except Exception:
+            print("QuSprout is not available!")
+            os._exit(1)
 
     def close(self):
-        self._client.close()
+        self._transport.close()
 
     @timefn
     def init(self, qubits, density, exectype=0):
