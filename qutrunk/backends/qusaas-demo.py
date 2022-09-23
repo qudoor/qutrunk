@@ -4,9 +4,11 @@ from thriftpy2.http import THttpHeaderFactory
 from thriftpy2.protocol import TBinaryProtocolFactory, TMultiplexedProtocolFactory
 
 from qutrunk.backends import BackendQuSaas, BackendQuSprout
-from qutrunk.backends.qusprout.rpcclient import QuSproutApiServer, qusprout, qusproutdata
+from qutrunk.backends.qusprout import QuSproutApiServer
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import All, H, Measure
+from qutrunk.sim.qusprout.qusprout import ttypes as qusprout
+from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
 
 
 def origin_rpc():

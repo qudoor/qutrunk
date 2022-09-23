@@ -98,6 +98,9 @@ class QuSaasApiServer(QuSproutApiServer):
                                    http_header_factory=header)
         self._taskid = uuid.uuid4().hex
 
+    def close(self):
+        self._client.close()
+
     def get_access_token(self):
         """
 
