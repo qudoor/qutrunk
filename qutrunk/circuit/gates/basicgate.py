@@ -34,6 +34,7 @@ class BasicGate:
             statement: The origin statement that generate target cmd.
         """
         circuit.append_cmd(cmd)
+        # TODO: need to improve
         statement = "" if circuit.in_op() else cmd.qusl()
         if statement != "":
             circuit.append_statement(statement)
