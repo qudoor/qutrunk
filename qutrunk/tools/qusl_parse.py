@@ -10,6 +10,7 @@ BASE_DIR = os.getcwd()
 py_file = BASE_DIR + "/qutrunk/tools/qusl.py"
 
 
+# TODO: have some problems.
 def parse(qusl_file):
     """Parse QuSL file and generate quantum circuit.
 

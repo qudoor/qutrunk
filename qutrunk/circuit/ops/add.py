@@ -12,7 +12,6 @@ class ADDOps(Operator):
         super().__init__()
 
     def __mul__(self, qr: Qureg):
-        print(type(qr))
         if not isinstance(qr, Qureg):
             raise TypeError("The operand must be Qureg.")
 
