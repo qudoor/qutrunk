@@ -8,4 +8,3 @@ class QasmError(QuTrunkError):
     def __init__(self, *message):
         """Set the error message."""
         super().__init__(*message)
-

@@ -1,11 +1,9 @@
 ## QuTrunk
 
 [![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://developer.queco.cn/qutrunk_api/)
-[![Release](https://img.shields.io/badge/release-v0.1.9-blue.svg)](https://github.com/PaddlePaddle/Paddle/releases)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/Angel-ML/angel/archive/refs/heads/branch-3.2.0.zip)
+[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/queco-quantum/qutrunk/archive/refs/heads/main.zip)
 
-[English](./README.md) | 简体中文
 
 ### **概述**
 ---
@@ -14,32 +12,37 @@
 * QuTrunk 基于量子逻辑门、量子线路等概念提供量子编程所需各类 API，这些 API 由相应的模块实现。例如 QCircuit 实现量子线路，Qubit 实现量子比特，Qureg 实现量子寄存器，Command 实现每个量子门操作的指令，Backend 实现运行量子线路的后端模块，gate 模块实现各类基础量子门操作。
 * QuTrunk 还可以作为其他上层量子计算应用的基础，例如：量子算法、量子可视化编程、量子机器学习等。
 
+QuTrunk内部模块划分及层次结构如下：  
 
-### 核心特点
----
-* 基于量子逻辑门、量子线路实现量子编程。
-* 提供 QuSL 量子汇编指令标准，QuSL 量子汇编与 Python 代码完全兼容。
-* 设备独立，在不同的量子后端（例如：BackendLocalCpp, BackendLocalPy, BackendQuSprout, BackendIBM等）上运行同一个量子电路。
-* 本地量子计算后端提供全振幅量子模拟计算，量子云服务提供：OMP 多线程、多点并行 MPI、GPU 等计算加速，同时预留了接口对接离子阱量子计算机。
-* 兼容 OpenQASM 2.0 标准。
-* 支持量子可视化编程（需要配合启科量子研发的量子集成开发环境 QuBranch）。
-* 在经典计算机上模拟量子程序，提供全振幅计算。
+<div align=center>
+<img src="./resource/qutrunk.png"/>
+</div>
 
 
 ### **核心模块**
 ---
-* QCircuit
-  量子线路，维护对所有量子比特的各种门操作及操作时序，代表了整个量子算法的实现。
-* Qubit
-  代表单个量子比特，是量子门操作的对象。
-* Qureg
- 维护若干个量子比特，用于实现一个具体的量子算法。
-* Command
-  每个量子门操作其背后都会转换成一个基础指令，这些指令按照时间顺序存放在QCircuit中，当整个算法结束或者需要计算当前量子线路的某种状态取值时，这些指令会被发送到指定的后端去执行。
-* Backend
-  量子计算后端模块，用于执行量子线路，支持Python和C++两种本地后端，QuSprout后端以及第三方后端(目前支持IBM)等。
-* Gate
-  量子算法基本组成单元，提供各类量子门操作，包括:*H*, *X*, *Y*, *Z*，*P*, *R*, *Rx*, *Ry*, *Rz*, *S*, *Sdg*, *T*, *Tdg*, *CNOT*, *Toffoli*, *Swap*等。
+* cicuit: 量子线路，通过应用各类基础门操作以及算符操作构建量子线路，代表了整个量子算法的实现。
+* qubit: 代表单个量子比特，是量子门和量子算符操作的目标对象。
+* qureg: 用于申请量子计算资源，维护若干个量子比特，用于实现某个具体的量子算法。
+* gate: 量子逻辑门模块，提供各类基础量子门操作，包括:*H*, *X*, *Y*, *Z*，*P*, *R*, *Rx*, *Ry*, *Rz*, *S*, *Sdg*, *T*, *Tdg*, *CNOT*, *Toffoli*, *Swap*等。
+* operator: 量子算符操作，通过若干基础量子门实现某些通用量子操作，比如振幅放大QAA, 量子傅立叶变换QFT等。
+* command: 对量子线路中所有门级操作做参数化处理，对接目标后端模块，用于运行整个量子线路。
+* qasm: 兼容OpenQASM 2.0标准，实现量子线路到OpenQASM指令的序列化和反序列化。
+* qusl: QuTrunk量子汇编标准，实现与qasm类似功能。
+* backend: 量子计算后端模块，用于执行量子线路，支持Python和C++两种本地后端，qusprout和qusaas两种远程后端以及第三方后端(目前支持IBM)。
+* qusprout: 对接启科研制的qubox设备，使用经典计算资源并针对量子计算特点做优化，提供高性能量子模拟计算服务。
+* qusaas: 对接启科量子计算云平台，接入多种量子计算资源，包括经典计算资源，离子阱量子计算机（研发中）。
+
+
+### 主要特点
+---
+* 基于量子逻辑门、量子算符和量子线路实现量子程序开发。
+* 提供QuSL量子汇编指令标准，QuSL量子汇编与Python代码完全兼容。
+* 设备独立，同一个量子线路只需替换后端类型即可以在不同的量子后端上运行。
+* 提供多种量子计算体验，本地量子计算提供Python和C++量两种计算后端，远程后端提供OMP多线程、MPI多节点并行、GPU加速等计算模式，同时预留了接口对接启科量子自行研制的离子阱量子计算机。
+* 兼容多种量子汇编指令格式：OpenQASM 2.0标准和QuSL汇编标准。
+* 支持量子可视化编程（需要配合启科量子研发的量子集成开发环境 QuBranch）。
+
 
 >**注意**:
 >  QuTrunk默认只提供Python版本的量子计算模拟器，如果用户需要更高性能的模拟器，可以尝试从: https://pypi.org/project/qutrunk/ 获取QuTrunk源码包进行安装，具体安装步骤可以参考后续的安装章节。
@@ -47,17 +50,24 @@
 
 ### **下载和安装**
 ---
-#### QuTrunk最新版本: [v0.1.9]()
-* #### **pip安装** 
+#### **1.pip安装** 
 
-   QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
+QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
 注意在正式使用 QuTurnk 之前，您需要先安装 Python（版本 3.7+）。
 
   ```python
   pip install qutrunk
   ```
 
-* #### **源码安装**  
+验证QuTrunk是否安装成功，打开终端进入python交互模式，执行如下语句：
+
+``` python
+import qutrunk
+qutrunk.run_check()
+```
+输出结果为："QuTrunk is installed successfully! You can use QuTrunk now."表明QuTrunk安装成功。
+
+#### **2.源码安装**  
 
   #### **Windows**
 
@@ -145,7 +155,7 @@
   All(Measure) * qr
 
   # print circuit
-  qc.print(qc)   
+  qc.print()   
   # run circuit
   res = qc.run(shots=1024) 
   # print result
@@ -173,20 +183,26 @@
                     0  1 
   ```
 
+### **量子可视化编程**  
+---
+QuBranch是由启科量子基于vscode开发的量子编程集成开发环境。  
+QuTrunk与QuBranch相互配合可以实现量子可视化编程，
+具体步骤参见[量子可视化编程](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
+
 ### **文档**
 ---
-* [QuTrunk 快速上手教程](http://developer.queco.cn/learn/doc/detail?id=12)
-* [QuTrunk API](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
+* [QuTrunk 快速上手教程](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
+* [QuTrunk API](http://developer.queco.cn/qutrunk_api/)
 
 
-## 如何参与开发
-
+### **如何参与开发**
+---
 1. 阅读源代码，了解我们当前的开发方向
 2. 找到自己感兴趣的功能或模块
 3. 进行开发，开发完成后自测功能是否正确
 4. Fork代码库，将修复代码提交到fork的代码库
 5. 发起pull request
-6. 更多详情请参见[链接](http://192.168.170.196/qudoor/qubox/-/blob/dev_ll/CONTRIBUTING.md)
+6. 更多详情请参见[链接](./CONTRIBUTING.md)
 
 
 ### **许可证**

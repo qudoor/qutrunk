@@ -132,8 +132,7 @@ class QuSproutApiServer:
 
     @timefn
     def cancel_cmd(self):
-        """Cancel current job.
-        """
+        """Cancel current job."""
         req = qusproutdata.CancelCmdReq(self._taskid)
         return self._client.cancelCmd(req)
 
@@ -180,6 +179,8 @@ class QuSproutApiServer:
         Returns:
             the expected value of a sum of products of Pauli operators.
         """
-        req = qusproutdata.GetExpecPauliSumReq(self._taskid, oper_type_list, term_coeff_list)
+        req = qusproutdata.GetExpecPauliSumReq(
+            self._taskid, oper_type_list, term_coeff_list
+        )
         res = self._client.getExpecPauliSum(req)
         return res.expect

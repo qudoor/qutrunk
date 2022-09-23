@@ -1,6 +1,5 @@
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import CNOT, X
-from qutrunk.backends import BackendQuSprout
 
 
 def run_bernstein_vazirani(backend=None):

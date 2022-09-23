@@ -5,6 +5,7 @@ DAG Node.
 
 class DAGNode:
     """Parent class for DAGOpNode, DAGInNode, and DAGOutNode."""
+
     def __init__(self, wire=None, node_id=-1):
         self._wire = wire
         self._node_id = node_id
@@ -58,6 +59,7 @@ class DAGInNode(DAGNode):
 
 class DAGOutNode(DAGNode):
     """Object to represent an outgoing wire node in the DAGCircuit."""
+
     def __init__(self, wire):
         super().__init__()
         self._type = "out"
