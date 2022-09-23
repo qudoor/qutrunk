@@ -1,7 +1,7 @@
 """Quantum state preparation Operator."""
 
 import cmath
-from typing import Union
+from typing import Optional, Union
 
 from qutrunk.exceptions import QuTrunkError
 from .operator import Operator, OperatorContext
@@ -30,7 +30,7 @@ class QSP(Operator):
             print(circuit.get_all_state())
     """
 
-    def __init__(self, state: Union[str, int], classicvector: list = None):
+    def __init__(self, state: Union[str, int], classicvector: Optional[list] = None):
         super().__init__()
         self.state = state
         self.classicvector = classicvector
