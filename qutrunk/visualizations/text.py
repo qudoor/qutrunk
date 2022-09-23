@@ -48,7 +48,7 @@ from qutrunk.circuit.gates import (
     CHGate,
     CSwapGate,
     SqrtXdgGate,
-    CSqrtXGate
+    CSqrtXGate,
 )
 from .text_draw_element import InputWire
 from .layer import Layer
@@ -76,7 +76,18 @@ class TextDrawing:
     Raises:
           ValueError.
     """
-    def __init__(self, qubits, cbits, nodes, circuit=None, plot_barriers=True, line_length=None, vertical_compression="medium", encoding=None):
+
+    def __init__(
+        self,
+        qubits,
+        cbits,
+        nodes,
+        circuit=None,
+        plot_barriers=True,
+        line_length=None,
+        vertical_compression="medium",
+        encoding=None,
+    ):
         # quantum qubits
         self.qubits = qubits
         # classics cbits
@@ -92,7 +103,9 @@ class TextDrawing:
 
         # vertically compressed square matrix in text mode
         if vertical_compression not in ["high", "medium", "low"]:
-            raise ValueError("Vertical compression can only be 'high', 'medium', or 'low'")
+            raise ValueError(
+                "Vertical compression can only be 'high', 'medium', or 'low'"
+            )
         self.vertical_compression = vertical_compression
 
         # encoding format
@@ -206,9 +219,7 @@ class TextDrawing:
         if isinstance(op.gate, MeasureGate):
             gate = MeasureFrom()
             layer.set_qubit(node.qargs[0], gate)
-            register, _, reg_index = get_bit_reg_index(
-                self.circuit, node.cargs[0]
-            )
+            register, _, reg_index = get_bit_reg_index(self.circuit, node.cargs[0])
             if register is not None:
                 layer.set_cbit(
                     node.cargs[0],
@@ -225,7 +236,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CH", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # I gate
@@ -237,7 +250,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CX", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # Toffoli gate
@@ -246,7 +261,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("Toffoli", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # X gate
@@ -263,7 +280,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CZ", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # CX gate
@@ -272,7 +291,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("MCX", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         elif isinstance(op.gate, P):
@@ -310,8 +331,15 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
-            gates.extend([Ex(conditional=conditional) for _ in range(len(node.qargs)-len(gates))])
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
+            gates.extend(
+                [
+                    Ex(conditional=conditional)
+                    for _ in range(len(node.qargs) - len(gates))
+                ]
+            )
             add_connected_gate(node, gates, layer, current_cons)
         # SqrtX gate
         elif isinstance(op.gate, SqrtXGate):
@@ -325,7 +353,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("√X", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # CY gate
@@ -334,7 +364,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CY", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # crx gate
@@ -343,7 +375,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("Rx(ϴ)", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # cry gate
@@ -352,7 +386,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("Ry(ϴ)", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # crz gate
@@ -361,7 +397,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("Rz(λ)", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # Rxx gate
@@ -392,7 +430,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CP", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # X1 gate
@@ -410,7 +450,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CU", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # CU1 gate
@@ -419,7 +461,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CU1", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # CU3 gate
@@ -428,7 +472,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CU3", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # CR gate
@@ -437,7 +483,9 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+            gates = self.set_ctrl_state(
+                node, conditional, ctrl_text, bool(controlled_bot)
+            )
             gates.append(BoxOnQuWire("CR", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # iSwap
@@ -457,8 +505,8 @@ class TextDrawing:
     def build_layers(self):
         """Constructs layers.
 
-         Returns:
-            list: List of DrawElements.
+        Returns:
+           list: List of DrawElements.
         """
         wire_names = self.wire_names()
 
@@ -470,12 +518,12 @@ class TextDrawing:
         # operator node
         for node_layer in self.nodes:
             # TODO:circuit
-            layer = Layer(
-                self.qubits, self.cbits,  self.circuit
-            )
+            layer = Layer(self.qubits, self.cbits, self.circuit)
 
             for node in node_layer:
-                layer, current_connections, connection_label = self.node_to_gate(node, layer)
+                layer, current_connections, connection_label = self.node_to_gate(
+                    node, layer
+                )
                 layer.connections.append((connection_label, current_connections))
 
             layer.connect_with("│")
@@ -484,16 +532,14 @@ class TextDrawing:
         return layers
 
     def _get_qubit_labels(self):
-        """Qubit name format: q[index], eg: q[1].
-        """
+        """Qubit name format: q[index], eg: q[1]."""
         qubits = []
         for qubit in self.qubits:
             qubits.append(f"q[{qubit.index}]")
         return qubits
 
     def _get_cbit_labels(self):
-        """Cbit name format: c[index], eg: c[1].
-        """
+        """Cbit name format: c[index], eg: c[1]."""
         cbits = []
         for cbit in self.cbits:
             cbits.append(f"c[{cbit.index}]")
@@ -541,7 +587,9 @@ class TextDrawing:
 
         for line in (bot_line, top_line):
             no_spaces = line.replace(" ", "")
-            if len(no_spaces) > 0 and all(c.isalpha() or c.isnumeric() for c in no_spaces):
+            if len(no_spaces) > 0 and all(
+                c.isalpha() or c.isnumeric() for c in no_spaces
+            ):
                 return False
 
         return True
@@ -581,7 +629,9 @@ class TextDrawing:
                 if self.should_compress(top_line, bottom_line):
                     lines.append(TextDrawing.merge_lines(lines.pop(), top_line))
                 else:
-                    lines.append(TextDrawing.merge_lines(lines[-1], top_line, icod="bot"))
+                    lines.append(
+                        TextDrawing.merge_lines(lines[-1], top_line, icod="bot")
+                    )
 
             # 2 Build the middle of the element
             mid_line = ""
@@ -655,7 +705,7 @@ class TextDrawing:
         ctrl_qubits = node.qargs[:num_ctrl_qubits]
         # The post num_ctrl_qubits is the target bit
         args_qubits = node.qargs[num_ctrl_qubits:]
-        ctrl_state = 2**num_ctrl_qubits-1
+        ctrl_state = 2**num_ctrl_qubits - 1
 
         ctrl_state = f"{ctrl_state:b}".rjust(num_ctrl_qubits, "0")[::-1]
 
@@ -682,15 +732,19 @@ class TextDrawing:
         num_ctrl_qubits = len(op.controls)
         # The front num_ctrl_qubits is the control bit
         ctrl_qubits = node.qargs[:num_ctrl_qubits]
-        ctrl_state = 2 ** num_ctrl_qubits - 1
+        ctrl_state = 2**num_ctrl_qubits - 1
 
         ctrl_state = f"{ctrl_state:b}".rjust(num_ctrl_qubits, "0")[::-1]
 
         for i in range(len(ctrl_qubits)):
             if ctrl_state[i] == "1":
-                gates.append(Bullet(conditional=conditional, label=ctrl_text, bottom=bottom))
+                gates.append(
+                    Bullet(conditional=conditional, label=ctrl_text, bottom=bottom)
+                )
             else:
-                gates.append(OpenBullet(conditional=conditional, label=ctrl_text, bottom=bottom))
+                gates.append(
+                    OpenBullet(conditional=conditional, label=ctrl_text, bottom=bottom)
+                )
         return gates
 
 
@@ -749,4 +803,3 @@ def get_bit_reg_index(circuit, bit):
     reg_index = bit.index
 
     return register, bit_index, reg_index
-

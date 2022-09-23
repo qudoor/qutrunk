@@ -3,12 +3,12 @@ from qutrunk.tools.function_time import timefn
 try:
     from qutrunk.sim.local import simulator
 except ImportError:  # pragma: no cover
-    # windows 
+    # windows
     from qutrunk.sim.local.Release import simulator
 
 
 class BackendLocalCpp:
-    """ Simulator is a compiler engine which simulates a quantum computer using C++-based kernels."""
+    """Simulator is a compiler engine which simulates a quantum computer using C++-based kernels."""
 
     @timefn
     def init(self, qubits, show):
@@ -66,7 +66,7 @@ class BackendLocalCpp:
             outcome: the qubit measure result(0 or 1)
 
         Returns:
-            the probability of target qubit 
+            the probability of target qubit
         """
         return simulator.getProbOfOutcome(qubit, outcome)
 
@@ -118,8 +118,8 @@ class BackendLocalCpp:
         temp_pauli_prod_list = []
         for item in pauli_prod_list:
             puali_prod_info = simulator.PauliProdInfo()
-            puali_prod_info.oper_type = item['oper_type']
-            puali_prod_info.target = item['target']
+            puali_prod_info.oper_type = item["oper_type"]
+            puali_prod_info.target = item["target"]
             temp_pauli_prod_list.append(puali_prod_info)
 
         return simulator.getExpecPauliProd(temp_pauli_prod_list)

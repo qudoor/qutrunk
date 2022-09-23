@@ -46,16 +46,20 @@ def algorithm(file: dict):
 
         f.write("Tree = lambda: defaultdict(Tree)\n")
         f.write("tree = Tree()\n")
-        c = ["for index, item in enumerate(outcome):\n",
-             "    i = str(bin(index))[2:]\n",
-             "    tree['probs'][i]['probability'] = item\n",
-             "    tree['probs'][i]['angle'] = 0\n"]
+        c = [
+            "for index, item in enumerate(outcome):\n",
+            "    i = str(bin(index))[2:]\n",
+            "    tree['probs'][i]['probability'] = item\n",
+            "    tree['probs'][i]['angle'] = 0\n",
+        ]
         f.writelines(c)
         # TODO:后期删除
         f.write("print(json.dumps(tree))\n")
         result_path = file["result_path"]
-        write_file = [f"with open(file=r'{result_path}', mode='w', encoding='utf-8') as f:\n",
-                      "    file = json.dump(json.dumps(tree), f)\n"]
+        write_file = [
+            f"with open(file=r'{result_path}', mode='w', encoding='utf-8') as f:\n",
+            "    file = json.dump(json.dumps(tree), f)\n",
+        ]
         f.writelines(write_file)
 
 
@@ -83,5 +87,5 @@ def run_algorithm(params_file: str):
     print("sucess")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_algorithm("ide_parameter.json")

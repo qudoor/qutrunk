@@ -23,12 +23,10 @@ def run_check_sprout():
     res = qc.run(shots=100)
     print("==========circuit running result=========")
     print(res.get_counts())
-    print("===========circuit running info==========") 
+    print("===========circuit running info==========")
     print(res.excute_info())
     print("QuTrunk is installed successfully! You can use QuTrunk now.")
 
 
 if __name__ == "__main__":
     run_check_sprout()
-
-

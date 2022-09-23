@@ -77,7 +77,7 @@ class BackendLocalPython:
             "CH": "ch",
             "SqrtXdg": "sqrtxdg",
             "CSqrtX": "csqrtx",
-            "CSwap": "cswap"
+            "CSwap": "cswap",
         }
         self.cmds = []
         self.result = Result()
@@ -299,7 +299,9 @@ class BackendLocalPython:
         if len(cmd.targets) == 1 and len(cmd.controls) == 1:
             self.sim.control_not(cmd.controls[0], cmd.targets[0])
         else:
-            self.sim.multi_controlled_multi_qubit_not(cmd.controls, len(cmd.controls), cmd.targets, len(cmd.targets))
+            self.sim.multi_controlled_multi_qubit_not(
+                cmd.controls, len(cmd.controls), cmd.targets, len(cmd.targets)
+            )
 
     def p(self, cmd):
         """Shift the phase between |0> and |1> of a single qubit by a given angle.
@@ -832,7 +834,7 @@ class BackendLocalPython:
         if len(cmd.targets) != 1:
             return
 
-        rotation = pi/4.0
+        rotation = pi / 4.0
         if cmd.inverse:
             rotation = -rotation
 
@@ -1054,7 +1056,7 @@ class BackendLocalPython:
             uimag = np.array([[0.5, -0.5], [-0.5, 0.5]])
 
         self.sim.csqrtx(cmd.controls[0], cmd.targets[0], ureal, uimag)
-    
+
     def cswap(self, cmd):
         if len(cmd.targets) != 2 or len(cmd.controls) != 1:
             return

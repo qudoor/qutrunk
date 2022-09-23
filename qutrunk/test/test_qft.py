@@ -20,9 +20,9 @@ MAX_QB_CNT = 8
 @pytest.fixture(autouse=True)
 def banner():
     print()
-    print('=' * 50)
+    print("=" * 50)
     yield
-    print('\n' * 5)
+    print("\n" * 5)
 
 
 @pytest.fixture(params=range(2, MAX_QB_CNT))
@@ -69,7 +69,9 @@ def decomposition_qft_state(circuit, inverse):
     # qft.append(circuit, qubits, inverse=inverse)
     # circuit.backend.send_circuit(circuit)
     state = circuit.get_all_state()
-    print(f"decomposition qft, qubits: {str(len(circuit.qubits))}, inverse: {str(inverse)}")
+    print(
+        f"decomposition qft, qubits: {str(len(circuit.qubits))}, inverse: {str(inverse)}"
+    )
     print(circuit.draw(line_length=1000))
     print(f"depth: {circuit.depth()}, width: {circuit.width()}")
     print(state)
@@ -100,7 +102,9 @@ def decomposition_qft_extra_state(circuit_extra, inverse):
     # qft.append(circuit_extra, qubits, inverse=inverse)
     # circuit.backend.send_circuit(circuit)
     state = circuit_extra.get_all_state()
-    print(f"decomposition qft extra, qubits: {str(len(circuit_extra.qubits))}, inverse: {str(inverse)}")
+    print(
+        f"decomposition qft extra, qubits: {str(len(circuit_extra.qubits))}, inverse: {str(inverse)}"
+    )
     print(circuit_extra.draw(line_length=1000))
     print(state)
 
@@ -175,7 +179,7 @@ def verify_state(dec_states, qiskit_states):
     # this test will run (MAX_QB_CNT - 2) * 2 times for each test case
     # 2 stands for inverse=[False, True]
     for dec_state, qiskit_state in zip(dec_states, qiskit_states):
-        dec_real, dec_img = (float(num.strip()) for num in dec_state.split(','))
+        dec_real, dec_img = (float(num.strip()) for num in dec_state.split(","))
         assert math.isclose(dec_real, qiskit_state.real, abs_tol=TOLERANCE)
         assert math.isclose(dec_img, qiskit_state.imag, abs_tol=TOLERANCE)
 

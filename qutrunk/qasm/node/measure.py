@@ -27,4 +27,10 @@ class Measure(Node):
 
     def qasm(self):
         """Return the corresponding OPENQASM string."""
-        return "measure " + self.children[0].qasm() + " -> " + self.children[1].qasm() + ";"
+        return (
+            "measure "
+            + self.children[0].qasm()
+            + " -> "
+            + self.children[1].qasm()
+            + ";"
+        )

@@ -1,3 +1,5 @@
+"""Quantum Teleportation."""
+
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, X, Z, Measure, CNOT, U3
 
@@ -20,6 +22,7 @@ def run_teleport():
     Measure * qureg[0]
     Measure * qureg[1]
 
+    # TODO: have some problem.
     # Apply a correction
     Z * qureg[2]
     X * qureg[2]
@@ -29,7 +32,7 @@ def run_teleport():
     res = qc.run(shots=1024)
 
     print(res.get_counts())
-    # return qureg
+    # return circuit
     return qc
 
 

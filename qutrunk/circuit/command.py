@@ -52,8 +52,10 @@ class Command:
         Returns:
             str: A representation of the command instance.
         """
-        return f"Command(gate={self.gate}, controls={self.controls}, targets={self.targets}, " \
-               f"rotation={self.rotation}), inverse={self.inverse})"
+        return (
+            f"Command(gate={self.gate}, controls={self.controls}, targets={self.targets}, "
+            f"rotation={self.rotation}), inverse={self.inverse})"
+        )
 
     def qasm(self) -> str:
         """Generate OpenQASM code for command."""
@@ -104,7 +106,7 @@ class Command:
 
         # add parentheses when qubits count is more than one
         if len(qubits_index) > 1:
-            qubits_str = '(' + qubits_str + ')'
+            qubits_str = "(" + qubits_str + ")"
 
         return name + param_str + " * " + qubits_str
 

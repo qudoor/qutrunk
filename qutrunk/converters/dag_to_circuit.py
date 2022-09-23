@@ -21,7 +21,7 @@ def dag_to_circuit(dag):
     circuit.metadata = dag.metadata
 
     for node in dag.topological_op_nodes():
-        if hasattr(node.op, 'definition'):
+        if hasattr(node.op, "definition"):
             unroll_custom_gate(circuit, node.op.definition, node.qargs, node.cargs)
         else:
             append_node(circuit, node)
