@@ -1,8 +1,10 @@
+"""Testing the functionality of exporting quantum circuits in Qusl format."""
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, Measure, CNOT
 
 
 def test_print_qusl():
+    """Test the print function in QCircuit."""
     qc = QCircuit()
     qreg = qc.allocate(2)
 

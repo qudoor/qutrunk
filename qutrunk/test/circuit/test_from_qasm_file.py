@@ -1,8 +1,10 @@
+"""Testing the functionality of parsing OpenQASM quantum circuits into QuTrunk quantum circuits."""
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, Measure, CNOT
 
 
 def test_qasm_file():
+    """Test the from_qasm_file function in QCircuit."""
     qc = QCircuit()
     qreg = qc.allocate(2)
 
