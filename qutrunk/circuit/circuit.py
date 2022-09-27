@@ -99,14 +99,14 @@ class QCircuit:
         if not isinstance(qubits, (int, list)):
             raise TypeError("qubits parameter should be type of int or list.")
 
-        size = qubits if isinstance(qubits, int) else sum(qubits)
-        self.qreg = Qureg(circuit=self, size=size)
-        self.creg = CReg(circuit=self, size=size)
+        qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
+        self.qreg = Qureg(circuit=self, size=qubit_size)
+        self.creg = CReg(circuit=self, size=qubit_size)
 
         if self.counter:
-            self.counter.qubits = size
+            self.counter.qubits = qubit_size
 
-        for index in range(size):
+        for index in range(qubit_size):
             self.qubit_indices[QuBit(self.qreg, index)] = index
             self.cbit_indices[CBit(self.creg, index)] = index
 
@@ -241,7 +241,7 @@ class QCircuit:
         return len(self.cmds)
 
     def get_prob_amp(self, index):
-        """The probability of returning the target index.
+        """get the probability of the target index.
 
         Get the probability of a state-vector at an index in the full state vector.
 
@@ -288,13 +288,13 @@ class QCircuit:
     def find_bit(self, bit):
         """Find locations in the circuit.
 
-        Returns the index of the qubit or Cbit in the circuit.
+        Returns the index of the qubit or CBit in the circuit.
 
         Args:
             bit: QuBit or CBit.
 
         Returns:
-            index: The index of QuBit or Cbit in circuit.
+            index: The index of QuBit or CBit in circuit.
         """
         try:
             if isinstance(bit, QuBit):
@@ -302,7 +302,7 @@ class QCircuit:
             elif isinstance(bit, CBit):
                 return self.cbit_indices[bit]
             else:
-                raise Exception(f"Could not locate bit of unknow type:{type(bit)}")
+                raise Exception(f"Could not locate bit of unknown type:{type(bit)}")
         except KeyError:
             raise Exception(f"Could not locate provided bit:{bit}")
 
@@ -332,6 +332,32 @@ class QCircuit:
         return inverse_circuit, inverse_circuit.qreg
 
     @staticmethod
+    def load(file, format=None):
+        """Deserialize file object containing a OpenQASM or qusl document to a Python object.
+
+        Args:
+            file (str): Path to the file for a qusl or OpenQASM program.
+
+        Return:
+            QCircuit: The QCircuit object for the input qusl or OpenQASM.
+
+        """
+        if format is None or format == "qusl":
+            from qutrunk.tools.qusl_parse import qusl_to_circuit
+            return qusl_to_circuit(file)
+
+        if format == "openqasm":
+            from qutrunk.qasm import Qasm
+            from qutrunk.converters import dag_to_circuit
+            from qutrunk.converters import ast_to_dag
+
+            qasm = Qasm(file)
+            ast = qasm.parse()
+            dag = ast_to_dag(ast)
+            return dag_to_circuit(dag)
+
+    # TODO: to delete
+    @staticmethod
     def from_qasm_file(file):
         """Take in a QASM file and generate a QCircuit object.
 
@@ -351,6 +377,7 @@ class QCircuit:
         dag = ast_to_dag(ast)
         return dag_to_circuit(dag)
 
+    # TODO: to delete
     @staticmethod
     def from_qusl_file(file):
         """Pase QuSL file and generate quantum circuit.
@@ -399,6 +426,7 @@ class QCircuit:
             )
         return self.backend.get_expec_pauli_sum(pauli_type_list, coeffi_list)
 
+    # TODO: need to improve
     def print(self, file=None, unroll=True):
         """Print quantum circuit in qutrunk form.
         
@@ -444,19 +472,7 @@ class QCircuit:
             if f is not sys.stdout:
                 f.close()
 
-    # TODO: file to circuit string
-    def dump(self, file=None, unroll=True):
-        """Serialize Quantum circuit as a JSON formatted stream to file.
-
-        Args:
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
-            file: Dump the qutrunk instruction to file(json format).
-        """
-        if file is None:
-            raise Exception("file argument need to be supplied.")
-
+    def _dump_qusl(self, file, unroll=True):
         with open(file, "w", encoding="utf-8") as f:
             qusl_data = {}
             qusl_data["target"] = "QuSL"
@@ -475,6 +491,33 @@ class QCircuit:
 
             qusl_data["code"] = inst
             f.write(json.dumps(qusl_data))
+
+    def _dump_openqasm(self, file):
+        with open(file, "w", encoding="utf-8") as f:
+            f.write("OPENQASM 2.0;\n")
+            f.write('include "qulib1.inc";\n')
+            f.write(f"qreg q[{str(len(self.qreg))}];\n")
+            f.write(f"creg c[{str(len(self.qreg))}];\n")
+            for c in self:
+                f.write(c.qasm() + ";\n")
+
+    def dump(self, file=None, format=None, unroll=True):
+        """Serialize Quantum circuit as a JSON formatted stream to file.
+
+        Args:
+            unroll: True: Dump the detailed instructions, especially, \
+                if the instruction contains an operator, the operator will be expanded.
+                False: Dump the brief instructions, the operator will not be expanded.
+            file: Dump the qutrunk instruction to file(json format).
+        """
+        if file is None:
+            raise Exception("file argument need to be supplied.")
+
+        if format is None or format == "qusl":
+            self._dump_qusl(file, unroll)
+
+        if format == "openqasm":
+            self._dump_openqasm(file)
 
     def print_qasm(self, file=None):
         """Convert circuit and dump to file/stdout.
