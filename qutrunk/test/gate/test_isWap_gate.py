@@ -13,13 +13,13 @@ def test_iswap_gate():
     # 使用本地量子计算模拟器
     circuit = QCircuit()
     qr = circuit.allocate(2)
-    iSwap(pi/2) * (qr[0], qr[1])
+    iSwap(pi / 2) * (qr[0], qr[1])
     res = circuit.get_all_state()
 
     # 使用BackendQuSprout量子计算模拟器
     circuit_box = QCircuit(backend=BackendQuSprout())
     qr_box = circuit_box.allocate(2)
-    iSwap(pi/2) * (qr_box[0], qr_box[1])
+    iSwap(pi / 2) * (qr_box[0], qr_box[1])
     res_box = circuit_box.get_all_state()
 
     # 检查数据是否一致

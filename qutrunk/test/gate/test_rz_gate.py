@@ -13,14 +13,14 @@ def test_rz_gate():
     # 使用本地量子计算模拟器
     circuit = QCircuit()
     qr = circuit.allocate(1)
-    Rz(pi/2) * qr[0]
-    res = (circuit.get_all_state())
+    Rz(pi / 2) * qr[0]
+    res = circuit.get_all_state()
 
     # 使用BackendQuSprout量子计算模拟器
     circuit_box = QCircuit(backend=BackendQuSprout())
     qr_box = circuit_box.allocate(1)
-    Rz(pi/2) * qr_box[0]
-    res_box = (circuit_box.get_all_state())
+    Rz(pi / 2) * qr_box[0]
+    res_box = circuit_box.get_all_state()
 
     # 检查数据是否一致
     assert check_all_state(res, res_box)

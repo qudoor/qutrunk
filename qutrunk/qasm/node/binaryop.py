@@ -30,7 +30,11 @@ class BinaryOp(Node):
     def qasm(self):
         """Return the corresponding OPENQASM string."""
         return (
-            "(" + self.children[1].qasm() + self.children[0].value + self.children[2].qasm() + ")"
+            "("
+            + self.children[1].qasm()
+            + self.children[0].value
+            + self.children[2].qasm()
+            + ")"
         )
 
     def latex(self):

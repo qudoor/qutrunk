@@ -7,8 +7,10 @@ from qutrunk.exceptions import QuTrunkError
 
 
 BASE_DIR = os.getcwd()
-py_file = BASE_DIR + '/qutrunk/tools/qusl.py'
+py_file = BASE_DIR + "/qutrunk/tools/qusl.py"
 
+
+# TODO: have some problems.
 def parse(qusl_file):
     """Parse QuSL file and generate quantum circuit.
 
@@ -24,8 +26,8 @@ def parse(qusl_file):
     if qusl_data is None:
         raise ValueError("Empty QuSL file")
 
-    qubits = qusl_data['meta']['qubits']
-    qusl_code_lines = qusl_data['code']
+    qubits = qusl_data["meta"]["qubits"]
+    qusl_code_lines = qusl_data["code"]
 
     if int(qubits) <= 0:
         raise ValueError("Invalid qubits")
@@ -41,6 +43,7 @@ def parse(qusl_file):
             fw.write("\t" + line)
         fw.write("\treturn circuit\n\n")
         fw.write("generate_circuit()")
+
 
 def qusl_to_circuit(file):
     """Parse QuSL file and generate quantum circuit.

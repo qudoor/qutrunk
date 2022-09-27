@@ -3,10 +3,12 @@ from math import pi
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import *
 
+
 @gate
 def my_gate(q):
     H * q[0]
     CNOT * (q[0], q[1])
+
 
 def run_gates():
     # allocate

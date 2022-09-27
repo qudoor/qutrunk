@@ -6,6 +6,7 @@ from setuptools import extension
 from distutils.command.build_ext import build_ext
 from setuptools import Extension
 
+
 class CMakeExtension(Extension):
     def __init__(self, name):
         super().__init__(name, sources=[])
@@ -22,7 +23,6 @@ class BuildFailed(Exception):
 
 
 class ExtBuilder(build_ext):
-
     def run(self):
         for ext in self.extensions:
             if isinstance(ext, CMakeExtension):
@@ -40,19 +40,20 @@ class ExtBuilder(build_ext):
 
         config = "Debug" if self.debug else "Release"
         cmake_args = [
-            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + str(extdir.parent.absolute()) + "/local",
-            "-DCMAKE_BUILD_TYPE=" + config
+            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY="
+            + str(extdir.parent.absolute())
+            + "/local",
+            "-DCMAKE_BUILD_TYPE=" + config,
         ]
 
-        build_args = [
-            "--config", config
-        ]
+        build_args = ["--config", config]
 
         os.chdir(build_temp)
         self.spawn(["cmake", f"{str(cwd)}/{ext.name}"] + cmake_args)
         if not self.dry_run:
             self.spawn(["cmake", "--build", "."] + build_args)
         os.chdir(str(cwd))
+
 
 def build(setup_kwargs):
     """

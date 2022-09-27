@@ -1,4 +1,5 @@
 """Grover's search algorithm."""
+
 import math
 import random
 
@@ -38,4 +39,3 @@ def run_grover(qubits=10, backend=None):
 if __name__ == "__main__":
     # local run
     circuit = run_grover()
-

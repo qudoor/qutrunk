@@ -3,7 +3,7 @@
 import math
 
 from qutrunk.backends import Backend
-from qutrunk.circuit.gates import (CNOT, H, Measure, Rx, Ry, Rz)
+from qutrunk.circuit.gates import CNOT, H, Measure, Rx, Ry, Rz
 from .ibm_client import send
 
 
@@ -44,7 +44,7 @@ class BackendIBM(Backend):
         super().__init__()
         self.circuit = None
         self._token = token
-        # default device: "ibmq_qasm_simulator" 
+        # default device: "ibmq_qasm_simulator"
         self.device = "ibmq_qasm_simulator"
         # the qubits to allocated
         self._allocated_qubits = set()
@@ -69,16 +69,18 @@ class BackendIBM(Backend):
             self.circuit_to_json(ct)
 
         for measured_id in self._measured_ids:
-            self._json.append({'qubits': [measured_id], 'name': 'measure', 'memory': [measured_id]})
+            self._json.append(
+                {"qubits": [measured_id], "name": "measure", "memory": [measured_id]}
+            )
         print("result==", self._json)
 
         info = {}
-        info['json'] = self._json
+        info["json"] = self._json
 
         info["nq"] = len(circuit.qreg)
-        info['shots'] = 1024
-        info['maxCredits'] = 10
-        info['backend'] = {'name': self.device}
+        info["shots"] = 1024
+        info["maxCredits"] = 10
+        info["backend"] = {"name": self.device}
 
         result = send(
             info,
@@ -92,7 +94,7 @@ class BackendIBM(Backend):
 
     def circuit_to_json(self, cmd):
         """Translates the command and in a local variable.
-        
+
         Args:
             cmd: The command convert to json format.
         """
@@ -103,28 +105,32 @@ class BackendIBM(Backend):
         elif gate is CNOT and len(cmd.controls) == 1:
             self._json.append({"qubits": [*cmd.controls, *cmd.targets], "name": "cx"})
         elif gate is H:
-            self._json.append({'qubits': cmd.targets, 'name': 'u2', 'params': [0, 3.141592653589793]})
+            self._json.append(
+                {"qubits": cmd.targets, "name": "u2", "params": [0, 3.141592653589793]}
+            )
         elif isinstance(gate, (Rx, Ry, Rz)):
-            u_name = {'Rx': 'u3', 'Ry': 'u3', 'Rz': 'u1'}
+            u_name = {"Rx": "u3", "Ry": "u3", "Rz": "u1"}
             u_angle = {
-                'Rx': [gate.angle, -math.pi / 2, math.pi / 2],
-                'Ry': [gate.angle, 0, 0],
-                'Rz': [gate.angle],
+                "Rx": [gate.angle, -math.pi / 2, math.pi / 2],
+                "Ry": [gate.angle, 0, 0],
+                "Rz": [gate.angle],
             }
 
             gate_name = u_name[str(gate)[0:2]]
             params = u_angle[str(gate)[0:2]]
 
-            self._json.append({'qubits': cmd.targets, 'name': gate_name, 'params': params})
+            self._json.append(
+                {"qubits": cmd.targets, "name": gate_name, "params": params}
+            )
 
         else:
             raise Exception(
-                'This command is not currently supported.\n'
-                + 'The IBM quantum chip can only do U1,U2,U3,barriers, and CX / CNOT.'
+                "This command is not currently supported.\n"
+                + "The IBM quantum chip can only do U1,U2,U3,barriers, and CX / CNOT."
             )
 
     def run(self, shots=1):
-        pass #nothing to run
+        pass  # nothing to run
 
     def backend_type(self):
         return "BackendIBM"

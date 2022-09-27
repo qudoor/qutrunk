@@ -1,6 +1,7 @@
+"""Quantum random number generator."""
+
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, Measure, All
-from qutrunk.backends import BackendQuSprout
 
 
 def run_random_byte(backend=None):

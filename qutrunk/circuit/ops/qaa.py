@@ -4,6 +4,7 @@ from .operator import Operator, OperatorContext
 from qutrunk.circuit import Qureg
 from qutrunk.circuit.gates import X, MCZ, All, H
 
+
 class QAA(Operator):
     """Quantum Amplitude Amplification Operator.
 
@@ -24,13 +25,14 @@ class QAA(Operator):
             QAA(3, 7) * qureg
             for i in range(2 ** len(qureg)):
                 print(circuit.get_prob_amp(i))
-        
-        First, the four qubits are uniformly superposed, 
-        and then the state value of 7 is selected as the marker value. 
-        Three times of QAA iterative calculation are performed. 
-        The result obtained after the operation is that the probability of 
+
+        First, the four qubits are uniformly superposed,
+        and then the state value of 7 is selected as the marker value.
+        Three times of QAA iterative calculation are performed.
+        The result obtained after the operation is that the probability of
         the corresponding state of 7 exceeds 96%
     """
+
     def __init__(self, iterations, marked_index):
         super().__init__()
         self.iterations = iterations
@@ -39,10 +41,11 @@ class QAA(Operator):
     def __mul__(self, qureg: Qureg):
         """Apply the QAA operator."""
         if not isinstance(qureg, Qureg):
-            raise TypeError("the operand must be Qureg")
-        if self.marked_index < 0 and self.marked_index >= 2 ** len(qureg):
-            raise ValueError("the marked index value exceed 2 ** len(qureg)")
-        
+            raise TypeError("The operand must be Qureg.")
+
+        if self.marked_index < 0 or self.marked_index >= 2 ** len(qureg):
+            raise ValueError("The marked index value exceed 2 ** len(qureg).")
+
         with OperatorContext(qureg.circuit) as oc:
             for i in range(self.iterations):
                 self._flip_process(qureg)
@@ -51,7 +54,9 @@ class QAA(Operator):
                 prob_amp = qureg.circuit.get_prob_amp(self.marked_index)
                 print(f"prob of state |{self.marked_index}> = {prob_amp}")
 
-        qureg.circuit.append_statement(f'QAA({self.iterations}, {self.marked_index}) * q')
+        qureg.circuit.append_statement(
+            f"QAA({self.iterations}, {self.marked_index}) * q"
+        )
 
     def _flip_process(self, qureg):
         """Flit the phase of target qubit.
@@ -82,6 +87,5 @@ class QAA(Operator):
         All(H) * qureg
         All(X) * qureg
         MCZ(len(qureg) - 1) * qureg
-        All(X) * qureg 
+        All(X) * qureg
         All(H) * qureg
-    

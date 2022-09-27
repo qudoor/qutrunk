@@ -18,7 +18,7 @@ class SubQureg:
 
     def append(self, qubit: QuBit):
         """Append QuBit to SubQureg.
-        
+
         Args:
             qubit: The target qubit append to SubQureg.
         """
@@ -33,6 +33,7 @@ class SubQureg:
             res.append(self.circuit.creg[i].value)
 
         return res
+
 
 class Qureg:
     """Register, maintains a set of qubits.
@@ -90,7 +91,7 @@ class Qureg:
         """Find the index of the provided qubit within this register.
 
         Args:
-            qubit: The qubit to get index. 
+            qubit: The qubit to get index.
         """
         return self.qubits.index(qubit)
 
@@ -111,21 +112,20 @@ class Qureg:
         Returns:
             The tuple contains all subqureg.
         """
-        if type(sections) != list:
-            raise TypeError("sections parameter should be a list")
+        if not isinstance(sections, list):
+            raise TypeError("sections parameter should be a list.")
+
         if sum(sections) != len(self.qubits):
-            raise ValueError("the sum of sections should be equal to len(qubits)")
+            raise ValueError("The sum of sections should be equal to len(qubits).")
 
         res = []
         start_index = 0
         for sec in sections:
+            slices = SubQureg(self.circuit)
             for i in range(sec):
-                slices = SubQureg(self.circuit)
                 # note: share the same QuBit
                 slices.append(self.qubits[start_index + i])
             res.append(slices)
             start_index += sec
 
         return tuple(res)
-
-
