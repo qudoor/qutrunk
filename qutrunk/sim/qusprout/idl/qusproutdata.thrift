@@ -29,6 +29,28 @@ struct Cmd {
 
     //是否执行逆操作
     6: required bool inverse
+
+    //扩展命令
+    7: optional cmdex ex
+}
+
+struct cmdex {
+    //QSP 振幅数据
+    1: optional qspamplitudes qspamp
+}
+
+struct qspamplitudes {
+    //振幅实部
+    1: required list<double> reals
+
+    //振幅虚部
+    2: required list<double> imags
+
+    //振幅开始索引
+    3: optional i32 startindex
+
+    //振幅结束索引
+    4: optional i32 endindex
 }
 
 //指令集
@@ -83,23 +105,6 @@ struct InitQubitsReq {
 }
 
 struct InitQubitsResp {
-    //返回码
-    1: required ecode.BaseCode base
-}
-
-//设置振幅
-struct SetAmplitudesReq {
-    //任务id
-    1: required string id
-
-    //振幅实部
-    2: required list<double> reals
-
-    //振幅虚部
-    3: required list<double> imags
-}
-
-struct SetAmplitudesResp {
     //返回码
     1: required ecode.BaseCode base
 }

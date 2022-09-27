@@ -32,5 +32,6 @@ from .y1 import Y1, Y1Gate
 from .z1 import Z1, Z1Gate
 from .i import I, IGate
 from .sxdg import SqrtXdg, SqrtXdgGate
+from .amp import AMP
 
 CTRL_CNT_PARAM = "ctrl_cnt"

@@ -1,10 +1,7 @@
 """Operator Module."""
-
-
 class Operator:
     """A series of quantum gate operations \
         provide a simple and convenient way to construct a quantum algorithm."""
-
     pass
 
 

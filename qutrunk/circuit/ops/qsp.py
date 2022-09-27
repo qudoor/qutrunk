@@ -6,8 +6,7 @@ from typing import Optional, Union
 from qutrunk.exceptions import QuTrunkError
 from .operator import Operator, OperatorContext
 from qutrunk.circuit import Qureg
-from qutrunk.circuit.gates import X, All, H
-
+from qutrunk.circuit.gates import X, All, H, AMP
 
 class QSP(Operator):
     """Quantum state preparation Operator.
@@ -30,17 +29,27 @@ class QSP(Operator):
             print(circuit.get_all_state())
     """
 
-    def __init__(self, state: Union[str, int], classicvector: Optional[list] = None):
+    def __init__(self, state: Union[str, int], classicvector: Optional[list] = None, ampstartind: Optional[int] = None, numamps: Optional[int] = None):
         super().__init__()
         self.state = state
         self.classicvector = classicvector
+        self.ampstartind = ampstartind
+        self.numamps = numamps
 
     def _check_state(self, qureg: Qureg):
         if self.state == "+":
             return True
 
         if self.state == "AMP":
-            if 0 <= len(self.classicvector) <= 2 ** len(qureg):
+            if self.ampstartind is None:
+                self.ampstartind = 0
+            
+            if self.numamps is None:
+                self.numamps = 2 ** len(qureg)
+
+            if 0 <= len(self.classicvector) <= 2 ** len(qureg)  \
+                and 0 <= self.ampstartind < 2 ** len(qureg) \
+                and self.numamps <= 2 ** len(qureg):
                 return True
 
         if isinstance(self.state, str):
@@ -83,11 +92,21 @@ class QSP(Operator):
         if (len(self.classicvector) <= 0):
             return
 
+        reals = []
+        imags = []
         listsum = sum(self.classicvector)
         for element in self.classicvector:
             normalized_element = cmath.sqrt(complex(element / listsum))
-            qureg.circuit.init_amp_reals.append(normalized_element.real)
-            qureg.circuit.init_amp_imags.append(normalized_element.imag)
+            reals.append(normalized_element.real)
+            imags.append(normalized_element.imag)
+
+        if self.ampstartind == None:
+            self.ampstartind = 0
+
+        if self.ampstartind == None:
+            self.numamps = 2 ** len(qureg)
+
+        AMP(reals, imags, self.ampstartind, self.numamps) * qureg
 
     def _process_plus_state(self, qureg: Qureg):
         """Process plus state."""

@@ -12,7 +12,7 @@ class Command:
         inverse: Whether to enable the inverse circuit.
     """
 
-    def __init__(self, gate, targets, controls=None, rotation=None, inverse=False):
+    def __init__(self, gate, targets=None, controls=None, rotation=None, inverse=False):
         # TODO: modify controls and rotation to tuple?
         if controls is None:
             self.controls = []
@@ -28,6 +28,12 @@ class Command:
         self.targets = targets
         self.cmd_ver = "1.0"
         self.inverse = inverse
+
+        #state-vector amplitudes properties
+        self.reals = []
+        self.imags = []
+        self.ampstartind = 0
+        self.numamps = 0
 
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""
