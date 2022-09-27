@@ -480,7 +480,6 @@ class QCircuit:
             unroll: True: Dump the detailed instructions, especially, \
                 if the instruction contains an operator, the operator will be expanded.
                 False: Dump the brief instructions, the operator will not be expanded.
-            file: Dump the qutrunk instruction to file(json format).
         """
         print(f"qreg q[{str(len(self.qreg))}]")
         print(f"creg c[{str(len(self.qreg))}]")
@@ -492,15 +491,7 @@ class QCircuit:
                 print(stm)
 
     def _print_qasm(self):
-        """Convert circuit and dump to file/stdout.
-
-        Convert circuit to QASM 2.0, and dump to file/stdout.
-        TODO: custom gate implemented by qutrunk can't be parsed by third party.
-        Refer to qulib1.inc and mapping.qutrunk_standard_gate.
-
-        Args:
-            file: Dump the qasm to file.
-        """
+        """Print quantum circuit in OpenQASM form."""
         print("OPENQASM 2.0;")
         print('include "qulib1.inc";')
         print(f"qreg q[{str(len(self.qreg))}];")
@@ -509,6 +500,14 @@ class QCircuit:
             print(c.qasm() + ";")
 
     def print(self, format=None, unroll=True):
+        """Print quantum circuit.
+
+        Args:
+            format(str): The format of needed to print, Default to qusl. options are "qusl" or "openqasm".
+            unroll: True: Dump the detailed instructions, especially, \
+                if the instruction contains an operator, the operator will be expanded.
+                False: Dump the brief instructions, the operator will not be expanded.
+        """
         if format is None or format == "qusl":
             self._print_qusl(unroll)
 
