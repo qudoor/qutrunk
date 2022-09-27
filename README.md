@@ -1,11 +1,9 @@
 ## QuTrunk
 
 [![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://developer.queco.cn/qutrunk_api/)
-[![Release](https://img.shields.io/badge/release-v0.1.9-blue.svg)](https://github.com/PaddlePaddle/Paddle/releases)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/Angel-ML/angel/archive/refs/heads/branch-3.2.0.zip)
+[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/queco-quantum/qutrunk/archive/refs/heads/main.zip)
 
-[English](./README.md) | 简体中文
 
 ### **概述**
 ---
@@ -60,6 +58,14 @@ QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
   ```python
   pip install qutrunk
   ```
+
+验证QuTrunk是否安装成功，打开终端进入python交互模式，执行如下语句：
+
+``` python
+import qutrunk
+qutrunk.run_check()
+```
+输出结果为："QuTrunk is installed successfully! You can use QuTrunk now."表明QuTrunk安装成功。
 
 #### **2.源码安装**  
 
@@ -149,7 +155,7 @@ QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
   All(Measure) * qr
 
   # print circuit
-  qc.print(qc)   
+  qc.print()   
   # run circuit
   res = qc.run(shots=1024) 
   # print result
@@ -177,20 +183,26 @@ QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
                     0  1 
   ```
 
+### **量子可视化编程**  
+---
+QuBranch是由启科量子基于vscode开发的量子编程集成开发环境。  
+QuTrunk与QuBranch相互配合可以实现量子可视化编程，
+具体步骤参见[量子可视化编程](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
+
 ### **文档**
 ---
-* [QuTrunk 快速上手教程](http://developer.queco.cn/learn/doc/detail?id=12)
-* [QuTrunk API](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
+* [QuTrunk 快速上手教程](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
+* [QuTrunk API](http://developer.queco.cn/qutrunk_api/)
 
 
-## 如何参与开发
-
+### **如何参与开发**
+---
 1. 阅读源代码，了解我们当前的开发方向
 2. 找到自己感兴趣的功能或模块
 3. 进行开发，开发完成后自测功能是否正确
 4. Fork代码库，将修复代码提交到fork的代码库
 5. 发起pull request
-6. 更多详情请参见[链接](http://192.168.170.196/qudoor/qubox/-/blob/dev_ll/CONTRIBUTING.md)
+6. 更多详情请参见[链接](./CONTRIBUTING.md)
 
 
 ### **许可证**
