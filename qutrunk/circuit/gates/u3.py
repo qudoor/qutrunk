@@ -64,11 +64,12 @@ class U3(BasicGate):
             inverse=self.is_inverse,
         )
         self.commit(qubit.circuit, cmd)
+        return cmd
 
     def __mul__(self, qubit):
         """Overwrite * operator to achieve quantum logic gate operation, \
             reuse __or__ operator implement."""
-        self.__or__(qubit)
+        return self.__or__(qubit)
 
     @property
     def matrix(self):
@@ -147,10 +148,11 @@ class CU3(BasicRotateGate):
             rotation=[self.theta, self.phi, self.lam],
         )
         self.commit(qubits[0].circuit, cmd)
+        return cmd
 
     def __mul__(self, qubits):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
-        self.__or__(qubits)
+        return self.__or__(qubits)
 
     @property
     def matrix(self):
@@ -237,10 +239,11 @@ class CU(BasicRotateGate):
             rotation=[self.theta, self.phi, self.lam, self.gamma],
         )
         self.commit(qubits[0].circuit, cmd)
+        return cmd
 
     def __mul__(self, qubits):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
-        self.__or__(qubits)
+        return self.__or__(qubits)
 
     @property
     def matrix(self):

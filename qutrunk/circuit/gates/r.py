@@ -51,10 +51,11 @@ class R(BasicRotateGate):
             self, targets, rotation=[self.theta, self.phi], inverse=self.is_inverse
         )
         self.commit(qubit.circuit, cmd)
+        return cmd
 
     def __mul__(self, qubit):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
-        self.__or__(qubit)
+        return self.__or__(qubit)
 
     @property
     def matrix(self):

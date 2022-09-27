@@ -36,10 +36,11 @@ class BarrierGate(BasicGate):
         targets = [q.index for q in qubit]
         cmd = Command(self, targets)
         self.commit(qubit[0].circuit, cmd)
+        return cmd
 
     def __mul__(self, qubits):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
-        self.__or__(qubits)
+        return self.__or__(qubits)
 
     @property
     def label(self):
