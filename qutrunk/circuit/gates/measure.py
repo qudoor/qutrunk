@@ -31,11 +31,10 @@ class MeasureGate(BasicGate):
         targets = [qubit.index]
         cmd = Command(self, targets)
         self.commit(qubit.circuit, cmd)
-        return cmd
 
     def __mul__(self, qubit):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
-        return self.__or__(qubit)
+        self.__or__(qubit)
 
 
 Measure = MeasureGate()

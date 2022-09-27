@@ -40,12 +40,11 @@ class YGate(BasicGate, Observable):
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)
         self.commit(qubit.circuit, cmd)
-        return cmd
 
     def __mul__(self, qubit):
         """Overwrite * operator to achieve quantum logic gate operation, \
             reuse __or__ operator implement."""
-        return self.__or__(qubit)
+        self.__or__(qubit)
 
     @property
     def matrix(self):
@@ -108,11 +107,10 @@ class CYGate(BasicGate):
         targets = [qubits[1].index]
         cmd = Command(self, targets, controls, inverse=self.is_inverse)
         self.commit(qubits[0].circuit, cmd)
-        return cmd
 
     def __mul__(self, qubits):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
-        return self.__or__(qubits)
+        self.__or__(qubits)
 
     @property
     def matrix(self):

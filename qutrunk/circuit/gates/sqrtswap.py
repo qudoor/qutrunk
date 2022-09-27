@@ -33,12 +33,11 @@ class SqrtSwapGate(BasicGate):
         targets = [q.index for q in qubits]
         cmd = Command(self, targets, inverse=self.is_inverse)
         self.commit(qubits[0].circuit, cmd)
-        return cmd
 
     def __mul__(self, qubits):
         """Overwrite * operator to achieve quantum logic gate operation, \
             reuse __or__ operator implement."""
-        return self.__or__(qubits)
+        self.__or__(qubits)
 
     @property
     def matrix(self):
