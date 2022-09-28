@@ -34,6 +34,9 @@ class SubQureg:
 
         return res
 
+    def __len__(self):
+        return len(self.qubits)
+
 
 class Qureg:
     """Register, maintains a set of qubits.
