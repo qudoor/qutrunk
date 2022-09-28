@@ -36,10 +36,10 @@ struct Cmd {
 
 struct cmdex {
     //QSP 振幅数据
-    1: optional qspamplitudes qspamp
+    1: optional amplitudes amp
 }
 
-struct qspamplitudes {
+struct amplitudes {
     //振幅实部
     1: required list<double> reals
 
@@ -47,10 +47,10 @@ struct qspamplitudes {
     2: required list<double> imags
 
     //振幅开始索引
-    3: optional i32 startindex
+    3: optional i32 startind
 
     //振幅结束索引
-    4: optional i32 endindex
+    4: optional i32 numamps
 }
 
 //指令集

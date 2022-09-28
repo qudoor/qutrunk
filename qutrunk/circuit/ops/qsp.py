@@ -29,11 +29,11 @@ class QSP(Operator):
             print(circuit.get_all_state())
     """
 
-    def __init__(self, state: Union[str, int], classicvector: Optional[list] = None, ampstartind: Optional[int] = None, numamps: Optional[int] = None):
+    def __init__(self, state: Union[str, int], classicvector: Optional[list] = None, startind: Optional[int] = None, numamps: Optional[int] = None):
         super().__init__()
         self.state = state
         self.classicvector = classicvector
-        self.ampstartind = ampstartind
+        self.startind = startind
         self.numamps = numamps
 
     def _check_state(self, qureg: Qureg):
@@ -41,16 +41,19 @@ class QSP(Operator):
             return True
 
         if self.state == "AMP":
-            if self.ampstartind is None:
-                self.ampstartind = 0
+            if self.startind is None:
+                self.startind = 0
             
-            if self.numamps is None:
-                self.numamps = 2 ** len(qureg)
+            if self.numamps is None or self.numamps > len(self.classicvector):
+                self.numamps = len(self.classicvector)
 
             if 0 <= len(self.classicvector) <= 2 ** len(qureg)  \
-                and 0 <= self.ampstartind < 2 ** len(qureg) \
-                and self.numamps <= 2 ** len(qureg):
+                and 0 <= self.startind < 2 ** len(qureg) \
+                and 0 <= self.numamps <= 2 ** len(qureg) \
+                and (self.startind + self.numamps) <= 2 ** len(qureg):
                 return True
+            else:
+                return False
 
         if isinstance(self.state, str):
             val = int(self.state, base=2)
@@ -69,7 +72,7 @@ class QSP(Operator):
             raise TypeError("the operand must be Qureg.")
 
         if not self._check_state(qureg):
-            raise ValueError("Invalid Classical state.")
+            raise ValueError("Invalid QSP state.")
 
         if qureg.circuit.gates_len > 0:
             raise QuTrunkError("QSP should be applied at the beginning of circuit.")
@@ -89,9 +92,6 @@ class QSP(Operator):
 
     def _process_amp_state(self, qureg: Qureg):
         """Process amp state."""
-        if (len(self.classicvector) <= 0):
-            return
-
         reals = []
         imags = []
         listsum = sum(self.classicvector)
@@ -100,13 +100,7 @@ class QSP(Operator):
             reals.append(normalized_element.real)
             imags.append(normalized_element.imag)
 
-        if self.ampstartind == None:
-            self.ampstartind = 0
-
-        if self.ampstartind == None:
-            self.numamps = 2 ** len(qureg)
-
-        AMP(reals, imags, self.ampstartind, self.numamps) * qureg
+        AMP(reals, imags, self.startind, self.numamps) * qureg
 
     def _process_plus_state(self, qureg: Qureg):
         """Process plus state."""

@@ -99,9 +99,10 @@ class Simulator:
     def amp(self, reals, imags, startindex, numamps):
         """Init amplitudes state"""
         
-        for index in numamps:
-            self.real[startindex] = reals[startindex]
-            self.imag[startindex] = imags[startindex]
+        for index in range(numamps):
+            self.real[startindex] = reals[index]
+            self.imag[startindex] = imags[index]
+            startindex += 1
 
     # TODO:need to improve.
     def hadamard(self, target):

@@ -1,5 +1,30 @@
 """Command Module."""
 
+class Amplitude:
+    """Set state-vector Amplitude.
+
+    Args:
+        reals: Amplitude read part.
+        imags: Amplitude imag part.
+        startind: Amplitude start index.
+        numamps: Amplitude number.
+    """
+    def __init__(self):
+        self.reals = []
+        self.imags = []
+        self.startind = 0
+        self.numamps = 0
+
+
+class CmdEx:
+    """Command extension.
+
+    Args:
+        amp: Amplitude object.
+    """
+    def __init__(self):
+        self.amp = Amplitude()
+
 
 class Command:
     """Converts the quantum gate operation into a specific command.
@@ -14,6 +39,11 @@ class Command:
 
     def __init__(self, gate, targets=None, controls=None, rotation=None, inverse=False):
         # TODO: modify controls and rotation to tuple?
+        if targets is None:
+            self.targets = []
+        else:
+            self.targets = targets
+
         if controls is None:
             self.controls = []
         else:
@@ -25,15 +55,11 @@ class Command:
             self.rotation = rotation
 
         self.gate = gate
-        self.targets = targets
         self.cmd_ver = "1.0"
         self.inverse = inverse
 
-        #state-vector amplitudes properties
-        self.reals = []
-        self.imags = []
-        self.ampstartind = 0
-        self.numamps = 0
+        #Command extention data
+        self.cmdex = CmdEx()
 
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""

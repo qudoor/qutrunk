@@ -1082,4 +1082,4 @@ class BackendLocalPython:
            cmd: the Command object.
         """
 
-        self.sim.amp(cmd.reals, cmd.imags, cmd.ampstartind, cmd.numamps)
+        self.sim.amp(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)

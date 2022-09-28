@@ -12,14 +12,14 @@ class AMP(BasicGate):
     Example:
         .. code-block:: python
 
-            AMP(reals, images, ampstartind, numamps) * qr
+            AMP(reals, images, startind, numamps) * qr
     """
 
-    def __init__(self, reals, images, ampstartind, numamps):
+    def __init__(self, reals, images, startind, numamps):
         super().__init__()
         self.reals = reals
         self.images = images
-        self.ampstartind = ampstartind
+        self.startind = startind
         self.numamps = numamps
 
     def __str__(self):
@@ -39,10 +39,10 @@ class AMP(BasicGate):
             raise NotImplementedError("The argument must be Qureg object.")
 
         cmd = Command(self)
-        cmd.reals = self.reals
-        cmd.imags = self.images
-        cmd.ampstartind = self.ampstartind
-        cmd.numamps = self.numamps
+        cmd.cmdex.amp.reals = self.reals
+        cmd.cmdex.amp.imags = self.images
+        cmd.cmdex.amp.startind = self.startind
+        cmd.cmdex.amp.numamps = self.numamps
         
         self.commit(qureg.circuit, cmd)
 

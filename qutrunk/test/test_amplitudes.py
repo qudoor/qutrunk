@@ -12,11 +12,21 @@ def test_amplitudes_local():
     qubit_len = 3
     circuit = QCircuit()
     qr = circuit.allocate(qubit_len)
-    QSP("AMP", [1-2j, 2+3j, 3-4j, 0.5+0.7j]) * qr
+
+    amplist = [1-2j, 2+3j, 3-4j, 0.5+0.7j]
+    startind = 0
+    numamps = 3
+    QSP("AMP", amplist, startind, numamps) * qr
+
+    if numamps > len(amplist):
+        numamps = len(amplist)
 
     res = ['0, 0'] * (2**qubit_len)
-    for i in range(len(circuit.init_amp_reals)): 
-        res[i] = ','.join([str(circuit.init_amp_reals[i]), str(circuit.init_amp_imags[i])])
+    res[0] = '1, 0'
+
+    for i in range(numamps): 
+        res[startind] = ','.join([str(qr.circuit.cmds[0].cmdex.amp.reals[i]), str(qr.circuit.cmds[0].cmdex.amp.imags[i])])
+        startind += 1
 
     res_box = circuit.get_all_state()
 
@@ -26,16 +36,26 @@ def test_amplitudes_local():
 test_amplitudes_local()
 
 def test_amplitudes_qusprout():
-    """test set amp for qusprout"""
-    # 使用qusprout量子计算模拟器
+    """test set amp for local"""
+    # 使用本地量子计算模拟器
     qubit_len = 3
     circuit = QCircuit(backend=BackendQuSprout())
     qr = circuit.allocate(qubit_len)
-    QSP("AMP", [1, 2, 3, 4, 5]) * qr
+
+    amplist = [1-2j, 2+3j, 3-4j, 0.5+0.7j]
+    startind = 0
+    numamps = 3
+    QSP("AMP", amplist, startind, numamps) * qr
+
+    if numamps > len(amplist):
+        numamps = len(amplist)
 
     res = ['0, 0'] * (2**qubit_len)
-    for i in range(len(circuit.init_amp_reals)): 
-        res[i] = ','.join([str(circuit.init_amp_reals[i]), str(circuit.init_amp_imags[i])])
+    res[0] = '1, 0'
+
+    for i in range(numamps): 
+        res[startind] = ','.join([str(qr.circuit.cmds[0].cmdex.amp.reals[i]), str(qr.circuit.cmds[0].cmdex.amp.imags[i])])
+        startind += 1
 
     res_box = circuit.get_all_state()
 
