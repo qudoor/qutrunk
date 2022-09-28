@@ -44,7 +44,7 @@ class QFTOps(Operator):
             qubits: Union[Qureg, Iterable[QuBit]], can be partial QFT.
         """
         if not all(isinstance(qb, QuBit) for qb in qubits):
-            raise TypeError("the operand must be Qureg or Iterable of QuBit.")
+            raise TypeError("The operand must be Qureg or Iterable of QuBit.")
 
         with OperatorContext(qubits[0].circuit) as oc:
             qb_cnt = len(qubits)
@@ -59,6 +59,7 @@ class QFTOps(Operator):
             for i in range(qb_cnt // 2):
                 Swap * (qubits[i], qubits[qb_cnt - i - 1])
 
+        # TODO: need to improve
         operand = ""
         if isinstance(qubits, Qureg):
             operand = "q"
@@ -95,6 +96,7 @@ class IQFTOps(Operator):
                     lam = -pi * (2.0 ** (target_qb_num - ctrl_qb_num))
                     CP(lam) * (qubits[ctrl_qb_num], qubits[target_qb_num])
 
+        # TODO: need to improve
         operand = ""
         if isinstance(qubits, Qureg):
             operand = "q"
