@@ -38,6 +38,7 @@ class BackendIBM(Backend):
 
             # run circuit
             res = qc.run(shots=100)
+            print(res)
     """
 
     def __init__(self, token=None, device=None):
@@ -127,7 +128,6 @@ class BackendIBM(Backend):
             num_retries=shots,
             verbose=True,
         )
-        print("result=", result)
         return result
 
     def backend_type(self):
