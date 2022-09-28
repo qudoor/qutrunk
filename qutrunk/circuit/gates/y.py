@@ -68,6 +68,22 @@ class YGate(BasicGate, Observable):
         puali_list.append(pauli)
         return puali_list
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = YGate()
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        gate = CYGate()
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 PauliY = Y = YGate()
 
@@ -116,6 +132,12 @@ class CYGate(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         return np.array([[0, 0, -1j, 0], [0, 1, 0, 0], [1j, 0, 0, 0], [0, 0, 0, 1]])
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CYGate()
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate
 
 
 CY = CYGate()

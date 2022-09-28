@@ -72,3 +72,9 @@ class U2(BasicGate):
                 [np.exp(1j * phi) * isqrt2, np.exp(1j * (phi + lam)) * isqrt2],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = U2(self.theta, self.phi)
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate

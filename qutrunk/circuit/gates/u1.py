@@ -64,6 +64,22 @@ class U1(BasicGate):
         lam = float(self.rotation)
         return np.array([[1, 0], [0, np.exp(1j * lam)]])
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = U1(self.rotation)
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate
+    
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        gate = CU1(self.rotation)
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 class CU1(BasicRotateGate):
     """Control U1 gate.
@@ -130,3 +146,9 @@ class CU1(BasicRotateGate):
         return np.matrix(
             [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, np.exp(1j * half_alpha)]]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CU1(self.rotation)
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate

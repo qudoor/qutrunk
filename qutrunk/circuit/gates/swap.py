@@ -53,6 +53,22 @@ class SwapGate(BasicGate):
         """Access to the matrix property of this gate."""
         return np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = SwapGate()
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        gate = CSwapGate()
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 Swap = SwapGate()
 
@@ -117,6 +133,12 @@ class CSwapGate(BasicGate):
                 [0, 0, 0, 0, 0, 0, 0, 1],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CSwapGate()
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate
 
 
 CSwap = CSwapGate()

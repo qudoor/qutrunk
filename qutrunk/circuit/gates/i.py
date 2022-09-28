@@ -61,5 +61,11 @@ class IGate(BasicGate, Observable):
         puali_list.append(pauli)
         return puali_list
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = IGate()
+        gate.is_inverse = bool(1-self.is_inverse) 
+        return gate
+
 
 PauliI = I = IGate()

@@ -66,3 +66,9 @@ class R(BasicRotateGate):
         exp_m = np.exp(-1j * phi)
         exp_p = np.exp(1j * phi)
         return np.array([[cos, -1j * exp_m * sin], [-1j * exp_p * sin, cos]])
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = R(self.theta, self.phi)
+        gate.is_inverse = bool(1-self.is_inverse) 
+        return gate

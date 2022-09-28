@@ -51,5 +51,11 @@ class SdgGate(BasicGate):
         """Access to the matrix property of this gate."""
         return np.matrix([[1, 0], [0, 1j]]).getH()
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = SdgGate()
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate
+
 
 Sdg = SdgGate()

@@ -67,3 +67,9 @@ class iSwap(BasicGate):
         return np.matrix(
             [[1, 0, 0, 0], [0, cos, -1j * sin, 0], [0, -1j * sin, cos, 0], [0, 0, 0, 1]]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = iSwap(self.rotation)
+        gate.is_inverse = bool(1-self.is_inverse) 
+        return gate

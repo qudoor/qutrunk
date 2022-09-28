@@ -72,3 +72,10 @@ class CR(BasicRotateGate):
                 [0, 0, 0, np.exp(1j * half_alpha)],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        # note: 状态相关方法需要重新生成一个新对象
+        gate = CR(self.rotation)
+        gate.is_inverse = bool(1-self.is_inverse) 
+        return gate

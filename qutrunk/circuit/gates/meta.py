@@ -174,18 +174,20 @@ class gate(BasicGate):
         self.__or__(qubits)
 
 
-def Inv(gate):
-    """Inverse gate.
+# note: 该方法会导致部分门操作产生状态污染，比如通过对象实例调用的门操作
+# 只要设置过状态，那么后续所有该量子门操作都带了这个状态
+# def Inv(gate):
+#     """Inverse gate.
 
-    Args:
-        gate: The gate will apply inverse operator.
+#     Args:
+#         gate: The gate will apply inverse operator.
 
-    Example:
-        .. code-block:: python
+#     Example:
+#         .. code-block:: python
 
-            Inv(H) * q[0]
-    """
-    if isinstance(gate, BasicGate):
-        gate.is_inverse = True
+#             Inv(H) * q[0]
+#     """
+#     if isinstance(gate, BasicGate):
+#         gate.is_inverse = True
 
-    return gate
+#     return gate

@@ -52,5 +52,11 @@ class X1Gate(BasicGate):
         factor = 1 / np.sqrt(2)
         return np.matrix([[factor, -1j * factor], [-1j * factor, factor]])
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = X1Gate()
+        gate.is_inverse = bool(1-self.is_inverse)
+        return gate
+
 
 X1 = X1Gate()
