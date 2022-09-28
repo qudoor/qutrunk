@@ -74,40 +74,103 @@ class Power(BasicGate):
     def __mul__(self, qubits: Union[QuBit, Qureg, tuple]):
         self.__or__(qubits)
 
-
-class gate(BasicGate):
-    """Definition of custom gate.
-
-    Implement by composing some basic logic gates.
+class CustomGate:
+    """Used to define custom gate.
 
     Example:
         .. code-block:: python
 
-            @gate
-            def my_gate(q):
-                H * q[0]
-                CNOT * (q[0], q[1])
+            from qutrunk.circuit import QCircuit
+            from qutrunk.circuit.gates import H, CNOT, CustomGate, All, Measure, gate
 
             circuit = QCircuit()
             q = circuit.allocate(2)
-            my_gate * q
+
+            @gate
+            def my_gate(a, b):
+                return CustomGate() << (H, a) << (CNOT, (a, b))
+
+            my_gate * (q[0], q[1])
             All(Measure) * q
+            circuit.print()
             res = circuit.run(shots=100)
-            print(res.get_counts())
+            print(res.get_counts()) 
+            
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.gate_type = None
+        self.gates = []
+        self.matrix = None
+
+    def append_gate(self, gate, qubits):
+        """Append basic gate to custom gate.
+        
+        Args:
+            gate: Basic gate.
+            qubits: The target qubits of quantum gate to apply.
+        """
+        if self.gate_type is None:
+            self.gate_type = "compose"
+        self.gates.append({"gate": gate, "qubits": qubits})
+
+    def __lshift__(self, gate_define):
+        self.append_gate(gate_define[0], gate_define[1])
+        return self
+
+    def define_matrix(self, matrix):
+        """Define specific matrix for custom gate.
+        
+        Args:
+            matrix: The matrix defined by user.
+        """
+        if self.gate_type is None:
+            self.gate_type = "matrix"
+        self.matrix = matrix
+
+class gate(BasicGate):
+    """Definition of custom gate.
+
+    Implement by composing some basic logic gates or define specific matrix.
+
+    Example:
+        .. code-block:: python
+
+            from qutrunk.circuit import QCircuit
+            from qutrunk.circuit.gates import H, CNOT, CustomGate, All, Measure, gate
+
+            circuit = QCircuit()
+            q = circuit.allocate(2)
+
+            @gate
+            def my_gate(a, b):
+                return CustomGate() << (H, a) << (CNOT, (a, b))
+
+            my_gate * (q[0], q[1])
+            All(Measure) * q
+            circuit.print()
+            res = circuit.run(shots=100)
+            print(res.get_counts()) 
     """
 
     def __init__(self, func):
         self.compose_gate = True
         self.callable = func
 
-    def __or__(self, qubits: Union[QuBit, Qureg, tuple]):
+    def __or__(self, qubits: Union[QuBit, tuple]):
         """Quantum logic gate operation."""
-        if not isinstance(qubits, (QuBit, Qureg, tuple)):
-            raise TypeError("qubits should be type of QuBit, Qureg or tuple")
+        if not isinstance(qubits, (QuBit, tuple)):
+            raise TypeError("qubits should be type of QuBit or tuple")
+        if isinstance(qubits, QuBit):
+            custom_gate = self.callable(qubits) 
+        else:
+            custom_gate = self.callable(*qubits)
+        if custom_gate.gate_type == "compose":
+            for c in custom_gate.gates:
+                c['gate'] * c['qubits']
 
-        self.callable(qubits)
-
-    def __mul__(self, qubits: Union[QuBit, Qureg, tuple]):
+    def __mul__(self, qubits: Union[QuBit, tuple]):
         self.__or__(qubits)
 
 
