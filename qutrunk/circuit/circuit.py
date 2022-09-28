@@ -191,6 +191,9 @@ class QCircuit:
         """
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
+        if self.backend.backend_type() == "BackendIBM":
+            # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
+            return result
         # TODO: measureSet
         if result and result.measureSet:
             for m in result.measureSet:
