@@ -46,11 +46,11 @@ def run_phase_estimation(backend=None):
     # stage 4: calculate the value of theta
     f = _bin_int(q1.to_cl())
     theta = f / 2 ** len(q1)
-    print(theta)
+    print("θ=", theta)
 
     return qc
 
 
 if __name__ == "__main__":
     circuit = run_phase_estimation()
-    circuit.draw()
+

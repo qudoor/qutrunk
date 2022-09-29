@@ -38,6 +38,19 @@ class QFTOps(Operator):
     def __init__(self):
         super().__init__()
 
+    def _add_statement(self, qubits):
+        operand = ""
+        if isinstance(qubits, Qureg):
+            operand = "q"
+        else:
+            operand += "("
+            for q in qubits:
+                operand += "q[" + str(q.index) + "], "
+            operand = operand[0:-2]
+            operand += ")"
+
+        qubits[0].circuit.append_statement("QFT * " + operand)
+
     def __mul__(self, qubits: Union[Qureg, Iterable[QuBit]]):
         """
         Args:
@@ -59,7 +72,14 @@ class QFTOps(Operator):
             for i in range(qb_cnt // 2):
                 Swap * (qubits[i], qubits[qb_cnt - i - 1])
 
-        # TODO: need to improve
+        self._add_statement(qubits)
+
+
+class IQFTOps(Operator):
+    def __init__(self):
+        super().__init__()
+
+    def _add_statement(self, qubits):
         operand = ""
         if isinstance(qubits, Qureg):
             operand = "q"
@@ -70,12 +90,7 @@ class QFTOps(Operator):
             operand = operand[0:-2]
             operand += ")"
 
-        qubits[0].circuit.append_statement("QFT * " + operand)
-
-
-class IQFTOps(Operator):
-    def __init__(self):
-        super().__init__()
+        qubits[0].circuit.append_statement("IQFT * " + operand)
 
     def __mul__(self, qubits: Union[Qureg, Iterable[QuBit]]):
         """
@@ -96,18 +111,7 @@ class IQFTOps(Operator):
                     lam = -pi * (2.0 ** (target_qb_num - ctrl_qb_num))
                     CP(lam) * (qubits[ctrl_qb_num], qubits[target_qb_num])
 
-        # TODO: need to improve
-        operand = ""
-        if isinstance(qubits, Qureg):
-            operand = "q"
-        else:
-            operand += "("
-            for q in qubits:
-                operand += "q[" + str(q.index) + "], "
-            operand = operand[0:-2]
-            operand += ")"
-
-        qubits[0].circuit.append_statement("IQFT * " + operand)
+        self._add_statement(qubits)
 
 
 QFT = QFTOps()
