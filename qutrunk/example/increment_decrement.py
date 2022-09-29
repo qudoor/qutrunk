@@ -32,9 +32,10 @@ def decrement(num_qubits, init_value):
     All(Measure) * qr
     res = circuit.run()
     print(res.get_outcome())
+
     return circuit
 
 
 if __name__ == "__main__":
-    circuit = increment(4, 0)
+    circuit = decrement(4, 0)
 
