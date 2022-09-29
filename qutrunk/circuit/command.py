@@ -31,6 +31,7 @@ class Command:
 
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""
+        # TODO: need to improve
         if type(self) is not type(other):
             return False
 

@@ -5,7 +5,7 @@ from qutrunk.circuit.ops.operator import Operator, OperatorContext
 from qutrunk.circuit.gates import X, MCX
 
 
-class ADDOps(Operator):
+class Increment(Operator):
     """Self-increment operation"""
 
     def __init__(self):
@@ -17,7 +17,7 @@ class ADDOps(Operator):
 
         num_qubits = len(qr)
 
-        with OperatorContext(qr[0].circuit) as oc:
+        with OperatorContext(qr[0].circuit):
             ctrl = []
             for i in range(num_qubits, 1, -1):
                 for j in range(i - 1):
@@ -29,4 +29,4 @@ class ADDOps(Operator):
     # TODO: add to statements
 
 
-ADD = ADDOps()
+INC = Increment()
