@@ -74,7 +74,7 @@ class Power(BasicGate):
     def __mul__(self, qubits: Union[QuBit, Qureg, tuple]):
         self.__or__(qubits)
 
-class CustomGate:
+class Gate:
     """Used to define custom gate.
 
     Example:
@@ -86,9 +86,9 @@ class CustomGate:
             circuit = QCircuit()
             q = circuit.allocate(2)
 
-            @gate
+            @def_gate
             def my_gate(a, b):
-                return CustomGate() << (H, a) << (CNOT, (a, b))
+                return Gate() << (H, a) << (CNOT, (a, b))
 
             my_gate * (q[0], q[1])
             All(Measure) * q
@@ -129,7 +129,7 @@ class CustomGate:
             self.gate_type = "matrix"
         self.matrix = matrix
 
-class gate(BasicGate):
+class def_gate(BasicGate):
     """Definition of custom gate.
 
     Implement by composing some basic logic gates or define specific matrix.
@@ -143,9 +143,9 @@ class gate(BasicGate):
             circuit = QCircuit()
             q = circuit.allocate(2)
 
-            @gate
+            @def_gate
             def my_gate(a, b):
-                return CustomGate() << (H, a) << (CNOT, (a, b))
+                return Gate() << (H, a) << (CNOT, (a, b))
 
             my_gate * (q[0], q[1])
             All(Measure) * q
@@ -163,15 +163,37 @@ class gate(BasicGate):
         if not isinstance(qubits, (QuBit, tuple)):
             raise TypeError("qubits should be type of QuBit or tuple")
         if isinstance(qubits, QuBit):
-            custom_gate = self.callable(qubits) 
+            custom_gate = self.callable(qubits)
         else:
             custom_gate = self.callable(*qubits)
         if custom_gate.gate_type == "compose":
             for c in custom_gate.gates:
                 c['gate'] * c['qubits']
+        elif custom_gate.gate_type == "matrix":
+            # apply custom gate defined by matrix
+            pass
 
     def __mul__(self, qubits: Union[QuBit, tuple]):
         self.__or__(qubits)
+
+    @property
+    def matrix(self):
+        """Access to the matrix property of this gate."""
+        # 根据比特位数将每个量子门张成一个大矩阵，G.matrix @ I @ I（根据量子比特位置关系调整I的顺序）
+        # 然后每个门张成的矩阵再做矩阵乘法
+        pass
+
+    def inv(self):
+        """Apply inverse gate."""
+        pass
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        pass
 
 
 # note: 该方法会导致部分门操作产生状态污染，比如通过对象实例调用的门操作
