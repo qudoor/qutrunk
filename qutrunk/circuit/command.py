@@ -22,8 +22,8 @@ class CmdEx:
     Args:
         amp: Amplitude object.
     """
-    def __init__(self):
-        self.amp = Amplitude()
+    def __init__(self, amp=None):
+        self.amp = amp
 
 
 class Command:
@@ -37,7 +37,7 @@ class Command:
         inverse: Whether to enable the inverse circuit.
     """
 
-    def __init__(self, gate, targets=None, controls=None, rotation=None, inverse=False):
+    def __init__(self, gate, targets=None, controls=None, rotation=None, inverse=False, cmdex=None):
         # TODO: modify controls and rotation to tuple?
         if targets is None:
             self.targets = []
@@ -59,7 +59,7 @@ class Command:
         self.inverse = inverse
 
         #Command extention data
-        self.cmdex = CmdEx()
+        self.cmdex = cmdex
 
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""

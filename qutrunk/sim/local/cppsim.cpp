@@ -22,15 +22,15 @@ namespace py = pybind11;
 using Qubits = vector<int>;
 using Qurota = vector<double>;
 
-typedef struct _Amplitudes{
+typedef struct _Amplitude{
     vector<double> reals;
     vector<double> imags;
     int startind;
     int numamps;
-} Amplitudes;
+} Amplitude;
 
 typedef struct _CmdEx {
-    Amplitudes amp;
+    Amplitude amp;
 } CmdEx;
 
 typedef struct _Cmd {
@@ -1480,12 +1480,12 @@ PYBIND11_MODULE(simulator, m) {
     m.def("getExpecPauliProd", &getExpecPauliProd, "getExpecPauliProd", py::arg("PauliProdList"));
     m.def("getExpecPauliSum", &getExpecPauliSum, "getExpecPauliSum", py::arg("pauli_type"), py::arg("coeff_type"));
 
-    py::class_<Amplitudes>(m, "Amplitudes")
+    py::class_<Amplitude>(m, "Amplitude")
         .def(py::init())
-        .def_readwrite("reals", &Amplitudes::reals)
-        .def_readwrite("imags", &Amplitudes::imags)
-        .def_readwrite("startind", &Amplitudes::startind)
-        .def_readwrite("numamps", &Amplitudes::numamps);
+        .def_readwrite("reals", &Amplitude::reals)
+        .def_readwrite("imags", &Amplitude::imags)
+        .def_readwrite("startind", &Amplitude::startind)
+        .def_readwrite("numamps", &Amplitude::numamps);
 
     py::class_<CmdEx>(m, "CmdEx")
         .def(py::init())

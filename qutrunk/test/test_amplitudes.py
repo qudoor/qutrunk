@@ -42,9 +42,9 @@ def test_amplitudes_qusprout():
     circuit = QCircuit(backend=BackendQuSprout())
     qr = circuit.allocate(qubit_len)
 
-    amplist = [1-2j, 2+3j, 3-4j, 0.5+0.7j]
-    startind = 0
-    numamps = 3
+    amplist = [1, 2, 3, 4, 5]
+    startind = 2
+    numamps = 6
     QSP("AMP", amplist, startind, numamps) * qr
 
     if numamps > len(amplist):

@@ -10,6 +10,27 @@ enum ExecCmdType {
     ExecTypeGpuSingle = 3
 }
 
+//振幅数据
+struct Amplitude {
+    //振幅实部
+    1: required list<double> reals
+
+    //振幅虚部
+    2: required list<double> imags
+
+    //振幅开始索引
+    3: required i32 startind
+
+    //振幅结束索引
+    4: required i32 numamps
+}
+
+//扩展指令
+struct Cmdex {
+    //振幅数据
+    1: optional Amplitude amp
+}
+
 //指令数据
 struct Cmd {
     //指令门类型
@@ -31,26 +52,7 @@ struct Cmd {
     6: required bool inverse
 
     //扩展命令
-    7: optional cmdex ex
-}
-
-struct cmdex {
-    //QSP 振幅数据
-    1: optional amplitudes amp
-}
-
-struct amplitudes {
-    //振幅实部
-    1: required list<double> reals
-
-    //振幅虚部
-    2: required list<double> imags
-
-    //振幅开始索引
-    3: optional i32 startind
-
-    //振幅结束索引
-    4: optional i32 numamps
+    7: optional Cmdex cmdex
 }
 
 //指令集

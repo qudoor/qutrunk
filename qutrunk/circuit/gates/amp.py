@@ -4,7 +4,8 @@ import cmath
 import numpy as np
 
 from .basicgate import BasicGate
-from qutrunk.circuit import Command, Qureg
+from qutrunk.circuit.command import Amplitude, Command, CmdEx
+from qutrunk.circuit import Qureg
 
 class AMP(BasicGate):
     """Apply set amplitudes gate.
@@ -38,7 +39,7 @@ class AMP(BasicGate):
         if not isinstance(qureg, Qureg):
             raise NotImplementedError("The argument must be Qureg object.")
 
-        cmd = Command(self)
+        cmd = Command(self, cmdex=CmdEx(Amplitude()))
         cmd.cmdex.amp.reals = self.reals
         cmd.cmdex.amp.imags = self.images
         cmd.cmdex.amp.startind = self.startind

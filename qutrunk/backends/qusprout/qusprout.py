@@ -127,6 +127,14 @@ class BackendQuSprout(Backend):
 
         for idx in range(start, stop):
             cmd = circuit.cmds[idx]
+            
+            cmdex = None
+            if cmd.cmdex is not None:
+                amp = None
+                if cmd.cmdex.amp is not None:
+                    amp = qusproutdata.Amplitude(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)
+                cmdex = qusproutdata.Cmdex(amp)
+            
             c = qusproutdata.Cmd(
                 str(cmd.gate),
                 cmd.targets,
@@ -134,6 +142,7 @@ class BackendQuSprout(Backend):
                 cmd.rotation,
                 cmd.qasm(),
                 cmd.inverse,
+                cmdex
             )
             cmds.append(c)
 
@@ -146,8 +155,6 @@ class BackendQuSprout(Backend):
             )
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
-            if self.circuit.init_amp_reals or self.circuit.init_amp_imags:
-                self._api_server.set_amplitudes(self.circuit.init_amp_reals, self.circuit.init_amp_imags)
 
         if len(cmds) == 0 and (not final):
             return
