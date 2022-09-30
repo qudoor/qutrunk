@@ -80,7 +80,6 @@ class QCircuit:
         if resource:
             self.counter = Counter(self)
 
-        self.qsp_amp = None
 
     def __iter__(self):
         """Used to iterate commands in quantum circuits."""
@@ -417,8 +416,6 @@ class QCircuit:
                 print(f"qreg q[{str(len(self.qreg))}]")
                 print(f"creg c[{str(len(self.qreg))}]")
                 if unroll:
-                    if self.qsp_amp:
-                        print
                     for c in self:
                         print(c.qusl())
                 else:

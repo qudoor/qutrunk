@@ -60,7 +60,7 @@ class Command:
 
         #Command extention data
         self.cmdex = cmdex
-
+        
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""
         if type(self) is not type(other):
@@ -112,6 +112,9 @@ class Command:
     def qusl(self) -> str:
         """Generate QuSL code for command."""
         name = str(self.gate)
+        if name == 'AMP':
+            return 'AMP({}, {}, {}) * q'.format(self.gate.classicvector, self.gate.startind, self.gate.numamps)
+
         params = []
         param_str = ""
 

@@ -1,14 +1,9 @@
 """QuSL parse."""
-
-import os
 import json
-
 from qutrunk.exceptions import QuTrunkError
 
 
-BASE_DIR = os.getcwd()
-py_file = BASE_DIR + "/qutrunk/tools/qusl.py"
-
+py_file = './qusl.py'
 
 def parse(qusl_file):
     """Parse QuSL file and generate quantum circuit.
@@ -34,7 +29,8 @@ def parse(qusl_file):
     with open(file=py_file, mode="w") as fw:
         fw.write("from qutrunk.circuit import QCircuit\n")
         fw.write("from qutrunk.circuit.gates import *\n")
-        fw.write("from qutrunk.circuit.ops import *\n\n")
+        fw.write("from qutrunk.circuit.ops import *\n")
+        fw.write("from qutrunk.circuit.ops.qsp import *\n\n")
         fw.write("def generate_circuit():\n")
         fw.write("\tcircuit = QCircuit()\n")
         fw.write(f"\tq = circuit.allocate({qubits})\n")
