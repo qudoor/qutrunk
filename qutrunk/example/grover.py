@@ -7,8 +7,7 @@ from numpy import pi
 
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Measure, All
-from qutrunk.circuit.ops import QSP, QAA
-
+from qutrunk.circuit.ops import PLUS, QAA
 
 def run_grover(qubits=10, backend=None):
     num_qubits = qubits
@@ -22,7 +21,8 @@ def run_grover(qubits=10, backend=None):
     circuit = QCircuit(backend=backend, resource=True)
     qureg = circuit.allocate(num_qubits)
 
-    QSP("+") * qureg
+    PLUS * qureg
+
     QAA(num_reps, sol_elem) * qureg
 
     All(Measure) * qureg
