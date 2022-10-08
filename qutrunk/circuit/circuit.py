@@ -79,6 +79,7 @@ class QCircuit:
         if resource:
             self.counter = Counter(self)
 
+
     def __iter__(self):
         """Used to iterate commands in quantum circuits."""
         return QCircuitIter(self.cmds)

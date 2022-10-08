@@ -22,6 +22,17 @@ namespace py = pybind11;
 using Qubits = vector<int>;
 using Qurota = vector<double>;
 
+typedef struct _Amplitude{
+    vector<double> reals;
+    vector<double> imags;
+    int startind;
+    int numamps;
+} Amplitude;
+
+typedef struct _CmdEx {
+    Amplitude amp;
+} CmdEx;
+
 typedef struct _Cmd {
     string gate{""};
     vector<int>  targets;
@@ -29,6 +40,7 @@ typedef struct _Cmd {
     vector<double>  rotation;
     string desc{""};
     bool inverse{false};
+    CmdEx cmdex;
 } Cmd;
 
 using Circuit = vector<Cmd>;
@@ -1144,6 +1156,11 @@ void qid(const Cmd& cmd)
     // do nothing
 }
 
+void qamp(const Cmd& cmd)
+{
+    setAmps(g_qureg, cmd.cmdex.amp.startind, (double*)cmd.cmdex.amp.reals.data(), (double*)cmd.cmdex.amp.imags.data(), cmd.cmdex.amp.numamps);
+}
+
 map<string, GateFunc> g_gateMap = {
     make_pair<string, GateFunc>("H", &qh),
     make_pair<string, GateFunc>("P", &qp),
@@ -1189,7 +1206,8 @@ map<string, GateFunc> g_gateMap = {
     make_pair<string, GateFunc>("CH", &qch), 
     make_pair<string, GateFunc>("SqrtXdg", &qsqrtxdg), 
     make_pair<string, GateFunc>("CSqrtX", &qcsqrtx), 
-    make_pair<string, GateFunc>("CSwap", &qcswap), 
+    make_pair<string, GateFunc>("CSwap", &qcswap),
+    make_pair<string, GateFunc>("AMP", &qamp)
 };
 
 void init(int qubits, bool showquantumgate) {
@@ -1447,17 +1465,31 @@ double getExpecPauliSum(const std::vector<int32_t>& pauli_type, const std::vecto
 }
 
 PYBIND11_MODULE(simulator, m) {
-    m.doc() = "simulator plugin"; // optional module docstring
+    m.doc() = "simulator plugin";
 
     m.def("init", &init, "init sim envirement", py::arg("qubits"), py::arg("showquantumgate"));
-    // m.def("release", &release, "release resource");
-    // m.def("execCmd", &execCmd, "execute circuit", py::arg("gate"), py::arg("targets"), py::arg("controls"), py::arg("rotation"), py::arg("desc"));
     m.def("getProbOfAmp", &getProbOfAmp, "getProbOfAmp", py::arg("index"));
     m.def("getProbOfOutcome", &getProbOfOutcome, "getProbOfOutcome", py::arg("qubit"), py::arg("outcome"));
     m.def("getProbOfAllOutcome", &getProbOfAllOutcome, "getProbOfAllOutcome", py::arg("qubits"));
     m.def("getAllState", &getAllState, "getAllState");
     m.def("apply_QFT", &apply_QFT, "apply_QFT", py::arg("qubits"));
     m.def("apply_Full_QFT", &apply_Full_QFT, "apply_Full_QFT");
+
+    m.def("send_circuit", &send_circuit, "send_circuit", py::arg("circuit"), py::arg("final"));
+    m.def("run", &run, "run", py::arg("shots"));
+    m.def("getExpecPauliProd", &getExpecPauliProd, "getExpecPauliProd", py::arg("PauliProdList"));
+    m.def("getExpecPauliSum", &getExpecPauliSum, "getExpecPauliSum", py::arg("pauli_type"), py::arg("coeff_type"));
+
+    py::class_<Amplitude>(m, "Amplitude")
+        .def(py::init())
+        .def_readwrite("reals", &Amplitude::reals)
+        .def_readwrite("imags", &Amplitude::imags)
+        .def_readwrite("startind", &Amplitude::startind)
+        .def_readwrite("numamps", &Amplitude::numamps);
+
+    py::class_<CmdEx>(m, "CmdEx")
+        .def(py::init())
+        .def_readwrite("amp", &CmdEx::amp);
 
     py::class_<Cmd>(m, "Cmd")
         .def(py::init())
@@ -1466,12 +1498,8 @@ PYBIND11_MODULE(simulator, m) {
         .def_readwrite("controls", &Cmd::controls)
         .def_readwrite("rotation", &Cmd::rotation)
         .def_readwrite("desc", &Cmd::desc)
-        .def_readwrite("inverse", &Cmd::inverse);
-
-    m.def("send_circuit", &send_circuit, "send_circuit", py::arg("circuit"), py::arg("final"));
-    m.def("run", &run, "run", py::arg("shots"));
-    m.def("getExpecPauliProd", &getExpecPauliProd, "getExpecPauliProd", py::arg("PauliProdList"));
-    m.def("getExpecPauliSum", &getExpecPauliSum, "getExpecPauliSum", py::arg("pauli_type"), py::arg("coeff_type"));
+        .def_readwrite("inverse", &Cmd::inverse)
+        .def_readwrite("cmdex", &Cmd::cmdex);
 
     py::class_<MeasureResult>(m, "MeasureResult")
         .def(py::init())
