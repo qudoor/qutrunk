@@ -13,11 +13,7 @@ class BackendLocalCpp:
     @timefn
     def init(self, qubits, show):
         return simulator.init(qubits, show)
-
-    @timefn
-    def set_amplitudes(self, reals, imags):
-        return simulator.set_amplitudes(reals, imags)
-        
+   
     @timefn
     def send_circuit(self, circuit, final):
         """

@@ -3,7 +3,7 @@ from numpy import pi
 
 from qutrunk.circuit import QCircuit
 from qutrunk.backends import BackendQuSprout, backend
-from qutrunk.circuit.ops.qsp import AMP
+from qutrunk.circuit.ops import AMP
 from qutrunk.test.gate.check_all_state import check_all_state
 
 def test_amplitudes_local():
@@ -14,8 +14,8 @@ def test_amplitudes_local():
     qr = circuit.allocate(qubit_len)
 
     amplist = [1-2j, 2+3j, 3-4j, 0.5+0.7j]
-    startind = 0
-    numamps = 3
+    startind = 1
+    numamps = 2
     AMP(amplist, startind, numamps) * qr
 
     if numamps > len(amplist):
@@ -43,7 +43,7 @@ def test_amplitudes_qusprout():
     qr = circuit.allocate(qubit_len)
 
     amplist = [1, 2, 3, 4, 5]
-    startind = 1
+    startind = 3
     numamps = 3
     AMP(amplist, startind, numamps) * qr
 

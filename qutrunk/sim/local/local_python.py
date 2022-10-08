@@ -89,10 +89,6 @@ class BackendLocalPython:
         self.sim.init_zero_state()
 
     @timefn
-    def set_amplitudes(self, reals, imags):
-        self.sim.set_amplitudes(reals, imags)
-
-    @timefn
     def send_circuit(self, circuit, final):
         """
         Send the quantum circuit to local backend.

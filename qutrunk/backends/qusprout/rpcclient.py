@@ -51,18 +51,6 @@ class QuSproutApiServer:
         return self._client.initQubits(req)
 
     @timefn
-    def set_amplitudes(self, reals, imags):
-        """
-        Initialize the amplitude of state-vector.
-
-        Args:
-            reals: The amplitude real part.
-            imags: The amplitude imag part.
-        """
-        req = qusproutdata.SetAmplitudesReq(self._taskid, reals, imags)
-        return self._client.setAmplitudes(req)
-
-    @timefn
     def send_circuit(self, circuit, final):
         """
         Args:

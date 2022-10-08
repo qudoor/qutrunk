@@ -1,13 +1,13 @@
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import CNOT, Measure, Toffoli, X, All, MCX
-from qutrunk.circuit.ops import QSP
+from qutrunk.circuit.ops import Classical
 
 
 def increment(num_qubits, init_value):
     circuit = QCircuit()
     qr = circuit.allocate(num_qubits)
 
-    QSP(init_value) * qr
+    Classical(init_value) * qr
 
     MCX(3) * (qr[0], qr[1], qr[2], qr[3])
     Toffoli * (qr[0], qr[1], qr[2])
@@ -25,7 +25,7 @@ def decrement(num_qubits, init_value):
     circuit = QCircuit()
     qr = circuit.allocate(num_qubits)
 
-    QSP(init_value) * qr
+    Classical(init_value) * qr
 
     X * qr[0]
     CNOT * (qr[0], qr[1])
