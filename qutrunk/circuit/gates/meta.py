@@ -210,6 +210,6 @@ class def_gate(BasicGate):
 #             Inv(H) * q[0]
 #     """
 #     if isinstance(gate, BasicGate):
-#         gate.is_inverse = True
+#         gate.is_inverse = not gate.is_inverse
 
 #     return gate

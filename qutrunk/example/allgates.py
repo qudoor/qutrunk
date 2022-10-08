@@ -77,8 +77,6 @@ def run_gates():
 
     # print circuit
     qc.print()
-    # print qasm circuit
-    qc.print_qasm()
 
     qc.run()
 

@@ -31,6 +31,7 @@ class Command:
 
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""
+        # TODO: need to improve
         if type(self) is not type(other):
             return False
 
@@ -86,7 +87,7 @@ class Command:
 
         # only append control bit count as param when it's more than one
         ctrl_cnt = len(self.controls)
-        if ctrl_cnt > 1:
+        if ctrl_cnt > 0:
             params.append(ctrl_cnt)
 
         angles = self.gate.angles()

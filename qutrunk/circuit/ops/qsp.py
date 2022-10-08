@@ -14,7 +14,7 @@ class QSP(Operator):
     Init the quantum state to specific state, currently support: Plus state, Classical state.
 
     Args:
-        state: The target state of circuit initialized to.
+        state: The target state of circuit initialized to. For example: "0", "1", "+"
 
     Example:
         .. code-block:: python

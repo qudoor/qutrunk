@@ -16,14 +16,15 @@ def run_bell_pair(backend=None):
 
     # print circuit
     qc.print()
+    # qc.dump(file="bell_pair.qusl")
 
     # run circuit
     res = qc.run(shots=100)
 
     # print result
     print(res.get_measure())
-    print(res.get_counts())
-    print(res.excute_info())
+    # print(res.get_counts())
+    # print(res.excute_info())
 
     return qc
 
@@ -31,3 +32,4 @@ def run_bell_pair(backend=None):
 if __name__ == "__main__":
     circuit = run_bell_pair()
     circuit.draw()
+
