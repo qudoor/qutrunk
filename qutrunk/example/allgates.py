@@ -4,9 +4,9 @@ from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import *
 
 
-@gate
+@def_gate
 def my_gate(a, b):
-    return CustomGate() << (H, a) << (CNOT, (a, b))
+    return Gate() << (H, a) << (CNOT, (a, b))
 
 
 def run_gates():
