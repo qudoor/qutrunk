@@ -8,7 +8,7 @@ import importlib
 from qutrunk.exceptions import QuTrunkError
 
 
-def parse(file):
+def _parse(file):
     """Parse QuSL file and generate quantum circuit.
 
     Args:
@@ -61,7 +61,7 @@ def qusl_to_circuit(file):
 
     try:
         # import generate_circuit function.
-        filename = parse(file)
+        filename = _parse(file)
         g = importlib.import_module(filename)
         # generate circuit object.
         circuit = g.generate_circuit()
