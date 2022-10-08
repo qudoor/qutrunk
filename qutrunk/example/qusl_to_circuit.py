@@ -1,4 +1,4 @@
-"""qusl to circuit."""
+"""qusl to circuit example."""
 from qutrunk.circuit import QCircuit
 
 
