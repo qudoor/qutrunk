@@ -14,6 +14,9 @@ class ADD(Operator):
             raise ValueError("number must be more than zero.")
         self.number = number
 
+    def _add_statement(self, qr):
+        qr[0].circuit.append_statement(f"ADD({self.number}) * q")
+
     def __mul__(self, qr: Qureg):
         if not isinstance(qr, Qureg):
             raise TypeError("The operand must be Qureg.")
@@ -31,4 +34,4 @@ class ADD(Operator):
 
                 X * qr[0]
 
-    # TODO: add to statements
+        self._add_statement(qr)

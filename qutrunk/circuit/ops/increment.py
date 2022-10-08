@@ -11,6 +11,9 @@ class Increment(Operator):
     def __init__(self):
         super().__init__()
 
+    def _add_statement(self, qr):
+        qr[0].circuit.append_statement("INC * q")
+
     def __mul__(self, qr: Qureg):
         if not isinstance(qr, Qureg):
             raise TypeError("The operand must be Qureg.")
@@ -26,7 +29,8 @@ class Increment(Operator):
                 ctrl = []
 
             X * qr[0]
-    # TODO: add to statements
+
+        self._add_statement(qr)
 
 
 INC = Increment()
