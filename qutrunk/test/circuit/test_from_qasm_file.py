@@ -15,7 +15,7 @@ def test_qasm_file():
 
     expect_in = qc.cmds
 
-    result = qc.from_qasm_file(file='b.qasm')
+    result = qc.load(file='b.qasm', format="openqasm")
     circuit_in = result.cmds
 
     assert expect_in == circuit_in

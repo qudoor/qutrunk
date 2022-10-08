@@ -5,13 +5,13 @@ from qutrunk.circuit.ops import QSP
 from qutrunk.circuit.ops import ADD
 
 
-def run_addition(num_qubits, init_value):
+def run_addition(num_qubits, init_value, number=0):
     circuit = QCircuit()
     qr = circuit.allocate(num_qubits)
 
     QSP(init_value) * qr
 
-    ADD(3) * qr
+    ADD(number) * qr
 
     All(Measure) * qr
     res = circuit.run()
@@ -21,4 +21,4 @@ def run_addition(num_qubits, init_value):
 
 
 if __name__ == "__main__":
-    circuit = run_addition(4, 0)
+    circuit = run_addition(4, 0, 5)

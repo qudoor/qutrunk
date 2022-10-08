@@ -1,7 +1,6 @@
 """Circuit Module."""
 import json
 import random
-import sys
 from typing import List, Optional, Union
 
 from qutrunk.backends import Backend, BackendLocal
@@ -337,6 +336,7 @@ class QCircuit:
 
         Args:
             file (str): Path to the file for a qusl or OpenQASM program.
+            format(str): The format of file content.
 
         Return:
             QCircuit: The QCircuit object for the input qusl or OpenQASM.
@@ -355,42 +355,6 @@ class QCircuit:
             ast = qasm.parse()
             dag = ast_to_dag(ast)
             return dag_to_circuit(dag)
-
-    # TODO: to delete
-    @staticmethod
-    def from_qasm_file(file):
-        """Take in a QASM file and generate a QCircuit object.
-
-        Args:
-            file (str): Path to the file for a QASM program.
-
-        Return:
-            QCircuit: The QCircuit object for the input QASM.
-        """
-        # pylint: disable=C0415，E0611，E1102
-        from qutrunk.qasm import Qasm
-        from qutrunk.converters import dag_to_circuit
-        from qutrunk.converters import ast_to_dag
-
-        qasm = Qasm(file)
-        ast = qasm.parse()
-        dag = ast_to_dag(ast)
-        return dag_to_circuit(dag)
-
-    # TODO: to delete
-    @staticmethod
-    def from_qusl_file(file):
-        """Parse QuSL file and generate quantum circuit.
-
-        Args:
-            file: The input QuSL file(json format).
-
-        Returns:
-            QCircuit object.
-        """
-        from qutrunk.tools.qusl_parse import qusl_to_circuit
-
-        return qusl_to_circuit(file)
 
     def expval(self, obs_data):
         """Computes the expected value of a product of Pauli operators.
