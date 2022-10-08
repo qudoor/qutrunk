@@ -67,7 +67,7 @@ class U1(BasicGate):
     def inv(self):
         """Apply inverse gate"""
         gate = U1(self.rotation)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
     
     def ctrl(self, ctrl_cnt=1):
@@ -150,5 +150,5 @@ class CU1(BasicRotateGate):
     def inv(self):
         """Apply inverse gate"""
         gate = CU1(self.rotation)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate

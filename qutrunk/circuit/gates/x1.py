@@ -55,7 +55,7 @@ class X1Gate(BasicGate):
     def inv(self):
         """Apply inverse gate"""
         gate = X1Gate()
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
 

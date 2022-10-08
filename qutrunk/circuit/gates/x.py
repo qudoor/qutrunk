@@ -71,7 +71,7 @@ class XGate(BasicGate, Observable):
     def inv(self):
         """Apply inverse gate"""
         gate = XGate()
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
     def ctrl(self, ctrl_cnt=1):
@@ -144,7 +144,7 @@ class MCX(BasicGate):
     def inv(self):
         """Apply inverse gate"""
         gate = MCX(self.ctrl_cnt)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
 

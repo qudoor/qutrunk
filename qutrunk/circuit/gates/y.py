@@ -71,7 +71,7 @@ class YGate(BasicGate, Observable):
     def inv(self):
         """Apply inverse gate"""
         gate = YGate()
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
     def ctrl(self, ctrl_cnt=1):
@@ -136,7 +136,7 @@ class CYGate(BasicGate):
     def inv(self):
         """Apply inverse gate"""
         gate = CYGate()
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
 

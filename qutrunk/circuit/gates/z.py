@@ -73,7 +73,7 @@ class ZGate(BasicGate, Observable):
     def inv(self):
         """Apply inverse gate"""
         gate = ZGate()
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
     def ctrl(self, ctrl_cnt=1):
@@ -150,7 +150,7 @@ class MCZ(BasicGate):
     def inv(self):
         """Apply inverse gate"""
         gate = MCZ(self.ctrl_cnt)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
 

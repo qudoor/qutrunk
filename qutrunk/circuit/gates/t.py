@@ -56,7 +56,7 @@ class TGate(BasicGate):
     def inv(self):
         """Apply inverse gate"""
         gate = TGate()
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
 

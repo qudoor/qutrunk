@@ -88,7 +88,7 @@ class U3(BasicGate):
     def inv(self):
         """Apply inverse gate"""
         gate = U3(self.theta, self.phi, self.lam)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
     def ctrl(self, ctrl_cnt=1):
@@ -194,7 +194,7 @@ class CU3(BasicRotateGate):
     def inv(self):
         """Apply inverse gate"""
         gate = CU3(self.theta, self.phi,  self.lam)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
 
 
@@ -289,5 +289,5 @@ class CU(BasicRotateGate):
     def inv(self):
         """Apply inverse gate"""
         gate = CU(self.theta, self.phi, self.lam, self.gamma)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate

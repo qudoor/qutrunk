@@ -70,5 +70,5 @@ class Rzz(BasicRotateGate):
     def inv(self):
         """Apply inverse gate"""
         gate = Rzz(self.rotation)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate

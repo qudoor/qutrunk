@@ -61,7 +61,7 @@ class P(BasicPhaseGate):
     def inv(self):
         """Apply inverse gate"""
         gate = P(self.rotation)
-        gate.is_inverse = bool(1-self.is_inverse) 
+        gate.is_inverse = not self.is_inverse 
         return gate
 
     def ctrl(self, ctrl_cnt=1):
@@ -139,5 +139,5 @@ class CP(BasicRotateGate):
     def inv(self):
         """Apply inverse gate"""
         gate = CP(self.rotation)
-        gate.is_inverse = bool(1-self.is_inverse) 
+        gate.is_inverse = not self.is_inverse 
         return gate

@@ -76,5 +76,5 @@ class U2(BasicGate):
     def inv(self):
         """Apply inverse gate"""
         gate = U2(self.theta, self.phi)
-        gate.is_inverse = bool(1-self.is_inverse)
+        gate.is_inverse = not self.is_inverse
         return gate
