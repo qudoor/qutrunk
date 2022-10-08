@@ -1,7 +1,7 @@
 """Quantum Teleportation."""
 
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import H, X, Z, Measure, CNOT, U3
+from qutrunk.circuit.gates import H, X, Z, Measure, CNOT, U3, Barrier
 
 
 def run_teleport():
@@ -11,16 +11,19 @@ def run_teleport():
 
     # Prepare an initial state
     U3(0.3, 0.2, 0.1) | qureg[0]
+    Barrier * qureg
 
     # Prepare a Bell pair
     H * qureg[1]
     CNOT * (qureg[1], qureg[2])
+    Barrier * qureg
 
     # Measure in the Bell basis
     CNOT * (qureg[0], qureg[1])
     H * qureg[0]
     Measure * qureg[0]
     Measure * qureg[1]
+    Barrier * qureg
 
     # TODO: have some problem.
     # Apply a correction

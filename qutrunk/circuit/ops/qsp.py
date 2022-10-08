@@ -11,7 +11,7 @@ class QSP(Operator):
     Parent class for CLASSICAL, PLUS, AMP
 
     Args:
-        state: The target state of circuit initialized to.
+        state: The target state of circuit initialized to. For example: "0", "1", "+"
 
     """
 
