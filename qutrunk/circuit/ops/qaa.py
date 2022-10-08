@@ -41,9 +41,10 @@ class QAA(Operator):
     def __mul__(self, qureg: Qureg):
         """Apply the QAA operator."""
         if not isinstance(qureg, Qureg):
-            raise TypeError("the operand must be Qureg")
-        if self.marked_index < 0 and self.marked_index >= 2 ** len(qureg):
-            raise ValueError("the marked index value exceed 2 ** len(qureg)")
+            raise TypeError("The operand must be Qureg.")
+
+        if self.marked_index < 0 or self.marked_index >= 2 ** len(qureg):
+            raise ValueError("The marked index value exceed 2 ** len(qureg).")
 
         with OperatorContext(qureg.circuit) as oc:
             for i in range(self.iterations):

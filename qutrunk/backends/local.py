@@ -37,6 +37,7 @@ class BackendLocal(Backend):
     Example:
         .. code-block:: python
 
+            from qutrunk.backends import BackendLocal
             from qutrunk.circuit import QCircuit
             from qutrunk.circuit.gates import H, CNOT, Measure
 
