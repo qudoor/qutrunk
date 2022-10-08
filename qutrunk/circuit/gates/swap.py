@@ -65,6 +65,8 @@ class SwapGate(BasicGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
+        if ctrl_cnt > 1:
+            raise ValueError("Swap gate do not support multiple control bits.")
         gate = CSwapGate()
         gate.is_inverse = self.is_inverse
         return gate

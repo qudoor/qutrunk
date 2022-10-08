@@ -70,6 +70,8 @@ class P(BasicPhaseGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
+        if ctrl_cnt > 1:
+            raise ValueError("P gate do not support multiple control bits.")
         gate = CP(self.rotation)
         gate.is_inverse = self.is_inverse
         return gate

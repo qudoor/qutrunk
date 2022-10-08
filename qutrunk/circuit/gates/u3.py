@@ -97,6 +97,8 @@ class U3(BasicGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
+        if ctrl_cnt > 1:
+            raise ValueError("U3 gate do not support multiple control bits.")
         gate = CU3(self.theta, self.phi, self.lam)
         gate.is_inverse = self.is_inverse
         return gate

@@ -75,6 +75,8 @@ class Ry(BasicRotateGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
+        if ctrl_cnt > 1:
+            raise ValueError("Ry gate do not support multiple control bits.")
         gate = CRy(self.rotation)
         gate.is_inverse = self.is_inverse
         return gate

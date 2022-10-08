@@ -69,6 +69,8 @@ class HGate(BasicGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
+        if ctrl_cnt > 1:
+            raise ValueError("H gate do not support multiple control bits.")
         gate = CHGate()
         gate.is_inverse = self.is_inverse
         return gate

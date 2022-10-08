@@ -75,6 +75,8 @@ class Rx(BasicRotateGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
+        if ctrl_cnt > 1:
+            raise ValueError("Rx gate do not support multiple control bits.")
         gate = CRx(self.rotation)
         gate.is_inverse = self.is_inverse
         return gate

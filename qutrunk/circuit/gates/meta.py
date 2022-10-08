@@ -155,20 +155,47 @@ class def_gate(BasicGate):
     """
 
     def __init__(self, func):
-        self.compose_gate = True
+        super().__init__()
+        self.ctrl_cnt = 0
         self.callable = func
+
+    def _get_operand(self, ctrl_qubits, target_qubits)->tuple:
+        if len(ctrl_qubits) == 0:
+            return target_qubits
+            
+        if isinstance(target_qubits, QuBit):
+            return (*ctrl_qubits, target_qubits)
+
+        return (*ctrl_qubits, *target_qubits)
 
     def __or__(self, qubits: Union[QuBit, tuple]):
         """Quantum logic gate operation."""
         if not isinstance(qubits, (QuBit, tuple)):
             raise TypeError("qubits should be type of QuBit or tuple")
-        if isinstance(qubits, QuBit):
-            custom_gate = self.callable(qubits)
+
+        ctrl_qubits = []
+        target_qubits = []
+        if self.ctrl_cnt > 0:
+            ctrl_qubits = qubits[0:self.ctrl_cnt]
+            target_qubits = qubits[self.ctrl_cnt:]
+            custom_gate = self.callable(*target_qubits)
         else:
-            custom_gate = self.callable(*qubits)
+            if isinstance(qubits, QuBit):
+                custom_gate = self.callable(qubits)
+            else:
+                custom_gate = self.callable(*qubits)
+
         if custom_gate.gate_type == "compose":
             for c in custom_gate.gates:
-                c['gate'] * c['qubits']
+                operand = self._get_operand(ctrl_qubits, c['qubits'])
+                if self.is_inverse and self.ctrl_cnt > 0:
+                    c['gate'].ctrl(self.ctrl_cnt).inv() * operand
+                elif self.is_inverse:
+                    c['gate'].inv() * operand
+                elif self.ctrl_cnt > 0:
+                    c['gate'].ctrl(self.ctrl_cnt) * operand
+                else:
+                    c['gate'] * operand
         elif custom_gate.gate_type == "matrix":
             # apply custom gate defined by matrix
             pass
@@ -184,16 +211,29 @@ class def_gate(BasicGate):
         pass
 
     def inv(self):
-        """Apply inverse gate."""
-        pass
+        """Apply inverse gate.
+
+        Note: Ensure all the basic gates used to compose custom gate has a inverse version, \
+            otherwise, an exception will be raised.
+        """
+        gate = def_gate(func=self.callable)
+        gate.is_inverse = not self.is_inverse
+        gate.ctrl_cnt = self.ctrl_cnt
+        return gate
 
     def ctrl(self, ctrl_cnt=1):
         """Apply controlled gate.
+
+        Note: Ensure all the basic gates used to compose custom gate has a control version, \
+            otherwise, an exception will be raised.
         
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
-        pass
+        gate = def_gate(func=self.callable)
+        gate.is_inverse = self.is_inverse
+        gate.ctrl_cnt = ctrl_cnt
+        return gate
 
 
 # note: 该方法会导致部分门操作产生状态污染，比如通过对象实例调用的门操作
