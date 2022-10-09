@@ -4,10 +4,9 @@ from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import *
 
 
-@gate
-def my_gate(q):
-    H * q[0]
-    CNOT * (q[0], q[1])
+@def_gate
+def my_gate(a, b):
+    return Gate() << (H, a) << (CNOT, (a, b))
 
 
 def run_gates():
@@ -78,8 +77,6 @@ def run_gates():
 
     # print circuit
     qc.print()
-    # print qasm circuit
-    qc.print_qasm()
 
     qc.run()
 

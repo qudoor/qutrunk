@@ -74,55 +74,182 @@ class Power(BasicGate):
     def __mul__(self, qubits: Union[QuBit, Qureg, tuple]):
         self.__or__(qubits)
 
-
-class gate(BasicGate):
-    """Definition of custom gate.
-
-    Implement by composing some basic logic gates.
+class Gate:
+    """Used to define custom gate.
 
     Example:
         .. code-block:: python
 
-            @gate
-            def my_gate(q):
-                H * q[0]
-                CNOT * (q[0], q[1])
+            from qutrunk.circuit import QCircuit
+            from qutrunk.circuit.gates import H, CNOT, CustomGate, All, Measure, gate
 
             circuit = QCircuit()
             q = circuit.allocate(2)
-            my_gate * q
+
+            @def_gate
+            def my_gate(a, b):
+                return Gate() << (H, a) << (CNOT, (a, b))
+
+            my_gate * (q[0], q[1])
             All(Measure) * q
+            circuit.print()
             res = circuit.run(shots=100)
-            print(res.get_counts())
+            print(res.get_counts()) 
+            
     """
 
-    def __init__(self, func):
-        self.compose_gate = True
-        self.callable = func
+    def __init__(self):
+        super().__init__()
+        self.gate_type = None
+        self.gates = []
+        self.matrix = None
 
-    def __or__(self, qubits: Union[QuBit, Qureg, tuple]):
-        """Quantum logic gate operation."""
-        if not isinstance(qubits, (QuBit, Qureg, tuple)):
-            raise TypeError("qubits should be type of QuBit, Qureg or tuple")
+    def append_gate(self, gate, qubits):
+        """Append basic gate to custom gate.
+        
+        Args:
+            gate: Basic gate.
+            qubits: The target qubits of quantum gate to apply.
+        """
+        if self.gate_type is None:
+            self.gate_type = "compose"
+        self.gates.append({"gate": gate, "qubits": qubits})
 
-        self.callable(qubits)
+    def __lshift__(self, gate_define):
+        self.append_gate(gate_define[0], gate_define[1])
+        return self
 
-    def __mul__(self, qubits: Union[QuBit, Qureg, tuple]):
-        self.__or__(qubits)
+    def define_matrix(self, matrix):
+        """Define specific matrix for custom gate.
+        
+        Args:
+            matrix: The matrix defined by user.
+        """
+        if self.gate_type is None:
+            self.gate_type = "matrix"
+        self.matrix = matrix
 
+class def_gate(BasicGate):
+    """Definition of custom gate.
 
-def Inv(gate):
-    """Inverse gate.
-
-    Args:
-        gate: The gate will apply inverse operator.
+    Implement by composing some basic logic gates or define specific matrix.
 
     Example:
         .. code-block:: python
 
-            Inv(H) * q[0]
-    """
-    if isinstance(gate, BasicGate):
-        gate.is_inverse = True
+            from qutrunk.circuit import QCircuit
+            from qutrunk.circuit.gates import H, CNOT, CustomGate, All, Measure, gate
 
-    return gate
+            circuit = QCircuit()
+            q = circuit.allocate(2)
+
+            @def_gate
+            def my_gate(a, b):
+                return Gate() << (H, a) << (CNOT, (a, b))
+
+            my_gate * (q[0], q[1])
+            All(Measure) * q
+            circuit.print()
+            res = circuit.run(shots=100)
+            print(res.get_counts()) 
+    """
+
+    def __init__(self, func):
+        super().__init__()
+        self.ctrl_cnt = 0
+        self.callable = func
+
+    def _get_operand(self, ctrl_qubits, target_qubits)->tuple:
+        if len(ctrl_qubits) == 0:
+            return target_qubits
+            
+        if isinstance(target_qubits, QuBit):
+            return (*ctrl_qubits, target_qubits)
+
+        return (*ctrl_qubits, *target_qubits)
+
+    def __or__(self, qubits: Union[QuBit, tuple]):
+        """Quantum logic gate operation."""
+        if not isinstance(qubits, (QuBit, tuple)):
+            raise TypeError("qubits should be type of QuBit or tuple")
+
+        ctrl_qubits = []
+        target_qubits = []
+        if self.ctrl_cnt > 0:
+            ctrl_qubits = qubits[0:self.ctrl_cnt]
+            target_qubits = qubits[self.ctrl_cnt:]
+            custom_gate = self.callable(*target_qubits)
+        else:
+            if isinstance(qubits, QuBit):
+                custom_gate = self.callable(qubits)
+            else:
+                custom_gate = self.callable(*qubits)
+
+        if custom_gate.gate_type == "compose":
+            for c in custom_gate.gates:
+                operand = self._get_operand(ctrl_qubits, c['qubits'])
+                if self.is_inverse and self.ctrl_cnt > 0:
+                    c['gate'].ctrl(self.ctrl_cnt).inv() * operand
+                elif self.is_inverse:
+                    c['gate'].inv() * operand
+                elif self.ctrl_cnt > 0:
+                    c['gate'].ctrl(self.ctrl_cnt) * operand
+                else:
+                    c['gate'] * operand
+        elif custom_gate.gate_type == "matrix":
+            # apply custom gate defined by matrix
+            pass
+
+    def __mul__(self, qubits: Union[QuBit, tuple]):
+        self.__or__(qubits)
+
+    @property
+    def matrix(self):
+        """Access to the matrix property of this gate."""
+        # 根据比特位数将每个量子门张成一个大矩阵，G.matrix @ I @ I（根据量子比特位置关系调整I的顺序）
+        # 然后每个门张成的矩阵再做矩阵乘法
+        pass
+
+    def inv(self):
+        """Apply inverse gate.
+
+        Note: Ensure all the basic gates used to compose custom gate has a inverse version, \
+            otherwise, an exception will be raised.
+        """
+        gate = def_gate(func=self.callable)
+        gate.is_inverse = not self.is_inverse
+        gate.ctrl_cnt = self.ctrl_cnt
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+
+        Note: Ensure all the basic gates used to compose custom gate has a control version, \
+            otherwise, an exception will be raised.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        gate = def_gate(func=self.callable)
+        gate.is_inverse = self.is_inverse
+        gate.ctrl_cnt = ctrl_cnt
+        return gate
+
+
+# note: 该方法会导致部分门操作产生状态污染，比如通过对象实例调用的门操作
+# 只要设置过状态，那么后续所有该量子门操作都带了这个状态
+# def Inv(gate):
+#     """Inverse gate.
+
+#     Args:
+#         gate: The gate will apply inverse operator.
+
+#     Example:
+#         .. code-block:: python
+
+#             Inv(H) * q[0]
+#     """
+#     if isinstance(gate, BasicGate):
+#         gate.is_inverse = not gate.is_inverse
+
+#     return gate

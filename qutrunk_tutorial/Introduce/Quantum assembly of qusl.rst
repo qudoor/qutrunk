@@ -262,7 +262,7 @@ circuit导出成QuSL
 	BASE_DIR = os.getcwd()
 	file_path = BASE_DIR + '/qutrunk/example/bell_pair.qusl'
 
-	circuit = QCircuit.from_qusl_file(file_path)
+    circuit = QCircuit.load(file_path, "qusl")
 	circuit.print()
 	result = circuit.run(shots=100)
 	print(result.get_counts())   

@@ -34,9 +34,24 @@ class BasicGate:
             statement: The origin statement that generate target cmd.
         """
         circuit.append_cmd(cmd)
+        # TODO: need to improve
         statement = "" if circuit.in_op() else cmd.qusl()
         if statement != "":
             circuit.append_statement(statement)
+
+    def inv(self):
+        """Apply inverse gate"""
+        # note: 状态相关方法需要重新生成一个新对象
+        raise NotImplementedError
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        # note: 状态相关方法需要重新生成一个新对象
+        raise NotImplementedError
 
 
 class BasicRotateGate(BasicGate):

@@ -66,3 +66,9 @@ class Ryy(BasicRotateGate):
                 [1j * sin(0.5 * self.rotation), 0, 0, cos(0.5 * self.rotation)],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = Ryy(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate

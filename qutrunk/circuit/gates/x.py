@@ -69,6 +69,22 @@ class XGate(BasicGate, Observable):
         puali_list.append(pauli)
         return puali_list
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = XGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        gate = MCX(ctrl_cnt)
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 PauliX = X = NOT = XGate()
 
@@ -125,6 +141,12 @@ class MCX(BasicGate):
         """Access to the matrix property of this gate."""
         if self.ctrl_cnt == 1:
             return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = MCX(self.ctrl_cnt)
+        gate.is_inverse = not self.is_inverse
+        return gate
 
 
 CX = CNOT = MCX(1)

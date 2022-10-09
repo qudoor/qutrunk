@@ -64,6 +64,24 @@ class Rz(BasicRotateGate):
             ]
         )
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = Rz(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("Rz gate do not support multiple control bits.")
+        gate = CRz(self.rotation)
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 class CRz(BasicRotateGate):
     """Control Rz gate.
@@ -129,3 +147,9 @@ class CRz(BasicRotateGate):
                 [0, 0, 0, 1],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CRz(self.rotation)
+        gate.is_inverse = not self.is_inverse
+        return gate

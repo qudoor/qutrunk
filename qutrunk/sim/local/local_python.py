@@ -78,6 +78,7 @@ class BackendLocalPython:
             "SqrtXdg": "sqrtxdg",
             "CSqrtX": "csqrtx",
             "CSwap": "cswap",
+            "AMP": "amp"
         }
         self.cmds = []
         self.result = Result()
@@ -1069,3 +1070,12 @@ class BackendLocalPython:
     def id(self, cmd):
         # do nothing
         pass
+
+    def amp(self, cmd):
+        """the set amplitudes gate.
+
+        Args:
+           cmd: the Command object.
+        """
+
+        self.sim.amp(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)

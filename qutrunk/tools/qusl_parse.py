@@ -2,15 +2,13 @@
 
 import os
 import json
+import random
+import importlib
 
 from qutrunk.exceptions import QuTrunkError
 
 
-BASE_DIR = os.getcwd()
-py_file = BASE_DIR + "/qutrunk/tools/qusl.py"
-
-
-def parse(qusl_file):
+def _parse(file):
     """Parse QuSL file and generate quantum circuit.
 
     Args:
@@ -19,19 +17,23 @@ def parse(qusl_file):
     Returns:
         QCircuit object.
     """
-    qusl_data = None
-    with open(file=qusl_file, mode="r", encoding="utf-8") as f:
+
+    with open(file, mode="r", encoding="utf-8") as f:
         qusl_data = json.load(f)
+
     if qusl_data is None:
-        raise ValueError("Empty QuSL file")
+        raise ValueError("Empty QuSL file.")
 
     qubits = qusl_data["meta"]["qubits"]
     qusl_code_lines = qusl_data["code"]
 
     if int(qubits) <= 0:
-        raise ValueError("Invalid qubits")
+        raise ValueError("Invalid qubits.")
 
-    with open(file=py_file, mode="w") as fw:
+    name = random.randint(1, 10000)
+    filename = f"{name}.py"
+
+    with open(file=filename, mode="w", encoding="utf-8") as fw:
         fw.write("from qutrunk.circuit import QCircuit\n")
         fw.write("from qutrunk.circuit.gates import *\n")
         fw.write("from qutrunk.circuit.ops import *\n\n")
@@ -43,22 +45,30 @@ def parse(qusl_file):
         fw.write("\treturn circuit\n\n")
         fw.write("generate_circuit()")
 
+    return str(name)
+
 
 def qusl_to_circuit(file):
     """Parse QuSL file and generate quantum circuit.
 
     Args:
+
         file: The input QuSL file(json format).
 
     Returns:
         QCircuit object.
     """
+
     try:
-        parse(file)
-        from qutrunk.tools.qusl import generate_circuit
+        # import generate_circuit function.
+        filename = _parse(file)
+        g = importlib.import_module(filename)
+        # generate circuit object.
+        circuit = g.generate_circuit()
+        # delete the temp file
+        os.remove(f"{filename}.py")
 
-        circuit = generate_circuit()
         return circuit
-
     except Exception as e:
-        raise QuTrunkError("parse QuSL error(err:", e + ")")
+        raise QuTrunkError(e)
+

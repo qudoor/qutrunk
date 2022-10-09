@@ -34,6 +34,9 @@ class SubQureg:
 
         return res
 
+    def __len__(self):
+        return len(self.qubits)
+
 
 class Qureg:
     """Register, maintains a set of qubits.
@@ -112,11 +115,11 @@ class Qureg:
         Returns:
             The tuple contains all subqureg.
         """
-        # TODO: need to improve.
-        if type(sections) != list:
-            raise TypeError("sections parameter should be a list")
+        if not isinstance(sections, list):
+            raise TypeError("sections parameter should be a list.")
+
         if sum(sections) != len(self.qubits):
-            raise ValueError("the sum of sections should be equal to len(qubits)")
+            raise ValueError("The sum of sections should be equal to len(qubits).")
 
         res = []
         start_index = 0
