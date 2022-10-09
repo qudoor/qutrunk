@@ -57,6 +57,24 @@ class HGate(BasicGate):
         """A label for identifying the gate."""
         self.__str__()
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = HGate()
+        gate.is_inverse = not self.is_inverse 
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("H gate do not support multiple control bits.")
+        gate = CHGate()
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 H = HGate()
 
@@ -126,6 +144,12 @@ class CHGate(BasicGate):
                 [0, 0, 0, 1],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CHGate()
+        gate.is_inverse = not self.is_inverse 
+        return gate
 
 
 CH = CHGate()

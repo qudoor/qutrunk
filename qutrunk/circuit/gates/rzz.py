@@ -66,3 +66,9 @@ class Rzz(BasicRotateGate):
                 [0, 0, 0, cmath.exp(-0.5 * 1j * self.rotation)],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = Rzz(self.rotation)
+        gate.is_inverse = not self.is_inverse
+        return gate

@@ -118,6 +118,7 @@ class Command:
 
         params = []
         param_str = ""
+        inv_str = ""
 
         # only append control bit count as param when it's more than one
         ctrl_cnt = len(self.controls)
@@ -138,7 +139,10 @@ class Command:
         if len(qubits_index) > 1:
             qubits_str = "(" + qubits_str + ")"
 
-        return name + param_str + " * " + qubits_str
+        if self.inverse:
+            inv_str += ".inv()"
+
+        return name + param_str + inv_str + " * " + qubits_str
 
     @property
     def name(self) -> str:

@@ -63,6 +63,24 @@ class Rx(BasicRotateGate):
             ]
         )
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = Rx(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("Rx gate do not support multiple control bits.")
+        gate = CRx(self.rotation)
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 class CRx(BasicRotateGate):
     """Control Rx Gate.
@@ -131,3 +149,9 @@ class CRx(BasicRotateGate):
         return np.array(
             [[cos, 0, -isin, 0], [0, 1, 0, 0], [-isin, 0, cos, 0], [0, 0, 0, 1]]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CRx(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate

@@ -48,5 +48,11 @@ class Z1Gate(BasicGate):
             [[np.exp(-1j * cmath.pi / 4), 0], [0, np.exp(1j * cmath.pi / 4)]]
         )
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = Z1Gate()
+        gate.is_inverse = not self.is_inverse
+        return gate
+
 
 Z1 = Z1Gate()
