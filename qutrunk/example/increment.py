@@ -1,7 +1,7 @@
-"""Self-increment operation operation example."""
+"""Self-increment operation  example."""
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Measure, All
-from qutrunk.circuit.ops import QSP
+from qutrunk.circuit.ops import Classical
 from qutrunk.circuit.ops import INC
 
 
@@ -9,7 +9,7 @@ def increment(num_qubits, init_value):
     circuit = QCircuit()
     qr = circuit.allocate(num_qubits)
 
-    QSP(init_value) * qr
+    Classical(init_value) * qr
 
     INC * qr
 

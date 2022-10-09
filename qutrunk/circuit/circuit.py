@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
 from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable
+from qutrunk.circuit.ops import AMP
 
 
 class QCircuit:
@@ -190,6 +191,9 @@ class QCircuit:
         """
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
+        if self.backend.backend_type() == "BackendIBM":
+            # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
+            return result
         # TODO: measureSet
         if result and result.measureSet:
             for m in result.measureSet:
@@ -323,7 +327,7 @@ class QCircuit:
         # inverse cmd and gate
         cmds = self.cmds
         for cmd in reversed(cmds):
-            if isinstance(cmd.gate, MeasureGate):
+            if isinstance(cmd.gate, (MeasureGate, AMP)):
                 raise ValueError("The circuit cannot be inverted.")
             cmd.inverse = True
             inverse_circuit.append_cmd(cmd)
@@ -344,6 +348,7 @@ class QCircuit:
         """
         if format is None or format == "qusl":
             from qutrunk.tools.qusl_parse import qusl_to_circuit
+
             return qusl_to_circuit(file)
 
         if format == "openqasm":

@@ -6,7 +6,24 @@ from qutrunk.circuit.gates import X, MCX
 
 
 class ADD(Operator):
-    """Self-increment operation"""
+    """Self-increment operation.
+
+    Example:
+        .. code-block:: python
+
+            from qutrunk.circuit import QCircuit
+            from qutrunk.circuit.gates import Measure, All
+            from qutrunk.circuit.ops import QSP
+            from qutrunk.circuit.ops import ADD
+
+            circuit = QCircuit()
+            qr = circuit.allocate(4)
+            QSP(0) * qr
+            ADD(3) * qr
+            All(H) * qr
+            res = circuit.run()
+            print(res.get_outcome())
+    """
 
     def __init__(self, number):
         super().__init__()

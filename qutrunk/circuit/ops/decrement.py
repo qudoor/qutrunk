@@ -6,7 +6,25 @@ from qutrunk.circuit.gates import X, MCX
 
 
 class Decrement(Operator):
-    """Self-decrement operation"""
+    """Self-decrement operation.
+
+    Example:
+        .. code-block:: python
+
+            from qutrunk.circuit import QCircuit
+            from qutrunk.circuit.gates import Measure, All
+            from qutrunk.circuit.ops import QSP
+            from qutrunk.circuit.ops import DEC
+
+            circuit = QCircuit()
+            qr = circuit.allocate(4)
+            QSP(0) * qr
+            DEC * qr
+            All(H) * qr
+            res = circuit.run()
+            print(res.get_outcome())
+
+    """
 
     def __init__(self):
         super().__init__()

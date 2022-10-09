@@ -85,6 +85,24 @@ class U3(BasicGate):
             ]
         )
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = U3(self.theta, self.phi, self.lam)
+        gate.is_inverse = not self.is_inverse
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("U3 gate do not support multiple control bits.")
+        gate = CU3(self.theta, self.phi, self.lam)
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 class CU3(BasicRotateGate):
     """Control U3 gate.
@@ -175,6 +193,12 @@ class CU3(BasicRotateGate):
             ]
         )
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CU3(self.theta, self.phi,  self.lam)
+        gate.is_inverse = not self.is_inverse
+        return gate
+
 
 class CU(BasicRotateGate):
     """Control U gate.
@@ -263,3 +287,9 @@ class CU(BasicRotateGate):
                 [0, c, 0, d],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CU(self.theta, self.phi, self.lam, self.gamma)
+        gate.is_inverse = not self.is_inverse
+        return gate

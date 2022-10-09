@@ -63,6 +63,24 @@ class Ry(BasicRotateGate):
             ]
         )
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = Ry(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("Ry gate do not support multiple control bits.")
+        gate = CRy(self.rotation)
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 class CRy(BasicRotateGate):
     """Control Ry gate.
@@ -125,3 +143,9 @@ class CRy(BasicRotateGate):
         return np.array(
             [[cos, 0, -sin, 0], [0, 1, 0, 0], [sin, 0, cos, 0], [0, 0, 0, 1]]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CRy(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate

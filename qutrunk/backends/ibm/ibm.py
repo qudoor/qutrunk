@@ -38,6 +38,7 @@ class BackendIBM(Backend):
 
             # run circuit
             res = qc.run(shots=100)
+            print(res)
     """
 
     def __init__(self, token=None, device=None):
@@ -72,25 +73,7 @@ class BackendIBM(Backend):
             self._json.append(
                 {"qubits": [measured_id], "name": "measure", "memory": [measured_id]}
             )
-        print("result==", self._json)
-
-        info = {}
-        info["json"] = self._json
-
-        info["nq"] = len(circuit.qreg)
-        info["shots"] = 1024
-        info["maxCredits"] = 10
-        info["backend"] = {"name": self.device}
-
-        result = send(
-            info,
-            device=self.device,
-            token=self._token,
-            num_retries=1024,
-            verbose=True,
-        )
-        print("result=", result)
-        return result
+        print("send circuit:", self._json)
 
     def circuit_to_json(self, cmd):
         """Translates the command and in a local variable.
@@ -130,7 +113,22 @@ class BackendIBM(Backend):
             )
 
     def run(self, shots=1):
-        pass  # nothing to run
+        info = {}
+        info["json"] = self._json
+
+        info["nq"] =  sum(self._allocated_qubits)
+        info["shots"] = shots
+        info["maxCredits"] = 10
+        info["backend"] = {"name": self.device}
+
+        result = send(
+            info,
+            device=self.device,
+            token=self._token,
+            num_retries=shots,
+            verbose=True,
+        )
+        return result
 
     def backend_type(self):
         return "BackendIBM"
