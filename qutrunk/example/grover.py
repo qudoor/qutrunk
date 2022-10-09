@@ -9,6 +9,7 @@ from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Measure, All
 from qutrunk.circuit.ops import PLUS, QAA
 
+
 def run_grover(qubits=10, backend=None):
     num_qubits = qubits
     num_elems = 2**num_qubits

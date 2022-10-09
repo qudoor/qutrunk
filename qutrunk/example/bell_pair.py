@@ -23,8 +23,19 @@ def run_bell_pair(backend=None):
 
     # print result
     print(res.get_measure())
-    print(res.get_counts())
+    # print(res.get_counts())
     # print(res.excute_info())
+    print(qc.get_prob_value(0))
+    print(qc.get_prob_value(1))
+    print(qc.get_prob_value(2))
+    print(qc.get_prob_value(3))
+
+    # print("*"*10)
+    # print(qc.get_prob_outcome(0, 0))
+    # print(qc.get_prob_outcome(0, 1))
+    # print(qc.get_prob_outcome(1))
+    # print(qc.get_prob_outcome(2))
+    # print(qc.get_prob_outcome(3))
 
     return qc
 

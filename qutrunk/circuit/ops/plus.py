@@ -28,7 +28,7 @@ class Plus(QSP):
         return "PLUS"
 
     def __mul__(self, qureg: Qureg):
-        if qureg.circuit.gates_len > 0:
+        if qureg.circuit.num_gates > 0:
             raise QuTrunkError("PLUS should be applied at the beginning of circuit.")
 
         super().__mul__(qureg)

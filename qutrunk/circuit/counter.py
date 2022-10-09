@@ -30,7 +30,7 @@ class Counter:
         """Statistics time and gates when circuit running finish."""
         self.total_time = time.time() - self.start_time
         self.qutrunk_time = self.total_time - self.backend_time
-        self.quantum_gates = self.circuit.gates_len
+        self.quantum_gates = self.circuit.num_gates
 
     def __repr__(self):
         return f"Counter(quit={self.qubits})"

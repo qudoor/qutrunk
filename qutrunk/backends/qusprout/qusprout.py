@@ -151,7 +151,7 @@ class BackendQuSprout(Backend):
         # 服务端初始化
         if start == 0:
             res, elapsed = self._api_server.init(
-                circuit.qubits_len, circuit.density, self.exectype.value
+                circuit.num_qubits, circuit.density, self.exectype.value
             )
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)

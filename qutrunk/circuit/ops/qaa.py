@@ -24,7 +24,7 @@ class QAA(Operator):
             All(H) * qureg
             QAA(3, 7) * qureg
             for i in range(2 ** len(qureg)):
-                print(circuit.get_prob_amp(i))
+                print(circuit.get_prob_value(i))
 
         First, the four qubits are uniformly superposed,
         and then the state value of 7 is selected as the marker value.
@@ -51,7 +51,7 @@ class QAA(Operator):
                 self._flip_process(qureg)
                 self._imag_process(qureg)
                 # show intermediate process
-                prob_amp = qureg.circuit.get_prob_amp(self.marked_index)
+                prob_amp = qureg.circuit.get_prob_value(self.marked_index)
                 print(f"prob of state |{self.marked_index}> = {prob_amp}")
 
         qureg.circuit.append_statement(

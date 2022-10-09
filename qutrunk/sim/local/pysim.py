@@ -966,6 +966,8 @@ class Simulator:
 
         real = self.real[index]
         imag = self.imag[index]
+        # TODO:doing
+        # print("in pysim=", real * real + imag * imag)
         return real * real + imag * imag
 
     def get_prob_outcome(self, qubit, outcome):

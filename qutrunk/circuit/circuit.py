@@ -149,9 +149,8 @@ class QCircuit:
         """
         self.cmd_cursor += num
 
-    # TODO: need to improve.
     @property
-    def qubits_len(self):
+    def num_qubits(self) -> int:
         """Get the number of qubits.
 
         Returns:
@@ -160,9 +159,8 @@ class QCircuit:
 
         return len(self.qreg)
 
-    # TODO: need to improve.
     @property
-    def gates_len(self):
+    def num_gates(self) -> int:
         """Get the number of gates.
 
         Returns:
@@ -184,6 +182,7 @@ class QCircuit:
             raise IndexError("qubit index out of range.")
         self.creg[qubit].value = value
 
+    # TODO: need to improve.
     def run(self, shots=1):
         """Run quantum circuit through the specified backend and shots.
 
@@ -195,7 +194,7 @@ class QCircuit:
         """
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
-        # TODO: need to improve
+
         if self.backend.name == "BackendIBM":
             # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
             return result
@@ -204,7 +203,7 @@ class QCircuit:
             for m in result.measureSet:
                 self.set_measure(m.id, m.value)
 
-        res = Result(self.qubits_len, result, self.backend, arguments={"shots": shots})
+        res = Result(self.num_qubits, result, self.backend, arguments={"shots": shots})
 
         return res
 
@@ -245,23 +244,23 @@ class QCircuit:
         return f"{self.prefix}-{str(random.getrandbits(15))}"
 
     def __len__(self) -> int:
-        """Return number of operations in circuit."""
+        """Return the number of operations in circuit."""
         return len(self.cmds)
 
-    def get_prob_amp(self, index):
-        """get the probability of the target index.
-
-        Get the probability of a state-vector at an index in the full state vector.
+    # TODO: need to improve.
+    def get_prob_value(self, value):
+        """Probability of obtaining quantum circuit measurements.
 
         Args:
-            index: Index in state vector of probability amplitudes.
+            value: The target value.
 
         Returns:
-            The probability of target index.
+            float: The probability of value.
         """
         self.backend.send_circuit(self)
-        return self.backend.get_prob_amp(index)
+        return self.backend.get_prob_amp(value)
 
+    # TODO: need to improve.
     def get_prob_outcome(self, qubit, outcome):
         """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
 
@@ -288,6 +287,7 @@ class QCircuit:
         self.backend.send_circuit(self)
         return self.backend.get_prob_all_outcome(qubits)
 
+    # TODO: need to improve.
     def get_all_state(self):
         """Get the current state vector of probability amplitudes for a set of qubits."""
         self.backend.send_circuit(self)
@@ -327,7 +327,7 @@ class QCircuit:
             ValueError: if the circuit cannot be inverted.
         """
         inverse_circuit = QCircuit(backend=self.backend, name=self.name + "_dg")
-        inverse_circuit.allocate(qubits=self.qubits_len)
+        inverse_circuit.allocate(qubits=self.num_qubits)
 
         # inverse cmd and gate
         cmds = self.cmds
@@ -366,6 +366,7 @@ class QCircuit:
             dag = ast_to_dag(ast)
             return dag_to_circuit(dag)
 
+    # TODO: need to improve.
     def expval(self, obs_data):
         """Computes the expected value of a product of Pauli operators.
 
@@ -381,6 +382,7 @@ class QCircuit:
         expect = self.backend.get_expec_pauli_prod(obs_data())
         return expect
 
+    # TODO: need to improve.
     def expval_sum(self, pauli_coeffi: Observable, qubitnum=0):
         """Computes the expected value of a sum of products of Pauli operators.
 
@@ -488,6 +490,7 @@ class QCircuit:
         if format == "openqasm":
             self._print_qasm()
 
+    # TODO: need to improve.
     def depth(
         self,
         counted_gate: Optional[callable] = lambda x: not isinstance(x, BarrierGate),
@@ -496,8 +499,8 @@ class QCircuit:
 
         Args:
             counted_gate (callable): A function to filter out some instructions.
-                Should take as input a tuple of (Instruction, list(Qubit), list(Clbit)).
-                By default filters out barrier
+                Should take as input a tuple of (Instruction, list(Qubit), list(CBit)).
+                By default filters out barrier.
 
         Returns:
             int: Depth of circuit.
@@ -540,14 +543,17 @@ class QCircuit:
         if self.counter:
             self.counter.show_verbose()
 
+    # TODO: need to improve.
     def enter_op(self):
         """Mark circuit in Operator Context."""
         self._in_op = True
 
+    # TODO: need to improve.
     def exit_op(self):
         """Mark circuit out Operator Context."""
         self._in_op = False
 
+    # TODO: need to improve.
     def in_op(self):
         """Get circuit Operator Context."""
         return self._in_op
@@ -562,14 +568,14 @@ class QCircuitIter:
 
     def __init__(self, cmds):
         self.idx = 0
-        self.cmds = cmds
+        self.__cmds = cmds
 
     def __iter__(self):
         return self
 
     def __next__(self):
         try:
-            cmd = self.cmds[self.idx]
+            cmd = self.__cmds[self.idx]
         except IndexError:
             raise StopIteration
 
