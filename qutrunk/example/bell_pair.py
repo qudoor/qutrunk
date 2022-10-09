@@ -17,6 +17,7 @@ def run_bell_pair(backend=None):
     # print circuit
     qc.print()
     # qc.dump(file="bell_pair.qusl")
+
     # run circuit
     res = qc.run(shots=100)
 

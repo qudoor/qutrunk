@@ -13,7 +13,7 @@ class BackendLocalCpp:
     @timefn
     def init(self, qubits, show):
         return simulator.init(qubits, show)
-
+   
     @timefn
     def send_circuit(self, circuit, final):
         """
@@ -35,6 +35,13 @@ class BackendLocalCpp:
             temp_cmd.rotation = cmd.rotation
             temp_cmd.desc = cmd.qasm()
             temp_cmd.inverse = cmd.inverse
+            if cmd.cmdex is not None:
+                if cmd.cmdex.amp is not None:
+                    temp_cmd.cmdex.amp.reals = cmd.cmdex.amp.reals
+                    temp_cmd.cmdex.amp.imags = cmd.cmdex.amp.imags
+                    temp_cmd.cmdex.amp.startind = cmd.cmdex.amp.startind
+                    temp_cmd.cmdex.amp.numamps = cmd.cmdex.amp.numamps
+
             temp_cmds.append(temp_cmd)
 
         simulator.send_circuit(temp_cmds, final)

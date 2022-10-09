@@ -14,7 +14,8 @@ def test_qusl_file():
     qc.print("a.qusl")
 
     expect_in = qc.statements
-    circuit_in = qc.from_qusl_file(file="a.qusl")
+    circuit_in = qc.load("a.qusl", "qusl")
+    # circuit_in = qc.from_qusl_file(file="a.qusl")
 
     assert expect_in == circuit_in.statements
 

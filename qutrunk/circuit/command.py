@@ -1,5 +1,30 @@
 """Command Module."""
 
+class Amplitude:
+    """Set state-vector Amplitude.
+
+    Args:
+        reals: Amplitude read part.
+        imags: Amplitude imag part.
+        startind: Amplitude start index.
+        numamps: Amplitude number.
+    """
+    def __init__(self):
+        self.reals = []
+        self.imags = []
+        self.startind = 0
+        self.numamps = 0
+
+
+class CmdEx:
+    """Command extension.
+
+    Args:
+        amp: Amplitude object.
+    """
+    def __init__(self, amp=None):
+        self.amp = amp
+
 
 class Command:
     """Converts the quantum gate operation into a specific command.
@@ -12,8 +37,13 @@ class Command:
         inverse: Whether to enable the inverse circuit.
     """
 
-    def __init__(self, gate, targets, controls=None, rotation=None, inverse=False):
+    def __init__(self, gate, targets=None, controls=None, rotation=None, inverse=False, cmdex=None):
         # TODO: modify controls and rotation to tuple?
+        if targets is None:
+            self.targets = []
+        else:
+            self.targets = targets
+
         if controls is None:
             self.controls = []
         else:
@@ -25,12 +55,15 @@ class Command:
             self.rotation = rotation
 
         self.gate = gate
-        self.targets = targets
         self.cmd_ver = "1.0"
         self.inverse = inverse
 
+        #Command extention data
+        self.cmdex = cmdex
+        
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""
+        # TODO: need to improve
         if type(self) is not type(other):
             return False
 
@@ -80,6 +113,9 @@ class Command:
     def qusl(self) -> str:
         """Generate QuSL code for command."""
         name = str(self.gate)
+        if name == 'AMP':
+            return 'AMP({}, {}, {}) * q'.format(self.gate.classicvector, self.gate.startind, self.gate.numamps)
+
         params = []
         param_str = ""
 
