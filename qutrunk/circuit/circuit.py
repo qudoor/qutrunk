@@ -71,6 +71,7 @@ class QCircuit:
         self.density = density
 
         self.backend.circuit = self
+        # TODO:?
         self.outcome = None
 
         if name is None:
@@ -89,7 +90,7 @@ class QCircuit:
 
         Args:
             qubits: int: The number of qubit allocated in circuit.\
-                    list: The sum of list is the umber of qubit allocated in circuit,\
+                    list: The sum of list is the number of qubit allocated in circuit,\
                     and each value item represents the size of corresponding subqureg.
 
         Returns:
@@ -139,6 +140,7 @@ class QCircuit:
         """
         self.statements.append(statement)
 
+    # TODO: need to improve.
     def forward(self, num):
         """Update the cmd_cursor when a bunch of quantum operations have been run.
 
@@ -147,6 +149,7 @@ class QCircuit:
         """
         self.cmd_cursor += num
 
+    # TODO: need to improve.
     @property
     def qubits_len(self):
         """Get the number of qubits.
@@ -157,6 +160,7 @@ class QCircuit:
 
         return len(self.qreg)
 
+    # TODO: need to improve.
     @property
     def gates_len(self):
         """Get the number of gates.
@@ -177,7 +181,7 @@ class QCircuit:
             IndexError: Qubit index must be less than then length of qreg.
         """
         if qubit >= len(self.qreg) or qubit < 0:
-            raise IndexError("qreg assignment index out of range.")
+            raise IndexError("qubit index out of range.")
         self.creg[qubit].value = value
 
     def run(self, shots=1):
@@ -191,7 +195,8 @@ class QCircuit:
         """
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
-        if self.backend.backend_type() == "BackendIBM":
+        # TODO: need to improve
+        if self.backend.name == "BackendIBM":
             # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
             return result
         # TODO: measureSet
@@ -665,7 +670,7 @@ class Result:
 
     def excute_info(self):
         result = {
-            "backend": self.backend.backend_type(),
+            "backend": self.backend.name,
             "task_id": self.task_id,
             "status": self.status,
             "arguments": self.arguments,

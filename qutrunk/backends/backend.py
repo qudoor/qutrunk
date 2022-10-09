@@ -16,5 +16,5 @@ class Backend(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def backend_type(self):
+    def name(self):
         pass

@@ -234,5 +234,6 @@ class BackendQuSprout(Backend):
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def backend_type(self):
+    @property
+    def name(self):
         return "BackendQuSprout"

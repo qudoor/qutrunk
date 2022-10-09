@@ -130,5 +130,6 @@ class BackendIBM(Backend):
         )
         return result
 
-    def backend_type(self):
+    @property
+    def name(self):
         return "BackendIBM"
