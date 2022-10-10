@@ -24,7 +24,7 @@ def run_bernstein_vazirani(backend=None):
     for qb in range(1, num_qubits):
         bit = int(bits % 2)
         bits = int(bits / 2)
-        success_prob *= circuit.get_prob_outcome(qb, bit)
+        success_prob *= circuit.get_prob_qubit_value(qb, bit)
 
     print(f"solution reached with probability {success_prob}")
     circuit.print()

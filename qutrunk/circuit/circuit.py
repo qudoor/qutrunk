@@ -247,7 +247,6 @@ class QCircuit:
         """Return the number of operations in circuit."""
         return len(self.cmds)
 
-    # TODO: need to improve.
     def get_prob_value(self, value):
         """Probability of obtaining quantum circuit measurements.
 
@@ -260,22 +259,24 @@ class QCircuit:
         self.backend.send_circuit(self)
         return self.backend.get_prob_amp(value)
 
-    # TODO: need to improve.
-    def get_prob_outcome(self, qubit, outcome):
+    def get_prob_qubit_value(self, qubit, value):
         """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
 
         Args:
             qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
+            value: The qubit measure result(0 or 1).
 
         Returns:
             The probability of target qubit.
         """
+        if qubit < 0 or qubit >= self.num_qubits:
+            raise IndexError("out of the range of qubits.")
+
         self.backend.send_circuit(self)
-        return self.backend.get_prob_outcome(qubit, outcome)
+        return self.backend.get_prob_outcome(qubit, value)
 
     # TODO:Get the maximum possible value of a qubit.
-    def get_prob_all_outcome(self, qubits):
+    def get_prob_qubits(self, qubits=None):
         """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
 
         Args:
@@ -284,6 +285,12 @@ class QCircuit:
         Returns:
             An array contains probability of target qubits.
         """
+        if qubits is None:
+            qubits = [i for i in range(self.num_qubits)]
+        else:
+            if not all(isinstance(qubit, int) for qubit in qubits):
+                raise TypeError("The argument must be integer.")
+
         self.backend.send_circuit(self)
         return self.backend.get_prob_all_outcome(qubits)
 
