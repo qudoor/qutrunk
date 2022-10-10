@@ -59,7 +59,7 @@ class QCircuit:
         self.cbit_indices = {}
 
         # 参数字典表 {Parameter: value}
-        self.parameters = {}
+        self.param_dict = {}
 
         # use local backend(default)
         if backend is None:
@@ -314,9 +314,9 @@ class QCircuit:
         except KeyError:
             raise Exception(f"Could not locate provided bit:{bit}")
 
-    def parameter(self, name):
+    def parameter(self, name: str):
         """
-        get a new object of Parameter.
+        Get a new object of Parameter.
 
         Args:
             name(str): Parameter name.
@@ -325,8 +325,24 @@ class QCircuit:
             p: Parameter object
         """
         p = Parameter(name)
-        self.parameters[name] = p
+        self.param_dict[name] = p
         return p
+
+    def parameters(self, names: list)->tuple:
+        """
+        Get a collection of Parameter.
+
+        Args:
+            names(list): A list of Parameter name.
+
+        Returns:
+            Tuple contains Parameter object
+        """ 
+        params = []
+        for name in names:
+            params.append(self.parameter(name))
+
+        return tuple(params)
 
     def get_parameter(self, name):
         """get the object of Parameter.
@@ -334,7 +350,7 @@ class QCircuit:
         Args:
             name(str): Parameter name.
         """
-        return self.parameters[name]
+        return self.param_dict[name]
 
     def bind_parameters(self, params):
         """
@@ -352,7 +368,7 @@ class QCircuit:
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
         # 1 参数是否在参数表中
-        parameters_table_key = self.parameters.keys()
+        parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key
             for param_key in params.keys()
@@ -364,7 +380,7 @@ class QCircuit:
 
         # update parameter
         for k, v in params.items():
-            param = self.parameters[k]
+            param = self.param_dict[k]
             param.update(v)
 
     def get_parameter_value(self, name):
@@ -373,7 +389,7 @@ class QCircuit:
         Args:
             name(str): Parameter name.
         """
-        for k, v in self.parameters.items():
+        for k, v in self.param_dict.items():
             if name == k:
                 return v.value
 
