@@ -383,6 +383,12 @@ class QCircuit:
             param = self.param_dict[k]
             param.update(v)
 
+        # note: 绑定参数后意味着线路已经改变，需要重新构建线路
+        new_circuit = QCircuit(backend=self.backend, name=self.name)
+        new_circuit.allocate(qubits=self.qubits_len)
+        new_circuit.set_cmds(self.cmds)
+        return new_circuit
+
     def get_parameter_value(self, name):
         """get the value of Parameter.
 
