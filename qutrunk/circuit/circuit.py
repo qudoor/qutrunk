@@ -332,38 +332,31 @@ class QCircuit:
         return inverse_circuit, inverse_circuit.qreg
 
     @staticmethod
-    def from_qasm_file(file):
-        """Take in a QASM file and generate a QCircuit object.
+    def load(file, format=None):
+        """Deserialize file object containing a OpenQASM or qusl document to a Python object.
 
         Args:
-            file (str): Path to the file for a QASM program.
+            file (str): Path to the file for a qusl or OpenQASM program.
+            format(str): The format of file content.
 
         Return:
-            QCircuit: The QCircuit object for the input QASM.
+            QCircuit: The QCircuit object for the input qusl or OpenQASM.
+
         """
-        # pylint: disable=C0415，E0611，E1102
-        from qutrunk.qasm import Qasm
-        from qutrunk.converters import dag_to_circuit
-        from qutrunk.converters import ast_to_dag
+        if format is None or format == "qusl":
+            from qutrunk.tools.qusl_parse import qusl_to_circuit
 
-        qasm = Qasm(file)
-        ast = qasm.parse()
-        dag = ast_to_dag(ast)
-        return dag_to_circuit(dag)
+            return qusl_to_circuit(file)
 
-    @staticmethod
-    def from_qusl_file(file):
-        """Pase QuSL file and generate quantum circuit.
+        if format == "openqasm":
+            from qutrunk.qasm import Qasm
+            from qutrunk.converters import dag_to_circuit
+            from qutrunk.converters import ast_to_dag
 
-        Args:
-            file: The input QuSL file(json format).
-
-        Returns:
-            QCircuit object.
-        """
-        from qutrunk.tools.qusl_parse import qusl_to_circuit
-
-        return qusl_to_circuit(file)
+            qasm = Qasm(file)
+            ast = qasm.parse()
+            dag = ast_to_dag(ast)
+            return dag_to_circuit(dag)
 
     def expval(self, obs_data):
         """Computes the expected value of a product of Pauli operators.
