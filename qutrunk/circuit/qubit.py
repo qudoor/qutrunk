@@ -5,8 +5,8 @@ class QuBit(Bit):
     """A quantum bit.
 
     Args:
-        circuit: A quantum circuit.
-        index: The index of the bit in its containing register.
+        qreg(Qureg): A quantum register containing the bit.
+        index (int): The index of the bit in its containing register.
 
     Raises:
         TypeError: If the provided register is not a Qureg object.

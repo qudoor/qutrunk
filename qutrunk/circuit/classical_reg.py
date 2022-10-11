@@ -1,6 +1,5 @@
-"""
-Classical register reference object.
-"""
+"""Classical register reference object."""
+
 import itertools
 
 from .classical_bit import CBit
@@ -36,7 +35,7 @@ class CReg:
         """Add a CBit instance.
 
         Args:
-            cbits: A list which store CBit instance.
+            cbit: A list which store CBit instance.
         """
         self.cbits.append(cbit)
 
@@ -51,7 +50,7 @@ class CReg:
             idx: The index of Cbit.
 
         Returns:
-            Cbit instance.
+            CBit instance.
         """
         if not isinstance(idx, int):
             raise ValueError("expected integer index into register")
@@ -64,7 +63,7 @@ class CReg:
         """Find the index of the provided cbit within this register.
 
         Args:
-            cbits: A list which store CBit instance.
+            cbit: A list which store CBit instance.
         """
         return self.cbits.index(cbit)
 
