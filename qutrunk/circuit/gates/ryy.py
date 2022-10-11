@@ -20,6 +20,8 @@ class Ryy(BasicRotateGate):
     """
 
     def __init__(self, alpha):
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 

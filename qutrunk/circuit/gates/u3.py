@@ -30,6 +30,8 @@ class U3(BasicGate):
             phi: U3 gate parameter2.
             lam: U3 gate parameter3.
         """
+        if theta is None or phi is None or lam is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi
@@ -108,6 +110,8 @@ class CU3(BasicRotateGate):
             phi: U3 gate parameter 2.
             lam: U3 gate parameter 3.
         """
+        if theta is None or phi is None or lam is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi
@@ -199,6 +203,8 @@ class CU(BasicRotateGate):
             lam:U gate parameter 3.
             gamma: U gate parameter 4.
         """
+        if theta is None or phi is None or lam is None or gamma is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi

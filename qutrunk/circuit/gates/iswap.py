@@ -22,6 +22,8 @@ class iSwap(BasicGate):
         Args:
             alpha: Rotation angle
         """
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
