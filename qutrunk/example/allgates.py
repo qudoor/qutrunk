@@ -11,11 +11,11 @@ def my_gate(q):
 
 
 def run_gates():
-    # allocate
+    # Create and allocate quantum circuit
     qc = QCircuit()
     qr = qc.allocate(3)
 
-    # apply gate
+    # Apply quantum gate
     H * qr[0]
     CNOT * (qr[0], qr[1])
     NOT * qr[0]
@@ -73,19 +73,24 @@ def run_gates():
     my_gate * (qr[0], qr[1])
     Power(2, my_gate) * (qr[0], qr[1])
 
-    # measure
+    # Measure all quantum qubits
     All(Measure) * qr
 
-    # print circuit
+    # Print quantum circuit
     qc.print()
-    # print qasm circuit
+
+    # Print quantum circuit as operqasm grammar
     qc.print(format="openqasm")
 
+    # Run quantum circuit
     qc.run()
 
     return qc
 
 
 if __name__ == "__main__":
+    # Run locally
     circuit = run_gates()
+
+    # Draw quantum circuit 
     circuit.draw(line_length=3000)
