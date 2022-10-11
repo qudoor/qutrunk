@@ -21,10 +21,6 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License"
 ]
 
-# 以后支持c++本地模拟器再开放
-build = "build.py"
-
-
 [tool.poetry.dependencies]
 python = "^3.8"
 pyyaml = "^6.0"

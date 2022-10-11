@@ -1,8 +1,8 @@
 from enum import Enum
 
 from qutrunk.backends.backend import Backend
-
 from qutrunk.tools.read_qubox import get_qulocalbox_setting
+from qutrunk.sim.local.local_python import BackendLocalPython as BackendLocalImpl
 
 
 class BackendLocalType(Enum):
@@ -19,14 +19,7 @@ class BackendLocalType(Enum):
     UNKNOWN = 2
 
 
-try:
-    from qutrunk.sim.local.local_cpp import BackendLocalCpp as BackendLocalImpl
-
-    local_type = BackendLocalType.CPP
-except ImportError:
-    from qutrunk.sim.local.local_python import BackendLocalPython as BackendLocalImpl
-
-    local_type = BackendLocalType.PYTHON
+local_type = BackendLocalType.PYTHON
 
 
 class BackendLocal(Backend):
@@ -201,9 +194,7 @@ class BackendLocal(Backend):
         return res
 
     def backend_type(self):
-        if local_type == BackendLocalType.CPP:
-            return "BackendLocalCpp"
-        elif local_type == BackendLocalType.PYTHON:
+        if local_type == BackendLocalType.PYTHON:
             return "BackendLocalPython"
         else:
             return "UNKNOWN"
