@@ -49,7 +49,7 @@ QuTrunk内部模块划分及层次结构如下：
 #### **pip安装** 
 
 QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
-注意在正式使用 QuTurnk 之前，您需要先安装 Python（版本 3.7+）。
+注意在正式使用 QuTurnk 之前，您需要先安装 Python（版本 3.8+）。
 
   ```python
   pip install qutrunk
