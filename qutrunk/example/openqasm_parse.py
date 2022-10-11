@@ -1,9 +1,13 @@
 """Deserialize OpenQASM file object."""
+import os
+from pathlib import Path
+
 from qutrunk.circuit import QCircuit
 
 
 def run_openqasm_parse():
-    circuit = QCircuit.load(file="bell_pair.qasm", format="openqasm")
+    qasm_file = Path(os.getcwd()) / "bell_pair.qasm"
+    circuit = QCircuit.load(file=qasm_file, format="openqasm")
 
     # run circuit
     res = circuit.run(shots=100)

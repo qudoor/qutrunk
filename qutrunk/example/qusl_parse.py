@@ -1,9 +1,13 @@
 """Deserialize QuSL file object."""
+import os
+from pathlib import Path
+
 from qutrunk.circuit import QCircuit
 
 
 def run_qusl_parse():
-    circuit = QCircuit.load(file="bell_pair.qusl")
+    qusl_file = Path(os.getcwd()) / "bell_pair.qusl"
+    circuit = QCircuit.load(file=qusl_file)
 
     # run circuit
     res = circuit.run(shots=100)
