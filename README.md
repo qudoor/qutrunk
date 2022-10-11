@@ -50,7 +50,7 @@ QuTrunk内部模块划分及层次结构如下：
 
 ### **下载和安装**
 ---
-#### **1.pip安装** 
+#### **pip安装** 
 
 QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
 注意在正式使用 QuTurnk 之前，您需要先安装 Python（版本 3.7+）。
@@ -66,74 +66,6 @@ import qutrunk
 qutrunk.run_check()
 ```
 输出结果为："QuTrunk is installed successfully! You can use QuTrunk now."表明QuTrunk安装成功。
-
-#### **2.源码安装**  
-
-  #### **Windows**
-
-  安装 C++ 编译器：
-
-  ```
-  下载visual studio community 2019, 在安装界面勾选`使用C++的桌面开发`进行安装
-  ```
-
-  然后再安装 cmake，使用命令行执行：
-
-  ```python
-  pip install cmake
-  ```
-
-  最后编译安装，解压下载的源码安装包，进入到解压目录下，执行:
-
-  ```python
-  python setup.py install
-  ```
-
-  #### **MacOS**
-
-  安装之前，确认已下载 QuTrunk（可于PyPI官网下载）
-
-  确认安装 C/C++ 编译器（一般 MacOS 已默认安装）
-
-  ```
-  执行 gcc –version 命令查询是否已经安装
-  ```
-  
-  安装 cmake，在终端执行：
-
-  ```python
-  pip install cmake
-  ```
-  
-  编译依赖安装完成后，再切换到下载目录，解压并开始编译安装QuTrunk：
-
-  ```python
-  tar -zxvf qutrunk-0.1.9.tar.gz
-  cd qutrunk-0.1.9
-  python setup.py install
-  ```
-
-  #### **Ubuntu**
-
-  首先安装 C/C++ 编译器
-
-  ```python
-  sudo apt install build-essential
-  ```
-  
-  然后安装cmake编译工具
-
-  ```python
-  sudo apt install cmake
-  ```
-  
-  最后编译安装 QuTrunk
-
-  ```python
-  tar -zxvf qutrunk-0.1.9.tar.gz
-  cd qutrunk-0.1.9
-  python setup.py install
-  ```
 
 
 ### **示例代码**
