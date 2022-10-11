@@ -392,6 +392,53 @@ class QCircuit:
             )
         return self.backend.get_expec_pauli_sum(pauli_type_list, coeffi_list)
 
+    def _dump_qusl(self, file, unroll=True):
+        with open(file, "w", encoding="utf-8") as f:
+            qusl_data = {}
+            qusl_data["target"] = "QuSL"
+            qusl_data["version"] = "1.0"
+
+            meta = {"circuit_name": self.name, "qubits": str(len(self.qreg))}
+            qusl_data["meta"] = meta
+
+            inst = []
+            if unroll:
+                for c in self:
+                    inst.append(c.qusl() + "\n")
+            else:
+                for stm in self.statements:
+                    inst.append(stm + "\n")
+
+            qusl_data["code"] = inst
+            f.write(json.dumps(qusl_data))
+
+    def _dump_openqasm(self, file):
+        with open(file, "w", encoding="utf-8") as f:
+            f.write("OPENQASM 2.0;\n")
+            f.write('include "qulib1.inc";\n')
+            f.write(f"qreg q[{str(len(self.qreg))}];\n")
+            f.write(f"creg c[{str(len(self.qreg))}];\n")
+            for c in self:
+                f.write(c.qasm() + ";\n")
+
+    def dump(self, file=None, format=None, unroll=True):
+        """Serialize Quantum circuit as a JSON formatted stream to file.
+
+        Args:
+            unroll: True: Dump the detailed instructions, especially, \
+                if the instruction contains an operator, the operator will be expanded.
+                False: Dump the brief instructions, the operator will not be expanded.
+            file: Dump the qutrunk instruction to file(json format).
+        """
+        if file is None:
+            raise Exception("file argument need to be supplied.")
+
+        if format is None or format == "qusl":
+            self._dump_qusl(file, unroll)
+
+        if format == "openqasm":
+            self._dump_openqasm(file)
+
     def print(self, file=None, unroll=True):
         """Print quantum circuit in qutrunk form.
         
