@@ -18,6 +18,8 @@ class Ry(BasicRotateGate):
     """
 
     def __init__(self, alpha):
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -77,6 +79,8 @@ class CRy(BasicRotateGate):
     """
 
     def __init__(self, angle):
+        if angle is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = angle
 

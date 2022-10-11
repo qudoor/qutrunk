@@ -25,6 +25,8 @@ class U2(BasicGate):
             theta: U2 gate parameter1.
             phi: U2 gate parameter2.
         """
+        if theta is None or phi is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi
