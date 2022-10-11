@@ -8,7 +8,6 @@ readme = "README.md"
 homepage = "http://www.qudoor.com/"
 repository = "https://github.com/queco-quantum/qutrunk"
 documentation  = "http://developer.queco.cn/qutrunk_api/"
-exclude = ["qutrunk/doc/coding_style.md"]
 keywords = ["qutrunk", "quantum", "sdk"]
 classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
