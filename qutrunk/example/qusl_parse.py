@@ -1,3 +1,4 @@
+"""Deserialize QuSL file object."""
 from qutrunk.circuit import QCircuit
 
 
