@@ -6,7 +6,8 @@ from qutrunk.circuit import QCircuit
 
 
 def run_openqasm_parse():
-    qasm_file = Path(os.getcwd()) / "bell_pair.qasm"
+    base = os.path.dirname(os.path.abspath(__file__))
+    qasm_file = Path(base) / "bell_pair.qasm"
     circuit = QCircuit.load(file=qasm_file, format="openqasm")
 
     # run circuit
