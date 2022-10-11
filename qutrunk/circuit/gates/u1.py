@@ -25,6 +25,8 @@ class U1(BasicGate):
         Args:
             alpha: Rotation angle.
         """
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -82,6 +84,8 @@ class CU1(BasicRotateGate):
         Args:
             alpha: Rotation angle.
         """
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
