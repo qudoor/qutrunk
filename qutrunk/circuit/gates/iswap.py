@@ -49,7 +49,7 @@ class iSwap(BasicGate):
             raise NotImplementedError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            raise AttributeError("Parameter Error: qubits should be two")
+            raise AttributeError("Parameter Error: Two target bits are required.")
 
         self.qubits = qubits
         targets = [q.index for q in qubits]
