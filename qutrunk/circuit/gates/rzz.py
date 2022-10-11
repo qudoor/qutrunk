@@ -47,7 +47,8 @@ class Rzz(BasicRotateGate):
             raise NotImplementedError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            raise AttributeError()
+            raise AttributeError("Parameter error: Two target qubits are required.")
+
         targets = [q.index for q in qubits]
         cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)
         self.commit(qubits[0].circuit, cmd)

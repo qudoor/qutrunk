@@ -96,9 +96,7 @@ class CHGate(BasicGate):
 
         if len(qubits) != 2:
             # TODO:need to improve.
-            raise AttributeError(
-                "Parameter error: 1 control bit and 1 destination bit should be passed."
-            )
+            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
 
         self.qubits = qubits
         controls = [qubits[0].index]

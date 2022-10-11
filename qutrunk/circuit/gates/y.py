@@ -99,9 +99,8 @@ class CYGate(BasicGate):
                 CY * (qr[0], qr[1])
         """
         if len(qubits) != 2:
-            raise AttributeError(
-                "Argument error：need to one controlled qubit and one target qubit."
-            )
+            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
+
         self.qubits = qubits
         controls = [qubits[0].index]
         targets = [qubits[1].index]

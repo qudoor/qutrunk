@@ -139,7 +139,7 @@ class CU3(BasicRotateGate):
             raise NotImplementedError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            raise AttributeError("Parameter Error: qubits should be two.")
+            raise AttributeError("Parameter Error: One controlled and one target qubit are required.")
 
         controls = [qubits[0].index]
         targets = [qubits[1].index]
@@ -231,7 +231,8 @@ class CU(BasicRotateGate):
 
         if len(qubits) != 2:
             # TODO: need to improve.
-            raise AttributeError("Parameter Error: qubits should be two")
+            raise AttributeError("Parameter error: One controlled and one target qubit is required.")
+
         self.qubits = qubits
         controls = [qubits[0].index]
         targets = [qubits[1].index]

@@ -20,6 +20,7 @@ class Rx(BasicRotateGate):
     def __init__(self, alpha):
         if alpha is None:
             raise NotImplementedError("The argument cannot be empty.")
+
         super().__init__()
         self.rotation = alpha
 
@@ -82,6 +83,7 @@ class CRx(BasicRotateGate):
     def __init__(self, angle):
         if angle is None:
             raise NotImplementedError("The argument cannot be empty.")
+
         super().__init__()
         self.rotation = angle
 
@@ -110,7 +112,7 @@ class CRx(BasicRotateGate):
         if len(qubits) != 2:
             # TODO:need to improve.
             raise AttributeError(
-                "Argument error：need to one controlled qubit and one target qubit."
+                "Parameter error: One controlled and one target qubit are required."
             )
 
         self.qubits = qubits
