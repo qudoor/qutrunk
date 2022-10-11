@@ -113,8 +113,7 @@ qutrunk.run_check()
 
 ### **量子可视化编程**  
 ---
-QuBranch是由启科量子基于vscode开发的量子编程集成开发环境。  
-QuTrunk与QuBranch相互配合可以实现量子可视化编程，
+QuBranch是由启科量子基于vscode开发的量子编程集成开发环境, QuTrunk与QuBranch相互配合可以实现量子可视化编程,
 具体步骤参见[量子可视化编程](http://developer.queco.cn/learn/doc/detail?id=12&childrenid=14)
 
 ### **文档**
