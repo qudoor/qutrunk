@@ -31,3 +31,4 @@ def run_bell_pair(backend=None):
 if __name__ == "__main__":
     circuit = run_bell_pair()
     circuit.draw()
+

@@ -439,74 +439,46 @@ class QCircuit:
         if format == "openqasm":
             self._dump_openqasm(file)
 
-    def print(self, file=None, unroll=True):
+    def _print_qusl(self, unroll):
         """Print quantum circuit in qutrunk form.
-        
+
         Args:
             unroll: True: Dump the detailed instructions, especially, \
                 if the instruction contains an operator, the operator will be expanded.
                 False: Dump the brief instructions, the operator will not be expanded.
-            file: Dump the qutrunk instruction to file(json format). 
         """
-        try:
-            f = open(file, "w", encoding="utf-8") if file else sys.stdout
-            if f is sys.stdout:
-                """Print quantum circuit in qutrunk form."""
-                print(f"qreg q[{str(len(self.qreg))}]")
-                print(f"creg c[{str(len(self.qreg))}]")
-                if unroll:
-                    for c in self:
-                        print(c.qusl())
-                else:
-                    for stm in self.statements:
-                        print(stm)
-            else:
-                qusl_data = {}
-                qusl_data["target"] = "QuSL"
-                qusl_data["version"] = "1.0"
+        print(f"qreg q[{str(len(self.qreg))}]")
+        print(f"creg c[{str(len(self.qreg))}]")
+        if unroll:
+            for c in self:
+                print(c.qusl())
+        else:
+            for stm in self.statements:
+                print(stm)
 
-                meta = {}
-                meta["circuit_name"] = self.name
-                meta["qubits"] = str(len(self.qreg))
-                qusl_data["meta"] = meta
+    def _print_qasm(self):
+        """Print quantum circuit in OpenQASM form."""
+        print("OPENQASM 2.0;")
+        print('include "qulib1.inc";')
+        print(f"qreg q[{str(len(self.qreg))}];")
+        print(f"creg c[{str(len(self.qreg))}];")
+        for c in self:
+            print(c.qasm() + ";")
 
-                inst = []
-                if unroll:
-                    for c in self:
-                        inst.append(c.qusl() + "\n")
-                else:
-                    for stm in self.statements:
-                        inst.append(stm + "\n")
-                qusl_data["code"] = inst
-                qusl_json = json.dumps(qusl_data)
-                f.write(qusl_json)
-        finally:
-            if f is not sys.stdout:
-                f.close()
-
-    def print_qasm(self, file=None):
-        """Convert circuit and dump to file/stdout.
-
-        Convert circuit to QASM 2.0, and dump to file/stdout.
-        TODO: custom gate implemented by qutrunk can't be parsed by third party.
-        Refer to qulib1.inc and mapping.qutrunk_standard_gate.
+    def print(self, format=None, unroll=True):
+        """Print quantum circuit.
 
         Args:
-            file: Dump the qasm to file.
+            format(str): The format of needed to print, Default to qusl. options are "qusl" or "openqasm".
+            unroll: True: Dump the detailed instructions, especially, \
+                if the instruction contains an operator, the operator will be expanded.
+                False: Dump the brief instructions, the operator will not be expanded.
         """
-        try:
-            f = open(file, "w") if file else sys.stdout
+        if format is None or format == "qusl":
+            self._print_qusl(unroll)
 
-            f.write("OPENQASM 2.0;\n")
-            f.write('include "qulib1.inc";\n')
-            f.write(f"qreg q[{str(len(self.qreg))}];\n")
-            f.write(f"creg c[{str(len(self.qreg))}];\n")
-            for c in self:
-                f.write(c.qasm() + ";\n")
-        finally:
-            # don't close sys.stdout
-            if f is not sys.stdout:
-                f.close()
+        if format == "openqasm":
+            self._print_qasm()
 
     def depth(
         self,
