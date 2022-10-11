@@ -17,7 +17,7 @@ def deutsch(backend=None):
 
     qc.print()
     result = qc.run()
-    print("the result of Deutsch: ", result.get_measure()[0])
+    print("The result of Deutsch: ", result.get_measure()[0])
     return qc
 
 
