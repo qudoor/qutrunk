@@ -1,3 +1,4 @@
+"""Deserialize OpenQASM file object."""
 from qutrunk.circuit import QCircuit
 
 
