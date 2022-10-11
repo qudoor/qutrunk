@@ -48,7 +48,7 @@ def qft_single_wave():
     P(math.pi / 4) * qreg[0]
     P(math.pi / 2) * qreg[1]
     P(math.pi) | qreg[2]
-    circuit.qft()
+    QFT * qreg
     print(circuit.get_all_state())
     circuit.run()
 
@@ -56,5 +56,6 @@ def qft_single_wave():
 
 
 if __name__ == "__main__":
-    # full_qft()
+    full_qft()
     partial_qft()
+    qft_single_wave()
