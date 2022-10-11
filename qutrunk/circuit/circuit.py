@@ -1,7 +1,6 @@
 """Circuit Module."""
 import json
 import random
-import sys
 from typing import List, Optional, Union
 
 from qutrunk.backends import Backend, BackendLocal
@@ -554,14 +553,14 @@ class QCircuitIter:
 
     def __init__(self, cmds):
         self.idx = 0
-        self.cmds = cmds
+        self.__cmds  = cmds
 
     def __iter__(self):
         return self
 
     def __next__(self):
         try:
-            cmd = self.cmds[self.idx]
+            cmd = self.__cmds[self.idx]
         except IndexError:
             raise StopIteration
 
