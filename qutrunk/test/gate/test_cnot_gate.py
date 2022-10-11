@@ -26,7 +26,7 @@ def test_cnot_gate():
 
 
 def test_mutli_cnot_gate():
-    """测试C_NOT门"""
+    """测试Multi-control X(NOT)门"""
     # 使用本地量子计算模拟器
     circuit = QCircuit()
     qr = circuit.allocate(3)
