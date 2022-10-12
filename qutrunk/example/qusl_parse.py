@@ -6,8 +6,8 @@ from qutrunk.circuit import QCircuit
 
 
 def run_qusl_parse():
-    base = os.path.dirname(os.path.abspath(__file__))
-    qusl_file = Path(base) / "bell_pair.qusl"
+    cur_path = os.path.dirname(os.path.abspath(__file__))
+    qusl_file = Path(cur_path) / "bell_pair.qusl"
     circuit = QCircuit.load(file=qusl_file)
 
     # run circuit
