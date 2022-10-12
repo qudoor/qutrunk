@@ -4,7 +4,7 @@ from qutrunk.circuit.gates import H, Measure, CNOT
 
 
 def test_dump_qusl():
-    """Testing the functionality of serializing quantum circuits as QUSL files in JSON format"""
+    """Testing the functionality of serializing quantum circuits as QUSL files in JSON format."""
     qc = QCircuit()
     qreg = qc.allocate(2)
 
@@ -14,7 +14,7 @@ def test_dump_qusl():
     Measure * qreg[1]
 
     qc.dump(file="a.qusl", format="qusl")
-    expect_out = '"code": ["H * q[0]\\n", "MCX * (q[0], q[1])\\n", "Measure * q[0]\\n", "Measure * q[1]\\n"]'
+    expect_out = '"code": ["H * q[0]\\n", "MCX(1) * (q[0], q[1])\\n", "Measure * q[0]\\n", "Measure * q[1]\\n"]'
 
     with open("a.qusl", "r") as stream:
         container = stream.readline()
@@ -24,7 +24,7 @@ def test_dump_qusl():
 
 
 def test_dump_openqasm():
-    """Testing the functionality of serializing quantum circuits as OpenQASM files in JSON format"""
+    """Testing the functionality of serializing quantum circuits as OpenQASM files in JSON format."""
     qc = QCircuit()
     qreg = qc.allocate(2)
 

@@ -20,7 +20,7 @@ class CBit(Bit):
 
         if not isinstance(creg, CReg):
             raise TypeError(
-                f"CBit needs a CReg and {type(creg).__name__} eas provided."
+                f"CBit needs a CReg and {type(creg).__name__} was provided."
             )
 
         super().__init__(creg, index)

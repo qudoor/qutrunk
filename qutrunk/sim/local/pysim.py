@@ -1015,9 +1015,13 @@ class Simulator:
         # todo better in float or ndarray
         state_list = []
         for i in range(self.total_num_amps):
-            real = "%.14f" % self.real[i]
-            imag = "%.14f" % self.imag[i]
-            state = real + ", " + imag
+            real = self.real[i]
+            imag = self.imag[i]
+            if self.real[i] > -1e-15 and self.real[i] < 1e-15:
+                real = 0
+            if self.imag[i] > -1e-15 and self.imag[i] < 1e-15:
+                imag = 0
+            state = str(real) + ", " + str(imag)
             state_list.append(state)
         return state_list
 

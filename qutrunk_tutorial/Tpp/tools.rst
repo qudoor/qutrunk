@@ -7,5 +7,5 @@ tools
 .. toctree::
    :maxdepth: 2   
 
-   01/tools
+   01/qutrunk.tools
   

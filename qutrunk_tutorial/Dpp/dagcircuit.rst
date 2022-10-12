@@ -7,4 +7,4 @@ dagcircuit
 .. toctree::
    :maxdepth: 2   
 
-   01/dagcircuit
+   01/qutrunk.dagcircuit

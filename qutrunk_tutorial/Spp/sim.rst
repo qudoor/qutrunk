@@ -7,6 +7,5 @@ sim
 .. toctree::
    :maxdepth: 2   
 
-   01/sim.local
+   01/qutrunk.sim.local
    
-   07/sim

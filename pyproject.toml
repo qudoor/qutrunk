@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qutrunk"
-version = "0.1.10"
+version = "0.1.11"
 description = "qutrunk is an open source library for quantum computing."
 authors = ["qudoorzh2022 <qudoorzh2022@163.com>"]
 license = "Apache-2.0"
@@ -8,7 +8,6 @@ readme = "README.md"
 homepage = "http://www.qudoor.com/"
 repository = "https://github.com/queco-quantum/qutrunk"
 documentation  = "http://developer.queco.cn/qutrunk_api/"
-exclude = ["qutrunk/doc/coding_style.md"]
 keywords = ["qutrunk", "quantum", "sdk"]
 classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -20,10 +19,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "License :: OSI Approved :: Apache Software License"
 ]
-
-# 以后支持c++本地模拟器再开放
-build = "build.py"
-
 
 [tool.poetry.dependencies]
 python = "^3.8"
