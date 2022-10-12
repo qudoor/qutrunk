@@ -7,5 +7,5 @@ visualizations
 .. toctree::
    :maxdepth: 2   
 
-   01/visualizations
+   01/qutrunk.visualizations
   

@@ -105,6 +105,9 @@ class QCircuit:
             raise TypeError("qubits parameter should be type of int or list.")
 
         qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
+        if qubit_size <= 0:
+            raise TypeError("Number of qubits should be larger than 0.")
+
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)
 
@@ -482,7 +485,7 @@ class QCircuit:
         pauli_type_list, coeffi_list = pauli_coeffi.obs_data()
         if (qubitnum != 0) and (len(coeffi_list) * qubitnum) != len(pauli_type_list):
             raise AttributeError(
-                "parameter error：the number of parameters is not correct."
+                "Parameter error: The number of parameters is not correct."
             )
         return self.backend.get_expec_pauli_sum(pauli_type_list, coeffi_list)
 
@@ -648,14 +651,14 @@ class QCircuitIter:
 
     def __init__(self, cmds):
         self.idx = 0
-        self.cmds = cmds
+        self.__cmds  = cmds
 
     def __iter__(self):
         return self
 
     def __next__(self):
         try:
-            cmd = self.cmds[self.idx]
+            cmd = self.__cmds[self.idx]
         except IndexError:
             raise StopIteration
 

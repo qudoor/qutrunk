@@ -39,6 +39,12 @@ class SwapGate(BasicGate):
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
             raise NotImplementedError("The argument must be Qubit object.")
 
+        if len(qubits) != 2:
+            # TODO:need to improve.
+            raise AttributeError(
+                "Parameter error: Two target qubits are required."
+            )
+
         targets = [q.index for q in qubits]
         cmd = Command(self, targets, inverse=self.is_inverse)
         self.commit(qubits[0].circuit, cmd)
@@ -107,7 +113,7 @@ class CSwapGate(BasicGate):
         if len(qubits) != 3:
             # TODO:need to improve.
             raise AttributeError(
-                "Argument error：need to one controlled qubit and two target qubit."
+                "Parameter error: One controlled and two target qubits are required."
             )
 
         self.qubits = qubits

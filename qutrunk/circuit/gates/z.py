@@ -124,8 +124,11 @@ class MCZ(BasicGate):
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
         """
+        if isinstance(qubits, QuBit) or len(qubits) <= self.ctrl_cnt:
+            raise AttributeError("The parameter miss controlled or target qubit(s).")
+
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise AttributeError("The argument must be Qubit object.")
 
         if isinstance(qubits, Qureg):
             temp = []

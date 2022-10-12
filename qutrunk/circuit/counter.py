@@ -1,4 +1,6 @@
-"""Resources required for the statistics of quantum circuits: number of quantum bits, number of quantum gates; Quantum circuits are time-consuming to compile and run."""
+"""Resources required for the statistics of quantum circuits:
+number of quantum bits, number of quantum gates; Quantum circuits are time-consuming to compile and run.
+"""
 import time
 
 

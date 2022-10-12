@@ -1,5 +1,4 @@
 import pytest
-
 from numpy import pi
 
 from qutrunk.circuit import QCircuit

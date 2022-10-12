@@ -130,7 +130,7 @@ class Command:
 
         # only append control bit count as param when it's more than one
         ctrl_cnt = len(self.controls)
-        if ctrl_cnt > 0:
+        if ctrl_cnt:
             params.append(ctrl_cnt)
 
         if len(self.rotation) > 0:
