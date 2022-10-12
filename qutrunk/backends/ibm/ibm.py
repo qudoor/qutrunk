@@ -26,7 +26,7 @@ class BackendIBM(Backend):
             from qutrunk.circuit.gates import H, CNOT, Measure
 
             # use BackendIBM
-            token = "your token"
+            token = "IBM Quantum token"
             qc = QCircuit(backend=BackendIBM(token=token))
             qr = qc.allocate(2)
 

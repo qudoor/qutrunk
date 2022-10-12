@@ -71,8 +71,9 @@ class BasicPhaseGate(BasicGate):
 class Observable:
     """Base class representing observables. It's usually PauliX, PauliY, PauliZ, PauliI."""
 
-    def obs(self, target):
-        """ Get Observable data.
+    def __call__(self, target):
+        """
+        Get Observable data.
 
         Args:
             target: The observed qubit.

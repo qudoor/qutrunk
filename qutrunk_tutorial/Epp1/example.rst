@@ -7,5 +7,5 @@ example
 .. toctree::
    :maxdepth: 2   
 
-   01/example
+   01/qutrunk.example
   

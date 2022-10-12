@@ -17,7 +17,8 @@ QuTrunk
    Dpp/dagcircuit 
    Epp1/example
    Epp2/exceptions
-   Qpp/qasm
+   Qpp1/qasm
+   Qpp2/qutrunk
    Spp/sim
    Tpp/tools
    Vpp/visualizations

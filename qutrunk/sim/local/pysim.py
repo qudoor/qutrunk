@@ -1017,9 +1017,13 @@ class Simulator:
         # todo better in float or ndarray
         state_list = []
         for i in range(self.total_num_amps):
-            real = "%.14f" % self.real[i]
-            imag = "%.14f" % self.imag[i]
-            state = real + ", " + imag
+            real = self.real[i]
+            imag = self.imag[i]
+            if self.real[i] > -1e-15 and self.real[i] < 1e-15:
+                real = 0
+            if self.imag[i] > -1e-15 and self.imag[i] < 1e-15:
+                imag = 0
+            state = str(real) + ", " + str(imag)
             state_list.append(state)
         return state_list
 
@@ -1354,11 +1358,11 @@ class Simulator:
             work_imag[i] = self.imag[i]
         for pauli_op in pauli_prod_list:
             op_type = pauli_op["oper_type"]
-            if op_type == PauliOpType.PAULI_X:
+            if op_type == PauliOpType.PAULI_X.value:
                 self.paulix_local(work_real, work_imag, pauli_op["target"])
-            elif op_type == PauliOpType.PAULI_Y:
-                self.pauliy_local(work_real, work_imag, pauli_op["target"])
-            elif op_type == PauliOpType.PAULI_Z:
+            elif op_type == PauliOpType.PAULI_Y.value:
+                self.pauliy_local(work_real, work_imag, pauli_op["target"], 1)
+            elif op_type == PauliOpType.PAULI_Z.value:
                 self.pauliz_local(work_real, work_imag, pauli_op["target"])
 
         real, imag = self.calc_inner_product_local(

@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
 from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable
+from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 
 
@@ -57,6 +58,9 @@ class QCircuit:
         self.qubit_indices = {}
         self.cbit_indices = {}
 
+        # 参数字典�{Parameter: value}
+        self.parameters = {}
+
         # use local backend(default)
         if backend is None:
             self.backend = BackendLocal()
@@ -101,6 +105,9 @@ class QCircuit:
             raise TypeError("qubits parameter should be type of int or list.")
 
         qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
+        if qubit_size <= 0:
+            raise TypeError("Number of qubits should be larger than 0.")
+
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)
 
@@ -321,6 +328,71 @@ class QCircuit:
         except KeyError:
             raise Exception(f"Could not locate provided bit:{bit}")
 
+    def parameter(self, name):
+        """
+        get a new object of Parameter.
+
+        Args:
+            name(str): Parameter name.
+
+        Returns:
+            p: Parameter object
+        """
+        p = Parameter(name)
+        self.parameters[name] = p
+        return p
+
+    def get_parameter(self, name):
+        """get the object of Parameter.
+
+        Args:
+            name(str): Parameter name.
+        """
+        return self.parameters[name]
+
+    def bind_parameters(self, params):
+        """
+        Assign numeric parameters to parameters.
+
+        Args:
+            params (dict): {parameter: value, ...}.
+
+        Raises:
+            ValueError: parameters variable contains parameters not present in the circuit.
+
+        Returns:
+            QCircuit:Quantum circuit
+        """
+        if not isinstance(params, dict):
+            raise ValueError("parameters must be dictionary.")
+        # 1 参数是否在参数表�
+        parameters_table_key = self.parameters.keys()
+        params_not_in_circuit = [
+            param_key
+            for param_key in params.keys()
+            if param_key not in parameters_table_key
+        ]
+        if len(params_not_in_circuit) > 0:
+            raise ValueError(f"Cannot bind parameters ({', '.join(map(str, params_not_in_circuit))}) "
+                             f"not present in the circuit.")
+
+        # update parameter
+        for k, v in params.items():
+            param = self.parameters[k]
+            param.update(v)
+
+    def get_parameter_value(self, name):
+        """get the value of Parameter.
+
+        Args:
+            name(str): Parameter name.
+        """
+        for k, v in self.parameters.items():
+            if name == k:
+                return v.value
+
+        return None
+
     def inverse(self):
         """Invert this circuit.
 
@@ -386,7 +458,7 @@ class QCircuit:
             The expected value of a product of Pauli operators.
         """
         self.backend.send_circuit(self)
-        expect = self.backend.get_expec_pauli_prod(obs_data())
+        expect = self.backend.get_expec_pauli_prod(obs_data)
         return expect
 
     # TODO: need to improve.
@@ -405,7 +477,7 @@ class QCircuit:
         pauli_type_list, coeffi_list = pauli_coeffi.obs_data()
         if (qubitnum != 0) and (len(coeffi_list) * qubitnum) != len(pauli_type_list):
             raise AttributeError(
-                "parameter error：the number of parameters is not correct."
+                "Parameter error: The number of parameters is not correct."
             )
         return self.backend.get_expec_pauli_sum(pauli_type_list, coeffi_list)
 
@@ -681,6 +753,14 @@ class Result:
             res.append({out.bitstr: out.count})
         return json.dumps(res)
 
+    def get_states(self):
+        """Get all states"""
+        return self.states
+
+    def get_values(self):
+        """Get all values"""
+        return self.values
+        
     def excute_info(self):
         result = {
             "backend": self.backend.name,

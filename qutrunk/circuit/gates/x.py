@@ -51,8 +51,9 @@ class XGate(BasicGate, Observable):
         """Access to the matrix property of this gate."""
         return np.matrix([[0, 1], [1, 0]])
 
-    def obs(self, target):
-        """Get Observable data.
+    def __call__(self, target):
+        """
+        Get Observable data.
 
         Args:
             target: The observed qubit.
@@ -121,9 +122,12 @@ class MCX(BasicGate):
                 MCX(2) * (qr[0], qr[1], qr[2]) # qr[0], qr[1] are control qubits, qr[2] is target qubit
                 MCX(3) * (qr[0], qr[1], qr[2], qr[3])
         """
+        if isinstance(qubits, QuBit) or len(qubits) <= self.ctrl_cnt:
+            raise AttributeError("The parameter miss controlled or target qubit(s).")
+
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
             # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise AttributeError("The argument must be Qubit object.")
 
         self.qubits = qubits
         controls = [q.index for q in qubits[0 : self.ctrl_cnt]]

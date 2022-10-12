@@ -51,8 +51,9 @@ class YGate(BasicGate, Observable):
         """Access to the matrix property of this gate."""
         return np.array([[0, -1j], [1j, 0]])
 
-    def obs(self, target):
-        """Get Observable data.
+    def __call__(self, target):
+        """
+        Get Observable data.
 
         Args:
             target: The observed qubit.
@@ -117,9 +118,8 @@ class CYGate(BasicGate):
                 CY * (qr[0], qr[1])
         """
         if len(qubits) != 2:
-            raise AttributeError(
-                "Argument error：need to one controlled qubit and one target qubit."
-            )
+            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
+
         self.qubits = qubits
         controls = [qubits[0].index]
         targets = [qubits[1].index]

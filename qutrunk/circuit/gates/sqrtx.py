@@ -110,7 +110,7 @@ class CSqrtXGate(BasicGate):
         if len(qubits) != 2:
             # TODO:need to improve.
             raise AttributeError(
-                "Argument error：need to one controlled qubit and one target qubit."
+                "Parameter error: One controlled and one target qubit are required."
             )
 
         self.qubits = qubits

@@ -25,6 +25,8 @@ class U1(BasicGate):
         Args:
             alpha: Rotation angle.
         """
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -100,6 +102,8 @@ class CU1(BasicRotateGate):
         Args:
             alpha: Rotation angle.
         """
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -127,7 +131,7 @@ class CU1(BasicRotateGate):
 
         if len(qubits) != 2:
             # TODO: need to improve.
-            raise AttributeError("Parameter Error: qubits should be two.")
+            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
 
         controls = [qubits[0].index]
         targets = [qubits[1].index]
