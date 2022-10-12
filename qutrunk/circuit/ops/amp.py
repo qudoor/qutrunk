@@ -62,7 +62,7 @@ class AMP(QSP):
             reals.append(normalized_element.real)
             imags.append(normalized_element.imag)
 
-        cmd = Command(self, cmdex=CmdEx(Amplitude()))
+        cmd = Command(self, cmdex=CmdEx(amp=Amplitude()))
         cmd.cmdex.amp.reals = reals
         cmd.cmdex.amp.imags = imags
         cmd.cmdex.amp.startind = self.startind

@@ -18,14 +18,27 @@ class Amplitude:
         self.numamps = 0
 
 
+class Mat:
+    """Custom matrix.
+
+    Args:
+        reals: matrix read part.
+        imags: matrix imag part.
+    """
+    def __init__(self):
+        self.reals = []
+        self.imags = []
+
+
 class CmdEx:
     """Command extension.
 
     Args:
         amp: Amplitude object.
     """
-    def __init__(self, amp=None):
+    def __init__(self, amp=None, mat=None):
         self.amp = amp
+        self.mat = mat
 
 
 class Command:
@@ -129,6 +142,9 @@ class Command:
         inv_str = ""
 
         # only append control bit count as param when it's more than one
+        if self.cmdex and self.cmdex.mat:
+            params += self.gate.matrix
+
         ctrl_cnt = len(self.controls)
         if ctrl_cnt:
             params.append(ctrl_cnt)
