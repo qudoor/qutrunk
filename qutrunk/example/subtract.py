@@ -21,5 +21,5 @@ def run_subtract(num_qubits, init_value, number=0):
 
 
 if __name__ == "__main__":
-    circuit = run_subtract(4, 3, 3)
+    circuit = run_subtract(4, 2, 3)
 

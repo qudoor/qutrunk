@@ -58,7 +58,7 @@ class QCircuit:
         self.qubit_indices = {}
         self.cbit_indices = {}
 
-        # 参数字典�{Parameter: value}
+        # {Parameter: value}
         self.parameters = {}
 
         # use local backend(default)
@@ -365,7 +365,7 @@ class QCircuit:
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-        # 1 参数是否在参数表�
+
         parameters_table_key = self.parameters.keys()
         params_not_in_circuit = [
             param_key

@@ -50,6 +50,7 @@ class BackendLocal(Backend):
         super().__init__()
         self.circuit = None
         self._local_impl = BackendLocalImpl()
+        # TODO: need to improve.
         box_config = get_qulocalbox_setting()
         self._show_quantum_gate = box_config.get("show_quantum_gate")
 

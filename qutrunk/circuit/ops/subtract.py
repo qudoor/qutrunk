@@ -5,6 +5,7 @@ from qutrunk.circuit.ops.operator import Operator, OperatorContext
 from qutrunk.circuit.gates import X, MCX
 
 
+# TODO: need to improve.
 class Subtract(Operator):
     """Subtract operation.
 
@@ -14,7 +15,7 @@ class Subtract(Operator):
             from qutrunk.circuit import QCircuit
             from qutrunk.circuit.gates import Measure, All
             from qutrunk.circuit.ops import QSP
-            from qutrunk.circuit.ops import ADD
+            from qutrunk.circuit.ops import Subtract
 
             circuit = QCircuit()
             qr = circuit.allocate(4)
