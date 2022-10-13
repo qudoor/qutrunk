@@ -8,6 +8,7 @@ from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
 from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
+from qutrunk.exceptions import QuTrunkError
 
 
 class QCircuit:
@@ -138,6 +139,19 @@ class QCircuit:
             cmd: The command append to circuit.
         """
         self.cmds.append(cmd)
+
+    def append_circuit(self, circuit):
+        """Append target circuit to current circuit.
+
+        Note: The target circuit must have the same qubits as current circuit.
+
+        Args:
+            circuit: The target circuit append to current circuit.
+        """
+        if circuit.qubits_len != self.qubits_len:
+            raise QuTrunkError("The target circuit must have the same qubits as current circuit.")
+        for cmd in circuit.cmds:
+            self.append_cmd(cmd)
 
     def append_statement(self, statement):
         """Append the origin statement when apply gate or operator.
