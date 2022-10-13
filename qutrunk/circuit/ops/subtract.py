@@ -1,12 +1,12 @@
-"""Addition operation."""
+"""Subtract operation."""
 
 from qutrunk.circuit import Qureg
 from qutrunk.circuit.ops.operator import Operator, OperatorContext
 from qutrunk.circuit.gates import X, MCX
 
 
-class ADD(Operator):
-    """Addition operation.
+class Subtract(Operator):
+    """Subtract operation.
 
     Example:
         .. code-block:: python
@@ -18,8 +18,8 @@ class ADD(Operator):
 
             circuit = QCircuit()
             qr = circuit.allocate(4)
-            QSP(0) * qr
-            ADD(3) * qr
+            QSP(3) * qr
+            Subtract(3) * qr
             All(H) * qr
             res = circuit.run()
             print(res.get_outcome())
@@ -32,7 +32,7 @@ class ADD(Operator):
         self.number = number
 
     def _add_statement(self, qr):
-        qr[0].circuit.append_statement(f"ADD({self.number}) * q")
+        qr[0].circuit.append_statement(f"Subtract({self.number}) * q")
 
     def __mul__(self, qr: Qureg):
         if not isinstance(qr, Qureg):
@@ -42,13 +42,12 @@ class ADD(Operator):
 
         with OperatorContext(qr[0].circuit):
             for _ in range(self.number):
-                ctrl = []
-                for i in range(num_qubits, 1, -1):
-                    for j in range(i - 1):
-                        ctrl.append(qr[j])
-                    MCX(i - 1) * (*ctrl, qr[i - 1])
-                    ctrl = []
-
                 X * qr[0]
+                ctrl = []
+                for i in range(1, num_qubits):
+                    for j in range(i):
+                        ctrl.append(qr[j])
+                    MCX(i) * (*ctrl, qr[i])
+                    ctrl = []
 
         self._add_statement(qr)

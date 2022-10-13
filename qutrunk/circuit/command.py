@@ -79,6 +79,7 @@ class Command:
                 r.set_host(self)
 
         # Command extention data
+        # TODO: extra
         self.cmdex = cmdex
 
     def __eq__(self, other):

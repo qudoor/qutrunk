@@ -1,17 +1,17 @@
-"""addition example."""
+"""subtract example."""
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Measure, All
 from qutrunk.circuit.ops import Classical
-from qutrunk.circuit.ops import ADD
+from qutrunk.circuit.ops import Subtract
 
 
-def run_addition(num_qubits, init_value, number=0):
+def run_subtract(num_qubits, init_value, number=0):
     circuit = QCircuit()
     qr = circuit.allocate(num_qubits)
 
     Classical(init_value) * qr
 
-    ADD(number) * qr
+    Subtract(number) * qr
 
     All(Measure) * qr
     res = circuit.run()
@@ -21,5 +21,5 @@ def run_addition(num_qubits, init_value, number=0):
 
 
 if __name__ == "__main__":
-    circuit = run_addition(4, 3, 3)
+    circuit = run_subtract(4, 3, 3)
 
