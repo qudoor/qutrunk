@@ -1384,8 +1384,8 @@ class Simulator:
         """Computes the expected value of a sum of products of Pauli operators."""
         num_qb = self.qubits
         targs = []
-        for q in range(targs):
-            targs[q] = q
+        for q in range(num_qb):
+            targs.append(q)
 
         value = 0
         num_sum_terms = len(term_coeff_list)

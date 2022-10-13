@@ -469,11 +469,11 @@ class QCircuit:
             dag = ast_to_dag(ast)
             return dag_to_circuit(dag)
 
-    def expval(self, obs_data):
+    def expval_pauli(self, paulis):
         """Computes the expected value of a product of Pauli operators.
 
         Args:
-            pauliprodlist:
+            paulis:
                 oper_type (int): Pauli operators.
                 target (int): indices of the target qubits.
 
@@ -484,24 +484,26 @@ class QCircuit:
         expect = self.backend.get_expec_pauli_prod(obs_data)
         return expect
 
-    def expval_sum(self, pauli_coeffi: Observable, qubitnum=0):
+    def expval_hamil(self, hamil):
+        """Computes the expected value of Hermitian operator."""
+        pass
+
+    def expval_pauli_sum(self, paulis, coeffs, qubitnum=0):
         """Computes the expected value of a sum of products of Pauli operators.
 
         Args:
-            pauliprodlist:
-                oper_type (int): Pauli operators.
-                term_coeff (float): The coefficients of each term in the sum of Pauli products.
+            paulis (list[int]): Pauli operators.
+            coeffs (list[float]): The coefficients of each term in the sum of Pauli products.
 
         Returns:
             Returns the operation type and the coefficients of each term in the sum of Pauli products.
         """
         self.backend.send_circuit(self)
-        pauli_type_list, coeffi_list = pauli_coeffi.obs_data()
-        if (qubitnum != 0) and (len(coeffi_list) * qubitnum) != len(pauli_type_list):
+        if (qubitnum != 0) and (len(coeffs) * qubitnum) != len(paulis):
             raise AttributeError(
                 "Parameter error: The number of parameters is not correct."
             )
-        return self.backend.get_expec_pauli_sum(pauli_type_list, coeffi_list)
+        return self.backend.get_expec_pauli_sum(paulis, coeffs)
 
     def _dump_qusl(self, file, unroll=True):
         with open(file, "w", encoding="utf-8") as f:
