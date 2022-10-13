@@ -36,14 +36,14 @@ def _parse(file):
     with open(file=filename, mode="w", encoding="utf-8") as fw:
         fw.write("from qutrunk.circuit import QCircuit\n")
         fw.write("from qutrunk.circuit.gates import *\n")
-        fw.write("from qutrunk.circuit.ops import *\n\n")
         fw.write("def generate_circuit():\n")
         fw.write("\tcircuit = QCircuit()\n")
         fw.write(f"\tq = circuit.allocate({qubits})\n")
         for line in qusl_code_lines:
             fw.write("\t" + line)
         fw.write("\treturn circuit\n\n")
-        fw.write("generate_circuit()")
+
+    return str(name)
 
     return str(name)
 

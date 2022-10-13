@@ -1,5 +1,7 @@
 """Command Module."""
 
+from qutrunk.circuit.parameter import Parameter
+
 class Amplitude:
     """Set state-vector Amplitude.
 
@@ -58,6 +60,13 @@ class Command:
         self.cmd_ver = "1.0"
         self.inverse = inverse
 
+        self.parameters = {}
+        for i, r in enumerate(self.rotation):
+            if isinstance(r, Parameter):
+                # map index to parameter
+                self.parameters[i] = r
+                r.set_host(self)
+
         #Command extention data
         self.cmdex = cmdex
         
@@ -102,9 +111,8 @@ class Command:
             name = name.replace("c", "c" + str(ctrl_cnt), 1)
 
         angles_str = ""
-        angles = self.gate.angles()
-        if angles:
-            angles_str = "(" + ",".join([str(ag) for ag in angles]) + ")"
+        if len(self.rotation) > 0:
+            angles_str = "(" + ",".join([str(ag) for ag in self.rotation]) + ")"
 
         qubits_index = self.controls + self.targets
         qubits_str = ",".join([f"q[{qi}]" for qi in qubits_index])
@@ -118,15 +126,15 @@ class Command:
 
         params = []
         param_str = ""
+        inv_str = ""
 
         # only append control bit count as param when it's more than one
         ctrl_cnt = len(self.controls)
-        if ctrl_cnt > 0:
+        if ctrl_cnt:
             params.append(ctrl_cnt)
 
-        angles = self.gate.angles()
-        if angles:
-            params += angles
+        if len(self.rotation) > 0:
+            params += self.rotation
 
         if params:
             param_str = "(" + ", ".join([str(param) for param in params]) + ")"
@@ -138,7 +146,10 @@ class Command:
         if len(qubits_index) > 1:
             qubits_str = "(" + qubits_str + ")"
 
-        return name + param_str + " * " + qubits_str
+        if self.inverse:
+            inv_str += ".inv()"
+
+        return name + param_str + inv_str + " * " + qubits_str
 
     @property
     def name(self) -> str:
@@ -149,3 +160,15 @@ class Command:
     def num_qubits(self) -> int:
         """Return the number of qubits."""
         return len(self.controls) + len(self.targets)
+
+    def update_parameter(self, param):
+        """Update command parameter.
+
+        Usually, parameter is the angle of rotation gate
+
+        Args:
+            param: Parameter object holds parameter's name and value.
+        """
+        for k, v in self.parameters.items():
+            if v == param:
+                self.rotation[k] = v.value

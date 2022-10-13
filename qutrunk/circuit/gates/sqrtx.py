@@ -52,6 +52,24 @@ class SqrtXGate(BasicGate):
         """Access to the matrix property of this gate."""
         return 0.5 * np.array([[1 + 1j, 1 - 1j], [1 - 1j, 1 + 1j]])
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = SqrtXGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("SqrtX gate do not support multiple control bits.")
+        gate = CSqrtXGate()
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 SqrtX = SqrtXGate()
 
@@ -92,7 +110,7 @@ class CSqrtXGate(BasicGate):
         if len(qubits) != 2:
             # TODO:need to improve.
             raise AttributeError(
-                "Argument error：need to one controlled qubit and one target qubit."
+                "Parameter error: One controlled and one target qubit are required."
             )
 
         self.qubits = qubits
@@ -114,6 +132,12 @@ class CSqrtXGate(BasicGate):
             [(1 - 1j) / 2, 0, (1 + 1j) / 2, 0],
             [0, 0, 0, 1],
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CSqrtXGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
 
 
 CSqrtX = CSqrtXGate()

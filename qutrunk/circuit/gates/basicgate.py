@@ -39,6 +39,20 @@ class BasicGate:
         if statement != "":
             circuit.append_statement(statement)
 
+    def inv(self):
+        """Apply inverse gate"""
+        # note: 状态相关方法需要重新生成一个新对象
+        raise NotImplementedError
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        # note: 状态相关方法需要重新生成一个新对象
+        raise NotImplementedError
+
 
 class BasicRotateGate(BasicGate):
     """Base class for rotation gate."""
@@ -57,8 +71,9 @@ class BasicPhaseGate(BasicGate):
 class Observable:
     """Base class representing observables. It's usually PauliX, PauliY, PauliZ, PauliI."""
 
-    def obs(self, target):
-        """ Get Observable data.
+    def __call__(self, target):
+        """
+        Get Observable data.
 
         Args:
             target: The observed qubit.

@@ -53,8 +53,9 @@ class ZGate(BasicGate, Observable):
         """Access to the matrix property of this gate."""
         return np.array([[1, 0], [0, -1]])
 
-    def obs(self, target):
-        """Get Observable data.
+    def __call__(self, target):
+        """
+        Get Observable data.
 
         Args:
             target: The observed qubit.
@@ -69,6 +70,22 @@ class ZGate(BasicGate, Observable):
         pauli["target"] = target.index
         puali_list.append(pauli)
         return puali_list
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = ZGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        gate = MCZ(ctrl_cnt)
+        gate.is_inverse = self.is_inverse
+        return gate
 
 
 PauliZ = Z = ZGate()
@@ -107,8 +124,11 @@ class MCZ(BasicGate):
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
         """
+        if isinstance(qubits, QuBit) or len(qubits) <= self.ctrl_cnt:
+            raise AttributeError("The parameter miss controlled or target qubit(s).")
+
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise AttributeError("The argument must be Qubit object.")
 
         if isinstance(qubits, Qureg):
             temp = []
@@ -130,6 +150,12 @@ class MCZ(BasicGate):
         """Access to the matrix property of this gate."""
         if self.ctrl_cnt == 1:
             return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = MCZ(self.ctrl_cnt)
+        gate.is_inverse = not self.is_inverse
+        return gate
 
 
 CZ = MCZ(1)

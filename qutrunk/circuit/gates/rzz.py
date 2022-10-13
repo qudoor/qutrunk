@@ -20,6 +20,8 @@ class Rzz(BasicRotateGate):
     """
 
     def __init__(self, alpha):
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -45,7 +47,8 @@ class Rzz(BasicRotateGate):
             raise NotImplementedError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            raise AttributeError()
+            raise AttributeError("Parameter error: Two target qubits are required.")
+
         targets = [q.index for q in qubits]
         cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)
         self.commit(qubits[0].circuit, cmd)
@@ -66,3 +69,9 @@ class Rzz(BasicRotateGate):
                 [0, 0, 0, cmath.exp(-0.5 * 1j * self.rotation)],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = Rzz(self.rotation)
+        gate.is_inverse = not self.is_inverse
+        return gate

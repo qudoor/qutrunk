@@ -7,7 +7,7 @@ circuit
 .. toctree::
    :maxdepth: 2   
 
-   01/circuit.gates
-   02/circuit.ops
-   03/circuit
+   01/qutrunk.circuit.gates
+   02/qutrunk.circuit.ops
+   03/qutrunk.circuit
   

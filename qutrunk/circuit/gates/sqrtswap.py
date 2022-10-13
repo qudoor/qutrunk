@@ -51,5 +51,10 @@ class SqrtSwapGate(BasicGate):
             ]
         )
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = SqrtSwapGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
 
 SqrtSwap = SqrtSwapGate()

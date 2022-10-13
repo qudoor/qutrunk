@@ -21,6 +21,8 @@ def decrement(num_qubits, init_value):
 
 
 if __name__ == "__main__":
+    # Run locally
     circuit = decrement(4, 0)
-    # circuit.print(unroll=False)
 
+    # Draw quantum circuit
+    circuit.draw()

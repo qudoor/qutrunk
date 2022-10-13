@@ -18,6 +18,8 @@ class Ry(BasicRotateGate):
     """
 
     def __init__(self, alpha):
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -63,6 +65,24 @@ class Ry(BasicRotateGate):
             ]
         )
 
+    def inv(self):
+        """Apply inverse gate"""
+        gate = Ry(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("Ry gate do not support multiple control bits.")
+        gate = CRy(self.rotation)
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 class CRy(BasicRotateGate):
     """Control Ry gate.
@@ -77,6 +97,8 @@ class CRy(BasicRotateGate):
     """
 
     def __init__(self, angle):
+        if angle is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = angle
 
@@ -101,7 +123,7 @@ class CRy(BasicRotateGate):
         if len(qubits) != 2:
             # TODO:need to improve.
             raise AttributeError(
-                "Argument error：need to one controlled qubit and one target qubit."
+                "Parameter error：One controlled and one target qubit are required."
             )
 
         self.qubits = qubits
@@ -125,3 +147,9 @@ class CRy(BasicRotateGate):
         return np.array(
             [[cos, 0, -sin, 0], [0, 1, 0, 0], [sin, 0, cos, 0], [0, 0, 0, 1]]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CRy(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate

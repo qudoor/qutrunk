@@ -5,25 +5,34 @@ from qutrunk.circuit.gates import H, Measure, All
 
 
 def run_random_byte(backend=None):
-    # allocate
+    # Create circuit with local simulator
     qc = QCircuit(backend)
 
+    # Allocate 8 quantuam qubits
     qureg = qc.allocate(8)
 
+    # Apply quantum gates
     All(H) * qureg
+
+    # Measure all quantum qubits
     All(Measure) * qureg
 
-    # print circuit
+    # Print circuit
     qc.print()
 
-    # run circuit
+    # Run circuit
     res = qc.run()
 
+    # Print measure result like:
+    # [0, 1, 0, 0, 0, 0, 1, 0]
     print(res.get_measure())
+
     return qc
 
 
 if __name__ == "__main__":
-    # local run
+    # Run locally
     circuit = run_random_byte()
+
+    # Dram quantum circuit
     circuit.draw()

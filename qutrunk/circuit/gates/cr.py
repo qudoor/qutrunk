@@ -22,6 +22,8 @@ class CR(BasicRotateGate):
         Args:
             alpha: Rotation angle.
         """
+        if alpha is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -42,12 +44,13 @@ class CR(BasicRotateGate):
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
             AttributeError: If the qubits should not be two.
-        """
+        """         
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
             raise NotImplementedError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            raise AttributeError("Parameter Error: qubits should be two.")
+            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
+
         self.qubits = qubits
         controls = [qubits[0].index]
         targets = [qubits[1].index]
@@ -72,3 +75,10 @@ class CR(BasicRotateGate):
                 [0, 0, 0, np.exp(1j * half_alpha)],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        # note: 状态相关方法需要重新生成一个新对象
+        gate = CR(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate

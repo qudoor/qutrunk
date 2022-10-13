@@ -39,6 +39,12 @@ class SwapGate(BasicGate):
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
             raise NotImplementedError("The argument must be Qubit object.")
 
+        if len(qubits) != 2:
+            # TODO:need to improve.
+            raise AttributeError(
+                "Parameter error: Two target qubits are required."
+            )
+
         targets = [q.index for q in qubits]
         cmd = Command(self, targets, inverse=self.is_inverse)
         self.commit(qubits[0].circuit, cmd)
@@ -52,6 +58,24 @@ class SwapGate(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         return np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = SwapGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("Swap gate do not support multiple control bits.")
+        gate = CSwapGate()
+        gate.is_inverse = self.is_inverse
+        return gate
 
 
 Swap = SwapGate()
@@ -89,7 +113,7 @@ class CSwapGate(BasicGate):
         if len(qubits) != 3:
             # TODO:need to improve.
             raise AttributeError(
-                "Argument error：need to one controlled qubit and two target qubit."
+                "Parameter error: One controlled and two target qubits are required."
             )
 
         self.qubits = qubits
@@ -117,6 +141,12 @@ class CSwapGate(BasicGate):
                 [0, 0, 0, 0, 0, 0, 0, 1],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CSwapGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
 
 
 CSwap = CSwapGate()

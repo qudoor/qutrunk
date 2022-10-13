@@ -7,6 +7,6 @@ backends
 .. toctree::
    :maxdepth: 2   
 
-   01/backends
-   02/backends.ibm
-   
+   01/qutrunk.backends
+   02/qutrunk.backends.ibm
+   03/qutrunk.backends.qusprout

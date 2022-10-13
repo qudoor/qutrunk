@@ -25,6 +25,8 @@ class U2(BasicGate):
             theta: U2 gate parameter1.
             phi: U2 gate parameter2.
         """
+        if theta is None or phi is None:
+            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi
@@ -72,3 +74,9 @@ class U2(BasicGate):
                 [np.exp(1j * phi) * isqrt2, np.exp(1j * (phi + lam)) * isqrt2],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = U2(self.theta, self.phi)
+        gate.is_inverse = not self.is_inverse
+        return gate

@@ -44,8 +44,9 @@ class IGate(BasicGate, Observable):
         """Access to the matrix property of this gate."""
         return np.matrix([[1, 0], [0, 1]])
 
-    def obs(self, target):
-        """Get Observable data.
+    def __call__(self, target):
+        """
+        Get Observable data.
 
         Args:
             target: The observed qubit.
@@ -60,6 +61,12 @@ class IGate(BasicGate, Observable):
         pauli["target"] = target.index
         puali_list.append(pauli)
         return puali_list
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = IGate()
+        gate.is_inverse = not self.is_inverse 
+        return gate
 
 
 PauliI = I = IGate()
