@@ -1010,6 +1010,7 @@ class Simulator:
 
         return outcome_probs
 
+    # TODO: to matrix
     def get_all_state(self):
         """
         Get the current state vector of probability amplitudes for a set of qubits

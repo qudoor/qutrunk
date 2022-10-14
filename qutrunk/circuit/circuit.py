@@ -2,6 +2,7 @@
 import json
 import random
 from typing import List, Optional, Union
+import numpy as np
 
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
@@ -306,6 +307,16 @@ class QCircuit:
         """Get the current state vector of probability amplitudes for a set of qubits."""
         self.backend.send_circuit(self)
         return self.backend.get_all_state()
+
+    def state_matrix(self):
+        """The matrix of the current state."""
+        m = []
+        state = self.get_all_state()
+        for s in state:
+            t = s.split(",")
+            m.append(complex(float(t[0]), float(t[1])))
+        n_state = np.array(m).reshape(-1, 2)
+        return n_state
 
     def find_bit(self, bit):
         """Find locations in the circuit.
