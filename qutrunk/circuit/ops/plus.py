@@ -3,6 +3,7 @@ from qutrunk.circuit import Qureg
 from qutrunk.circuit.ops import QSP
 from qutrunk.exceptions import QuTrunkError
 
+
 class Plus(QSP):
     """Quantum state preparation Operator.
 
@@ -22,7 +23,7 @@ class Plus(QSP):
     """
 
     def __init__(self):
-        super().__init__('+')
+        super().__init__("+")
 
     def __str__(self):
         return "PLUS"
