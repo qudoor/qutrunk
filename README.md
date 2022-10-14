@@ -15,7 +15,7 @@
 QuTrunk内部模块划分及层次结构如下：  
 
 <div align=center>
-<img src="./resource/qutrunk.png"/>
+<img src="http://developer.queco.cn/media/images/qutrunkTuPian.original.png"/>
 </div>
 
 
@@ -94,7 +94,7 @@ qutrunk.run_check()
 
 运行结果：
 <div>
-<img src="./resource/bell_pair.png"/>
+<img src="http://developer.queco.cn/media/images/bell_pairYunXingJieGuo.original.png"/>
 </div>
 
 ### **量子可视化编程**  
