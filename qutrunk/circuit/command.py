@@ -24,10 +24,12 @@ class Mat:
     Args:
         reals: matrix read part.
         imags: matrix imag part.
+        unitary: matrix is unitary or not
     """
     def __init__(self):
         self.reals = []
         self.imags = []
+        self.unitary = False
 
 
 class CmdEx:

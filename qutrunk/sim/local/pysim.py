@@ -152,8 +152,8 @@ class Simulator:
                 self.imag[ind] = 0
                 
                 for c in range(numTargAmps):
-                    reElem = reals[r,c]
-                    imElem = imags[r,c]
+                    reElem = reals[r][c]
+                    imElem = imags[r][c]
                     self.real[ind] += reAmps[c]*reElem - imAmps[c]*imElem
                     self.imag[ind] += reAmps[c]*imElem + imAmps[c]*reElem
 

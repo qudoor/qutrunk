@@ -1,5 +1,5 @@
 """Definition of some meta operator."""
-from typing import Union
+from typing import Union, Optional
 import numpy as np
 
 from .basicgate import BasicGate
@@ -113,16 +113,18 @@ class Matrix(BasicGate):
         if (not self.check_matrix_format(len(targets))):
             raise AttributeError("The matrix is not in the right format by specified target(s).")
 
-        cmd = Command(self, targets, controls, cmdex=CmdEx(mat=Mat()))
-
-        e = self.matrix
+        e = np.matrix(self.matrix)
         if self.is_inverse:
-            e = np.matrix(self.matrix)
-            e = e.T.conjugate()
+            if not self.is_unitary(e):
+                raise AttributeError("Only unitary matrices support invertible operations")
+            else:
+                e = e.T.conjugate()
 
-        cmd.cmdex.mat.reals = np.real(e)
-        cmd.cmdex.mat.imags = np.imag(e)
-
+        cmd = Command(self, targets, controls, cmdex=CmdEx(mat=Mat()))
+        cmd.cmdex.mat.reals = np.real(e).tolist()
+        cmd.cmdex.mat.imags = np.imag(e).tolist()
+        cmd.cmdex.mat.unitary = self.is_unitary(e)
+       
         self.commit(qubits.circuit, cmd) if isinstance(qubits, QuBit) else self.commit(qubits[0].circuit, cmd)
 
     def __mul__(self, qubit):
@@ -161,53 +163,61 @@ class Matrix(BasicGate):
     def is_unitary(self, mat):
         """ 
             Test a matrix is unitary or not
-            m = [[1, 1], [0, 1]]
+            m = [[1, 0], [0, 1]]
             m = np.matrix(m)
             print(is_unitary(m))
         """
         return np.allclose(np.eye(mat.shape[0]), mat.H * mat)
 
 
-class def_gate(BasicGate):
+class Gate(BasicGate):
     """Definition of custom gate.
 
     Implement by composing some basic logic gates or define specific matrix.
 
     Example:
         .. code-block:: python
+        @Gate
+        def my_gate(a, b, c, d):
+            return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
+                << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
+                << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
 
-            from qutrunk.circuit import QCircuit
-            from qutrunk.circuit.gates import H, CNOT, CustomGate, All, Measure, gate
-
-            circuit = QCircuit()
-            q = circuit.allocate(2)
-
-            def_gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (q[0], q[1], q[2])) \
-                       << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (q[0], q[1])) \
-                       << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), q[0])
-            All(Measure) * q
-            circuit.print()
-            res = circuit.run(shots=100)
-            print(res.get_counts()) 
+        my_gate * (q[3], q[1], q[0], q[3])
     """
 
-    def __init__(self):
+    def __init__(self, func: Optional[callable]=None):
         super().__init__()
         self.gates = []
-
-    def append_gate(self, gate, qubits):
-        """Append basic gate to custom gate.
-        
-        Args:
-            gate: Basic gate.
-            qubits: The target qubits of quantum gate to apply.
-        """
-        self.gates.append({"gate": gate, "qubits": qubits})
+        self.func = func
 
     def __lshift__(self, gate_define):
-        gate_define[0] * gate_define[1]
-        self.append_gate(gate_define[0], gate_define[1])
+        if not isinstance(gate_define[0], BasicGate):
+            raise AttributeError("The first parameter is not a gate object.")
+        
+        if not isinstance(gate_define[1], QuBit) and not all(isinstance(qubit, QuBit) for qubit in gate_define[1]):
+            raise AttributeError("The argument must be Qubit object.")
+
+        self.gates.append({"gate": gate_define[0], "qubits": gate_define[1]})
+
         return self
+
+    def __or__(self, qubits: Union[QuBit, tuple]):
+        """Quantum logic gate operation."""
+        if not isinstance(qubits, QuBit) and not all(isinstance(qubit, QuBit) for qubit in qubits):
+            raise AttributeError("The argument must be Qubit object.")
+
+        if isinstance(qubits, QuBit):
+            custom_gate = self.func(qubits)
+        else:
+            custom_gate = self.func(*qubits)
+
+        for c in custom_gate.gates:
+            c['gate'] * c['qubits']
+           
+    def __mul__(self, qubits: Union[QuBit, tuple]):
+        self.__or__(qubits)
+
 
 # note: 该方法会导致部分门操作产生状态污染，比如通过对象实例调用的门操作
 # 只要设置过状态，那么后续所有该量子门操作都带了这个状态
