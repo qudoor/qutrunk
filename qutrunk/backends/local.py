@@ -19,6 +19,7 @@ class BackendLocalType(Enum):
     UNKNOWN = 2
 
 
+# TODO: need to improve.
 local_type = BackendLocalType.PYTHON
 
 
@@ -195,6 +196,7 @@ class BackendLocal(Backend):
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
+    # TODO: need to improve.
     @property
     def name(self):
         if local_type == BackendLocalType.CPP:

@@ -46,7 +46,7 @@ class QAA(Operator):
         if self.marked_index < 0 or self.marked_index >= 2 ** len(qureg):
             raise ValueError("The marked index value exceed 2 ** len(qureg).")
 
-        with OperatorContext(qureg.circuit) as oc:
+        with OperatorContext(qureg.circuit):
             for i in range(self.iterations):
                 self._flip_process(qureg)
                 self._imag_process(qureg)
@@ -64,8 +64,11 @@ class QAA(Operator):
         Args:
             qureg: The qureg apply flip process.
         """
+        # 0b111
         bit_flip = bin(self.marked_index)
+        # 00000111
         bit_flip = bit_flip[2:].zfill(len(qureg))
+        # 11100000
         bit_flip = bit_flip[::-1]
 
         for i in range(len(bit_flip)):
@@ -89,3 +92,4 @@ class QAA(Operator):
         MCZ(len(qureg) - 1) * qureg
         All(X) * qureg
         All(H) * qureg
+
