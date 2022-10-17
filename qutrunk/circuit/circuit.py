@@ -469,7 +469,7 @@ class QCircuit:
             dag = ast_to_dag(ast)
             return dag_to_circuit(dag)
 
-    def expval_pauli(self, paulis):
+    def expval_pauli(self, paulis: Union[list, object]):
         """Computes the expected value of a product of Pauli operators.
 
         Args:
@@ -480,8 +480,13 @@ class QCircuit:
         Returns:
             The expected value of a product of Pauli operators.
         """
+        pauli_list = []
+        if not isinstance(paulis, list):
+            pauli_list.append(paulis)
+        else:
+            pauli_list = paulis 
         self.backend.send_circuit(self)
-        expect = self.backend.get_expec_pauli_prod(obs_data)
+        expect = self.backend.get_expec_pauli_prod(pauli_list)
         return expect
 
     def expval_hamil(self, hamil):
