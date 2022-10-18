@@ -12,7 +12,7 @@ Backend代表运行量子线路的后端模块，gate模块里面实现了各类
 ------------------
 1.  基于量子逻辑门，量子线路实现量子编程。
 2.  提供QuSL量子汇编指令标准，QuSL量子汇编与Python代码完全兼容。
-3.  支持多种量子计算后端模块，比如：BackendLocalPy(本地Python版本模拟器)；BackendLocalCpp(本地C++版本模拟器)；BackendQuSprout(量子计算云服务)；BackendIBM(IBM量子云计算平台)等。
+3.  支持多种量子计算后端模块，比如：BackendLocalPy(本地Python版本模拟器)；BackendQuSprout(量子计算云服务)；BackendIBM(IBM量子云计算平台)等。
 4.  本地量子计算后端提供全振幅量子模拟计算，量子云服务提供：OMP多线程、多点并行MPI、GPU等计算加速，同时预留了接口对接离子阱量子计算机。
 5.  兼容OpenQASM/2.0标准。
 6.  支持量子可视化编程（需要配合启科量子研发的量子集成开发环境QuBranch）。

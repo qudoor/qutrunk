@@ -78,7 +78,8 @@ class BackendLocalPython:
             "SqrtXdg": "sqrtxdg",
             "CSqrtX": "csqrtx",
             "CSwap": "cswap",
-            "AMP": "amp"
+            "AMP": "amp",
+            "Matrix": "matrix"
         }
         self.cmds = []
         self.result = Result()
@@ -1079,3 +1080,12 @@ class BackendLocalPython:
         """
 
         self.sim.amp(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)
+
+    def matrix(self, cmd):
+        """Apply custom matrix gate.
+
+        Args:
+           cmd: the Command object.
+        """
+
+        self.sim.matrix(cmd.controls, cmd.targets, cmd.cmdex.mat.reals, cmd.cmdex.mat.imags)
