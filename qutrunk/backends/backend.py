@@ -1,8 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 
-# TODO: need to improve.
-class Backend(metaclass=ABCMeta):
+class Backend(ABC):
     """Basic simulator: All simulators are derived from this class."""
 
     @abstractmethod
