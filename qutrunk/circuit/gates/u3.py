@@ -30,9 +30,10 @@ class U3(BasicGate):
             phi: U3 gate parameter2.
             lam: U3 gate parameter3.
         """
+        super().__init__()
+
         if theta is None or phi is None or lam is None:
             raise NotImplementedError("The argument cannot be empty.")
-        super().__init__()
         self.theta = theta
         self.phi = phi
         self.lam = lam

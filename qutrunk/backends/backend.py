@@ -14,8 +14,8 @@ class Backend(metaclass=ABCMeta):
             final: True if quantum circuit finish, default False, \
                 when final==True The backend program will release the computing resources.
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def name(self):
-        pass
+        raise NotImplementedError
