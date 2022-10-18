@@ -45,9 +45,11 @@ class CircuitLayer(PyLayer):
     def backward(ctx, dy):
         circuit, obs, input_data, = ctx.saved_tensor()
         grad = parameter_shift(ctx.func, circuit, obs, input_data)
-        return paddle.to_tensor(grad, stop_gradient=False)
+        grad = paddle.to_tensor(grad, dtype='float32', stop_gradient=False)
+        grad = paddle.reshape(grad, dy.shape)
+        return grad
 
-phi = paddle.to_tensor(0.012, stop_gradient=False)
+phi = paddle.to_tensor(0.12, stop_gradient=False)
 
 # define circuit by qutrunk
 def def_circuit():
@@ -59,9 +61,22 @@ def def_circuit():
 
 circuit, obs = def_circuit()
 
-# apply circuit layer
-z = CircuitLayer.apply(circuit, obs, phi)
-z.mean().backward()
+# optimizer 
+sgd_optimizer = paddle.optimizer.SGD(learning_rate=0.01, parameters=[phi])
 
-# get gradient
-print(phi.grad)
+total_epoch = 150
+for i in range(total_epoch):
+    # apply circuit layer
+    z = CircuitLayer.apply(circuit, obs, phi)
+    loss = z.mean()
+    loss.backward()
+    sgd_optimizer.step()
+    sgd_optimizer.clear_grad()
+    
+    if i%30 == 0:
+        print("epoch {} loss {}".format(i, loss.numpy()))
+        
+print("finished training, loss {}".format(loss.numpy()))
+# final phi after optimize
+print("final_phi:", phi)
+
