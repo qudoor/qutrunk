@@ -3,8 +3,9 @@
 from math import pi
 
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import H, NOT, Measure, CP, All, Barrier
+from qutrunk.circuit.gates import H, NOT, Measure, CP, All, Barrier, P
 from qutrunk.circuit.ops import IQFT
+from qutrunk.circuit.ops import QPE
 
 
 def _bin_int(itrable):
@@ -42,7 +43,7 @@ def run_phase_estimation(backend=None):
     # print circuit
     # qc.print()
 
-    # # run circuit
+    # run circuit
     qc.run(shots=100)
 
     # print result
@@ -56,8 +57,42 @@ def run_phase_estimation(backend=None):
     return qc
 
 
+def run_qpe(backend=None):
+    """Estimate T-gate phase."""
+    # allocate
+    qc = QCircuit(backend=backend)
+    q1, q2 = qc.allocate([3, 1])
+
+    # Prepare our eigenstate |psi>
+    NOT * q2[0]
+    Barrier * q1
+    Barrier * q2
+
+    # apply QPE
+    QPE(P(pi/4)) * (q1, q2)
+
+    # print circuit
+    # qc.print()
+
+    # run circuit
+    qc.run(shots=100)
+
+    # print result
+    print(q1.to_cl())
+
+    # calculate the value of theta
+    f = _bin_int(q1.to_cl())
+    theta = f / 2 ** len(q1)
+    print("θ=", theta)
+
+    return qc
+
+
 if __name__ == "__main__":
-    circuit = run_phase_estimation()
-    circuit.draw(line_length=300)
+    # circuit = run_phase_estimation()
+    # circuit.draw(line_length=300)
+
+    circuit = run_qpe()
+
 
 

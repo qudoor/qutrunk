@@ -13,3 +13,4 @@ from .increment import INC
 from .decrement import DEC
 from .addition import ADD
 from .subtract import Subtract
+from .qpe import QPE
