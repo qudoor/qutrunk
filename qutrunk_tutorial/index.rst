@@ -22,5 +22,6 @@ QuTrunk
    Spp/sim
    Tpp/tools
    Vpp/visualizations
-   
-
+   Gate/gate1  
+   Gate/gate2  
+  
