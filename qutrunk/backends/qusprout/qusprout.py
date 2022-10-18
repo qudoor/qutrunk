@@ -130,10 +130,13 @@ class BackendQuSprout(Backend):
             
             cmdex = None
             if cmd.cmdex is not None:
-                amp = None
+                _amp = None
+                _mat = None
                 if cmd.cmdex.amp is not None:
-                    amp = qusproutdata.Amplitude(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)
-                cmdex = qusproutdata.Cmdex(amp)
+                    _amp = qusproutdata.Amplitude(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)
+                if cmd.cmdex.mat is not None:
+                    _mat = qusproutdata.Matrix(cmd.cmdex.mat.reals, cmd.cmdex.mat.imags, cmd.cmdex.mat.unitary)
+                cmdex = qusproutdata.Cmdex(amp=_amp, mat=_mat)
             
             c = qusproutdata.Cmd(
                 str(cmd.gate),

@@ -25,10 +25,24 @@ struct Amplitude {
     4: required i32 numamps
 }
 
+//自定义矩阵
+struct Matrix {
+    //矩阵实部
+    1: required list<list<double>> reals
+
+    //矩阵虚部
+    2: required list<list<double>> imags
+    
+    //是否为酉矩阵
+    3: required bool unitary
+}
+
 //扩展指令
 struct Cmdex {
     //振幅数据
     1: optional Amplitude amp
+    //矩阵数据
+    2: optional Matrix mat
 }
 
 //指令数据

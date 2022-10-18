@@ -104,6 +104,59 @@ class Simulator:
             self.imag[startindex] = imags[index]
             startindex += 1
 
+    def matrix(self, controls, targets, reals, imags):
+        """Apply custom matrix"""
+        ctrlMask = self.get_qubit_bit_mask(controls, len(controls))
+
+        numTargs = len(targets)
+        numTasks = self.total_num_amps >> numTargs
+        numTargAmps = 1 << numTargs
+
+        ampInds = [0]*numTargAmps
+        reAmps = [0]*numTargAmps
+        imAmps = [0]*numTargAmps
+
+        sortedTargs = [0]*numTargs
+        for t in range(numTargs):
+            sortedTargs[t] = targets[t]
+        sortedTargs.sort()
+
+        for thisTask in range(numTasks):
+            # find this task's start index (where all targs are 0)
+            thisInd00 = thisTask
+            for t in range(numTargs):
+                thisInd00 = self.insert_zero_bit(thisInd00, sortedTargs[t])
+                
+            # this task only modifies amplitudes if control qubits are 1 for this state
+            thisGlobalInd00 = thisInd00
+            if (ctrlMask and ((ctrlMask & thisGlobalInd00) != ctrlMask)):
+                continue
+                
+            # determine the indices and record values of this tasks's target amps
+            for i in range(numTargAmps):
+                # get statevec index of current target qubit assignment
+                ind = thisInd00
+                for t in range(numTargs):
+                    if (self.extract_bit(t, i)):
+                        ind = self.flip_bit(ind, targets[t])
+                
+                # update this tasks's private arrays
+                ampInds[i] = ind
+                reAmps [i] = self.real[ind]
+                imAmps [i] = self.imag[ind]
+            
+            # modify this tasks's target amplitudes
+            for r in range(numTargAmps):
+                ind = ampInds[r]
+                self.imag[ind] = 0
+                self.imag[ind] = 0
+                
+                for c in range(numTargAmps):
+                    reElem = reals[r][c]
+                    imElem = imags[r][c]
+                    self.real[ind] += reAmps[c]*reElem - imAmps[c]*imElem
+                    self.imag[ind] += reAmps[c]*imElem + imAmps[c]*reElem
+
     # TODO:need to improve.
     def hadamard(self, target):
         """
