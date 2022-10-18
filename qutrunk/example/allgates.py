@@ -69,7 +69,9 @@ def run_gates():
     Barrier * qr
 
     Power(2, H) * qr[0]
+
     my_gate * (qr[0], qr[1])
+    Barrier * qr
     Power(2, my_gate) * (qr[0], qr[1])
 
     # Measure all quantum qubits
