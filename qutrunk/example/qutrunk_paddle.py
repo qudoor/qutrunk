@@ -22,8 +22,7 @@ def parameter_shift(circuit_func, circuit, obs, input_data, shift=np.pi/2):
         
         gradient = np.array([expectation_right]) - np.array([expectation_left])
         gradients.append(gradient)
-    gradients = np.array(gradients).T
-    gradients = np.squeeze(gradients)
+    gradients = np.squeeze(np.array(gradients).T)
     return gradients
 
 # define circuit layer by PyLayer
@@ -64,7 +63,7 @@ circuit, obs = def_circuit()
 # optimizer 
 sgd_optimizer = paddle.optimizer.SGD(learning_rate=0.01, parameters=[phi])
 
-total_epoch = 150
+total_epoch = 140
 for i in range(total_epoch):
     # apply circuit layer
     z = CircuitLayer.apply(circuit, obs, phi)
@@ -73,7 +72,7 @@ for i in range(total_epoch):
     sgd_optimizer.step()
     sgd_optimizer.clear_grad()
     
-    if i%30 == 0:
+    if i%20 == 0:
         print("epoch {} loss {}".format(i, loss.numpy()))
         
 print("finished training, loss {}".format(loss.numpy()))
