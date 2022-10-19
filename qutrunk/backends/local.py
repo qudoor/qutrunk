@@ -1,29 +1,9 @@
-from enum import Enum
-
 from qutrunk.backends.backend import Backend
 from qutrunk.tools.read_qubox import get_qulocalbox_setting
 from qutrunk.sim.local.local_python import BackendLocalPython as BackendLocalImpl
 
 
 # TODO: need to improve.
-class BackendLocalType(Enum):
-    """Backend Local Type.
-
-    Args:
-        CPP: C++ quantum circuit simulator.
-        PYTHON: Python quantum circuit simulator.
-        UNKNOWN: Invalid backend.
-    """
-
-    CPP = 0
-    PYTHON = 1
-    UNKNOWN = 2
-
-
-# TODO: need to improve.
-local_type = BackendLocalType.PYTHON
-
-
 class BackendLocal(Backend):
     """
     The local backend uses the simulator to run the quantum circuit, qutrunk provide two types simulator.
@@ -200,9 +180,4 @@ class BackendLocal(Backend):
     # TODO: need to improve.
     @property
     def name(self):
-        if local_type == BackendLocalType.CPP:
-            return "BackendLocalCpp"
-        elif local_type == BackendLocalType.PYTHON:
-            return "BackendLocalPython"
-        else:
-            return "UNKNOWN"
+        return "BackendLocalPython"
