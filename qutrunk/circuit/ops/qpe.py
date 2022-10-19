@@ -1,7 +1,7 @@
 """Quantum Phase Estimation."""
 
 from qutrunk.circuit.ops.operator import Operator, OperatorContext
-from qutrunk.circuit.gates import H, NOT, Measure, CP, All, Barrier, T
+from qutrunk.circuit.gates import H, Measure, All, Barrier
 from qutrunk.circuit.ops import IQFT
 
 
