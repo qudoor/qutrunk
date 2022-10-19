@@ -21,7 +21,7 @@ class Ryy(BasicRotateGate):
 
     def __init__(self, alpha):
         if alpha is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -40,15 +40,14 @@ class Ryy(BasicRotateGate):
                 Ryy(alpha) * (qr[0], qr[1])
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
-            AttributeError: If the qubits should not be two.
+            TypeError: If the argument is not a Qubit object.
+            ValueError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            raise AttributeError("Parameter error: Two target qubits are required.")
+            raise ValueError("Parameter error: Two target qubits are required.")
 
         targets = [q.index for q in qubits]
         cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)

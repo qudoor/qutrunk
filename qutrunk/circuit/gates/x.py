@@ -125,7 +125,7 @@ class MCX(BasicGate):
             raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) <= self.ctrl_cnt:
-            raise AttributeError("The parameter miss controlled or target qubit(s).")
+            raise ValueError("The parameter miss controlled or target qubit(s).")
 
         self.qubits = qubits
         controls = [q.index for q in qubits[0 : self.ctrl_cnt]]

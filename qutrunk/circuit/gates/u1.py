@@ -45,11 +45,10 @@ class U1(BasicGate):
                 U1(pi/2) * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)
@@ -103,7 +102,7 @@ class CU1(BasicRotateGate):
             alpha: Rotation angle.
         """
         if alpha is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise TypeError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -122,16 +121,14 @@ class CU1(BasicRotateGate):
                 CU1(pi/2) * (qr[0], qr[1])
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
             AttributeError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO: need to improve.
-            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
+            raise ValueError("Parameter error: One controlled and one target qubit are required.")
 
         controls = [qubits[0].index]
         targets = [qubits[1].index]

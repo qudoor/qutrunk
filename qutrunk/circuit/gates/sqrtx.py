@@ -35,8 +35,7 @@ class SqrtXGate(BasicGate):
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)
@@ -101,15 +100,14 @@ class CSqrtXGate(BasicGate):
                 CSqrtX * (qr[0], qr[1])
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
             AttributeError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO:need to improve.
-            raise AttributeError(
+            raise ValueError(
                 "Parameter error: One controlled and one target qubit are required."
             )
 

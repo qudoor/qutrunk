@@ -7,6 +7,7 @@ from qutrunk.circuit import QuBit, Qureg
 from qutrunk.circuit.command import Command, CmdEx, Mat
 
 
+# need to improve.
 class All(BasicGate):
     """Meta operator, provides unified operation of multiple qubits.
 
@@ -64,7 +65,7 @@ class Power(BasicGate):
     def __or__(self, qubits: Union[QuBit, Qureg, tuple]):
         """Quantum logic gate operation."""
         if self.power < 0:
-            raise ValueError("power should >= 0")
+            raise ValueError("power should >= 0.")
 
         if not isinstance(qubits, (QuBit, Qureg, tuple)):
             raise TypeError("qubits should be type of QuBit, Qureg or tuple.")
@@ -106,12 +107,12 @@ class Matrix(BasicGate):
         if not isinstance(qubits, QuBit) and not all(
             isinstance(qubit, QuBit) for qubit in qubits
         ):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if (isinstance(qubits, QuBit) and self.ctrl_cnt > 0) or (
             not isinstance(qubits, QuBit) and (len(qubits) <= self.ctrl_cnt)
         ):
-            raise AttributeError("The parameter miss controlled or target qubit(s).")
+            raise ValueError("The parameter miss controlled or target qubit(s).")
 
         controls = (
             None if self.ctrl_cnt <= 0 else [q.index for q in qubits[0 : self.ctrl_cnt]]
@@ -123,14 +124,14 @@ class Matrix(BasicGate):
         )
 
         if not self.check_matrix_format(len(targets)):
-            raise AttributeError(
+            raise ValueError(
                 "The matrix is not in the right format by specified target(s)."
             )
 
         e = np.matrix(self.matrix)
         if self.is_inverse:
             if not self.is_unitary(e):
-                raise AttributeError(
+                raise ValueError(
                     "Only unitary matrices support invertible operations"
                 )
             else:
@@ -212,12 +213,12 @@ class Gate(BasicGate):
 
     def __lshift__(self, gate_define):
         if not isinstance(gate_define[0], BasicGate):
-            raise AttributeError("The first parameter is not a gate object.")
+            raise TypeError("The first parameter is not a gate object.")
 
         if not isinstance(gate_define[1], QuBit) and not all(
             isinstance(qubit, QuBit) for qubit in gate_define[1]
         ):
-            raise AttributeError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         self.gates.append({"gate": gate_define[0], "qubits": gate_define[1]})
 
@@ -228,7 +229,7 @@ class Gate(BasicGate):
         if not isinstance(qubits, QuBit) and not all(
             isinstance(qubit, QuBit) for qubit in qubits
         ):
-            raise AttributeError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if isinstance(qubits, QuBit):
             custom_gate = self.func(qubits)
