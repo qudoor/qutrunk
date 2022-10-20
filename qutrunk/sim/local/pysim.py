@@ -51,8 +51,7 @@ class Simulator:
         self.total_num_amps = 0  # numAmpsPerChunk
 
     def create_qureg(self, num_qubits):
-        """
-        Allocate resource
+        """Allocate resource.
 
         Args:
             num_qubits: number of qubits
@@ -60,6 +59,7 @@ class Simulator:
         self.qubits = num_qubits
         num_amps = 2**num_qubits
         self.total_num_amps = num_amps
+        # TODO: need to improve.
         self.real = [0] * num_amps
         self.imag = [0] * num_amps
 
@@ -72,6 +72,7 @@ class Simulator:
     def init_zero_state(self):
         """Init zero state"""
         self.init_blank_state()
+        # TODO:??
         self.real[0] = 1.0
 
     def init_plus_state(self):

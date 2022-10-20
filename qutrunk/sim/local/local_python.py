@@ -1,6 +1,7 @@
 import math
 from copy import deepcopy
 
+# TDOO: need to improve.
 import numpy as np
 from numpy import pi
 
@@ -9,6 +10,7 @@ from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
 
 
+# TODO: need to improve.
 class MeasureResult:
     def __init__(self, id=0, value=0):
         # TODO: id是关键字，不建议使用
@@ -85,7 +87,7 @@ class BackendLocalPython:
         self.result = Result()
 
     @timefn
-    def init(self, qubits, show=None):
+    def init(self, qubits):
         self.sim.create_qureg(qubits)
         self.sim.init_zero_state()
 
@@ -117,6 +119,7 @@ class BackendLocalPython:
         Returns:
             result: the Result object contain circuit running outcome.
         """
+        # TODO: need to improve.
         run_times = shots - 1
         while run_times > 0:
             self.result.measureSet = []
@@ -223,6 +226,7 @@ class BackendLocalPython:
         self.sim.get_expec_pauli_sum(oper_type_list, term_coeff_list)
 
     def exec_cmd(self, cmd):
+        # TODO: need to improve.
         if str(cmd.gate) == "Measure":
             res = self.sim.measure(cmd.targets[0])
             mr = MeasureResult(cmd.targets[0], res)
