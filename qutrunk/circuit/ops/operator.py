@@ -9,6 +9,7 @@ class Operator(BasicGate):
     pass
 
 
+# TODO:??
 class OperatorContext:
     """Operator Context.
 
