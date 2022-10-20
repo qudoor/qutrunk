@@ -1,13 +1,15 @@
+"""Python implementation of a quantum computer simulator."""
+import warnings
+
 from qutrunk.backends.backend import Backend
-from qutrunk.tools.read_qubox import get_qulocalbox_setting
+# TODO:need to improve.
 from qutrunk.sim.local.local_python import BackendLocalPython as BackendLocalImpl
 
 
-# TODO: need to improve.
 class BackendLocal(Backend):
-    """
-    The local backend uses the simulator to run the quantum circuit, qutrunk provide two types simulator.
-    C++ simulator is preferred. If C++ simulator is not available, python simulator is used instead.
+    """Python implementation of a quantum computer simulator.
+
+    The local backend uses the simulator to run the quantum circuit.
 
     Example:
         .. code-block:: python
@@ -32,9 +34,6 @@ class BackendLocal(Backend):
         super().__init__()
         self.circuit = None
         self._local_impl = BackendLocalImpl()
-        # TODO: need to improve.
-        box_config = get_qulocalbox_setting()
-        self._show_quantum_gate = box_config.get("show_quantum_gate")
 
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to local backend.
@@ -48,10 +47,7 @@ class BackendLocal(Backend):
         stop = len(circuit.cmds)
 
         if start == 0:
-            res, elapsed = self._local_impl.init(
-                len(circuit.qreg),
-                self._show_quantum_gate,
-            )
+            res, elapsed = self._local_impl.init(len(circuit.qreg))
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
 
@@ -141,6 +137,12 @@ class BackendLocal(Backend):
         res, elapsed = self._local_impl.qft(qubits)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
+
+        warnings.warn(
+            "QuTrunk has implemented the QFT operation",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return res
 
     def get_expec_pauli_prod(self, pauli_prod_list):
@@ -177,7 +179,6 @@ class BackendLocal(Backend):
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    # TODO: need to improve.
     @property
     def name(self):
         return "BackendLocalPython"
