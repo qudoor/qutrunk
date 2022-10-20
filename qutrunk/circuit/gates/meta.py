@@ -6,6 +6,7 @@ from .basicgate import BasicGate
 from qutrunk.circuit import QuBit, Qureg
 from qutrunk.circuit.command import Command, CmdEx, Mat
 
+
 class All(BasicGate):
     """Meta operator, provides unified operation of multiple qubits.
 
@@ -77,7 +78,8 @@ class Power(BasicGate):
 
 class Matrix(BasicGate):
     """Custom matrix gate."""
-    def __init__(self, matrix, ctrl_cnt = 0):
+
+    def __init__(self, matrix, ctrl_cnt=0):
         super().__init__()
         self.matrix = matrix
         self.ctrl_cnt = ctrl_cnt
@@ -101,22 +103,36 @@ class Matrix(BasicGate):
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
         """
-        if not isinstance(qubits, QuBit) and not all(isinstance(qubit, QuBit) for qubit in qubits):
+        if not isinstance(qubits, QuBit) and not all(
+            isinstance(qubit, QuBit) for qubit in qubits
+        ):
             raise NotImplementedError("The argument must be Qubit object.")
 
-        if (isinstance(qubits, QuBit) and self.ctrl_cnt > 0) or (not isinstance(qubits, QuBit) and (len(qubits) <= self.ctrl_cnt)):
+        if (isinstance(qubits, QuBit) and self.ctrl_cnt > 0) or (
+            not isinstance(qubits, QuBit) and (len(qubits) <= self.ctrl_cnt)
+        ):
             raise AttributeError("The parameter miss controlled or target qubit(s).")
 
-        controls = None if self.ctrl_cnt <= 0 else [q.index for q in qubits[0 : self.ctrl_cnt]]
-        targets = [qubits.index] if isinstance(qubits, QuBit) else [q.index for q in qubits[self.ctrl_cnt:]]
-        
-        if (not self.check_matrix_format(len(targets))):
-            raise AttributeError("The matrix is not in the right format by specified target(s).")
+        controls = (
+            None if self.ctrl_cnt <= 0 else [q.index for q in qubits[0 : self.ctrl_cnt]]
+        )
+        targets = (
+            [qubits.index]
+            if isinstance(qubits, QuBit)
+            else [q.index for q in qubits[self.ctrl_cnt :]]
+        )
+
+        if not self.check_matrix_format(len(targets)):
+            raise AttributeError(
+                "The matrix is not in the right format by specified target(s)."
+            )
 
         e = np.matrix(self.matrix)
         if self.is_inverse:
             if not self.is_unitary(e):
-                raise AttributeError("Only unitary matrices support invertible operations")
+                raise AttributeError(
+                    "Only unitary matrices support invertible operations"
+                )
             else:
                 e = e.T.conjugate()
 
@@ -124,22 +140,24 @@ class Matrix(BasicGate):
         cmd.cmdex.mat.reals = np.real(e).tolist()
         cmd.cmdex.mat.imags = np.imag(e).tolist()
         cmd.cmdex.mat.unitary = self.is_unitary(e)
-       
-        self.commit(qubits.circuit, cmd) if isinstance(qubits, QuBit) else self.commit(qubits[0].circuit, cmd)
+
+        self.commit(qubits.circuit, cmd) if isinstance(qubits, QuBit) else self.commit(
+            qubits[0].circuit, cmd
+        )
 
     def __mul__(self, qubit):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
         self.__or__(qubit)
-    
+
     def inv(self):
         """Apply inverse gate"""
         gate = Matrix(self.matrix, self.ctrl_cnt)
-        gate.is_inverse = not self.is_inverse 
+        gate.is_inverse = not self.is_inverse
         return gate
-        
+
     def ctrl(self, ctrl_cnt=1):
         """Apply controlled gate.
-        
+
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
@@ -148,24 +166,24 @@ class Matrix(BasicGate):
         return gate
 
     def check_matrix_format(self, numtargets):
-        len_targets = 2 ** numtargets
+        len_targets = 2**numtargets
         len_matrix = len(self.matrix)
         if len_targets != len_matrix:
             return False
-        
+
         for row in range(len(self.matrix)):
             len_row = len(self.matrix[row])
             if len_targets != len_row:
                 return False
-        
+
         return True
 
     def is_unitary(self, mat):
-        """ 
-            Test a matrix is unitary or not
-            m = [[1, 0], [0, 1]]
-            m = np.matrix(m)
-            print(is_unitary(m))
+        """
+        Test a matrix is unitary or not
+        m = [[1, 0], [0, 1]]
+        m = np.matrix(m)
+        print(is_unitary(m))
         """
         return np.allclose(np.eye(mat.shape[0]), mat.H * mat)
 
@@ -187,7 +205,7 @@ class Gate(BasicGate):
         my_gate * (q[3], q[1], q[0], q[2])
     """
 
-    def __init__(self, func: Optional[callable]=None):
+    def __init__(self, func: Optional[callable] = None):
         super().__init__()
         self.gates = []
         self.func = func
@@ -195,8 +213,10 @@ class Gate(BasicGate):
     def __lshift__(self, gate_define):
         if not isinstance(gate_define[0], BasicGate):
             raise AttributeError("The first parameter is not a gate object.")
-        
-        if not isinstance(gate_define[1], QuBit) and not all(isinstance(qubit, QuBit) for qubit in gate_define[1]):
+
+        if not isinstance(gate_define[1], QuBit) and not all(
+            isinstance(qubit, QuBit) for qubit in gate_define[1]
+        ):
             raise AttributeError("The argument must be Qubit object.")
 
         self.gates.append({"gate": gate_define[0], "qubits": gate_define[1]})
@@ -205,7 +225,9 @@ class Gate(BasicGate):
 
     def __or__(self, qubits: Union[QuBit, tuple]):
         """Quantum logic gate operation."""
-        if not isinstance(qubits, QuBit) and not all(isinstance(qubit, QuBit) for qubit in qubits):
+        if not isinstance(qubits, QuBit) and not all(
+            isinstance(qubit, QuBit) for qubit in qubits
+        ):
             raise AttributeError("The argument must be Qubit object.")
 
         if isinstance(qubits, QuBit):
@@ -214,8 +236,8 @@ class Gate(BasicGate):
             custom_gate = self.func(*qubits)
 
         for c in custom_gate.gates:
-            c['gate'] * c['qubits']
-           
+            c["gate"] * c["qubits"]
+
     def __mul__(self, qubits: Union[QuBit, tuple]):
         self.__or__(qubits)
 
