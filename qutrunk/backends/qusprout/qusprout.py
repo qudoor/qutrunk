@@ -127,7 +127,7 @@ class BackendQuSprout(Backend):
 
         for idx in range(start, stop):
             cmd = circuit.cmds[idx]
-            
+
             cmdex = None
             if cmd.cmdex is not None:
                 _amp = None
@@ -137,7 +137,7 @@ class BackendQuSprout(Backend):
                 if cmd.cmdex.mat is not None:
                     _mat = qusproutdata.Matrix(cmd.cmdex.mat.reals, cmd.cmdex.mat.imags, cmd.cmdex.mat.unitary)
                 cmdex = qusproutdata.Cmdex(amp=_amp, mat=_mat)
-            
+
             c = qusproutdata.Cmd(
                 str(cmd.gate),
                 cmd.targets,
@@ -237,5 +237,6 @@ class BackendQuSprout(Backend):
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def backend_type(self):
+    @property
+    def name(self):
         return "BackendQuSprout"
