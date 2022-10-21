@@ -100,12 +100,16 @@ class QCircuit:
             # TODO: update description and demo
             qreg: The register of quantum.
         """
+
         if not isinstance(qubits, (int, list)):
             raise TypeError("qubits parameter should be type of int or list.")
 
         qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
         if qubit_size <= 0:
             raise TypeError("Number of qubits should be larger than 0.")
+
+        if qubit_size > 20:
+            raise ValueError("Number of qubits should be less than 20.")
 
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)
