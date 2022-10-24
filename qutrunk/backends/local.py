@@ -89,6 +89,21 @@ class BackendLocal(Backend):
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
+    def get_prob_outcome(self, qubit, outcome):
+        """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
+
+        Args:
+            qubit: The specified qubit to be measured.
+            outcome: The qubit measure result(0 or 1).
+
+        Returns:
+            The probability of target qubit.
+        """
+        res, elapsed = self._local_impl.get_prob_outcome(qubit, outcome)
+        if self.circuit.counter:
+            self.circuit.counter.acc_run_time(elapsed)
+        return res
+
     def get_prob_all_outcome(self, qubits):
         """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
 

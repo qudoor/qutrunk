@@ -90,8 +90,6 @@ def run_qpe(backend=None):
 
 if __name__ == "__main__":
     # circuit = run_phase_estimation()
-    # circuit.draw(line_length=300)
-
     circuit = run_qpe()
 
 
