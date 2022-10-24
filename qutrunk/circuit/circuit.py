@@ -1,7 +1,7 @@
 """Circuit Module."""
 import json
 import random
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Callable
 import numpy as np
 
 from qutrunk.backends import Backend, BackendLocal
@@ -102,12 +102,16 @@ class QCircuit:
             # TODO: update description and demo
             qreg: The register of quantum.
         """
+
         if not isinstance(qubits, (int, list)):
             raise TypeError("qubits parameter should be type of int or list.")
 
         qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
         if qubit_size <= 0:
             raise TypeError("Number of qubits should be larger than 0.")
+
+        if qubit_size > 20:
+            raise ValueError("Number of qubits should be less than 20.")
 
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)
@@ -280,7 +284,6 @@ class QCircuit:
         if qubit < 0 or qubit >= self.num_qubits:
             raise IndexError("out of the range of qubits.")
 
-        self.backend.send_circuit(self)
         return self.backend.get_prob_outcome(qubit, value)
 
     # TODO:Get the maximum possible value of a qubit.
@@ -384,8 +387,10 @@ class QCircuit:
             if param_key not in parameters_table_key
         ]
         if len(params_not_in_circuit) > 0:
-            raise ValueError(f"Cannot bind parameters ({', '.join(map(str, params_not_in_circuit))}) "
-                             f"not present in the circuit.")
+            raise ValueError(
+                f"Cannot bind parameters ({', '.join(map(str, params_not_in_circuit))}) "
+                f"not present in the circuit."
+            )
 
         # update parameter
         for k, v in params.items():
@@ -583,7 +588,7 @@ class QCircuit:
     # TODO: need to improve.
     def depth(
         self,
-        counted_gate: Optional[callable] = lambda x: not isinstance(x, BarrierGate),
+        counted_gate: Optional[Callable] = lambda x: not isinstance(x, BarrierGate),
     ) -> int:
         """Return circuit depth (i.e., max length of critical path).
 
@@ -771,7 +776,7 @@ class Result:
     def get_values(self):
         """Get all values"""
         return self.values
-        
+
     def excute_info(self):
         result = {
             "backend": self.backend.name,

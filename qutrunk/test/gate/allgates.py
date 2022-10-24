@@ -1,3 +1,5 @@
+"""All gate operations supported by qutrunk."""
+
 from math import pi
 
 from qutrunk.circuit import QCircuit
@@ -93,5 +95,3 @@ if __name__ == "__main__":
     # Run locally
     circuit = run_gates()
 
-    # Draw quantum circuit 
-    circuit.draw(line_length=3000)

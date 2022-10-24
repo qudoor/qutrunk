@@ -69,6 +69,7 @@ class BackendLocal(Backend):
             result: The Result object contain circuit running outcome.
         """
         res, elapsed = self._local_impl.run(shots)
+        # TODO: circuit is None?
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
@@ -84,21 +85,6 @@ class BackendLocal(Backend):
             The probability of target index.
         """
         res, elapsed = self._local_impl.get_prob_amp(index)
-        if self.circuit.counter:
-            self.circuit.counter.acc_run_time(elapsed)
-        return res
-
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
-
-        Returns:
-            The probability of target qubit.
-        """
-        res, elapsed = self._local_impl.get_prob_outcome(qubit, outcome)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
@@ -124,17 +110,6 @@ class BackendLocal(Backend):
             Array contains all amplitudes of state vector
         """
         res, elapsed = self._local_impl.get_all_state()
-        if self.circuit.counter:
-            self.circuit.counter.acc_run_time(elapsed)
-        return res
-
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qreg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        res, elapsed = self._local_impl.qft(qubits)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
 
