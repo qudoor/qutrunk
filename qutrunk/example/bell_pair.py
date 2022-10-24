@@ -1,4 +1,5 @@
 """Bell state example."""
+
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, CNOT, Measure
 
