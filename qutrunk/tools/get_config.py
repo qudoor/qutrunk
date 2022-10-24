@@ -1,13 +1,14 @@
-import os
-import yaml
+"""Get Qubox configure info."""
 
-# TODO: need to improve.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
+import yaml
 
 
 def get_qubox_setting():
     """Get Qubox configure info."""
-    yaml_file = os.path.join(BASE_DIR, "config", "qubox.yaml")  # yaml文件路径
+    # the path of qubox.yaml
+    yaml_file = Path.cwd().parent / "config" / "qubox.yaml"
     with open(yaml_file) as f:
         yaml_content = yaml.load(f, Loader=yaml.FullLoader)
-        return "{ip}:{port}".format(ip=yaml_content["ip"], port=yaml_content["port"])
+        return f"{yaml_content['ip']}:{yaml_content['port']}"
