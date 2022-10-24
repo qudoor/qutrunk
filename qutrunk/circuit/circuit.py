@@ -484,10 +484,6 @@ class QCircuit:
         expect = self.backend.get_expec_pauli_prod(obs_data)
         return expect
 
-    def expval_hamil(self, hamil):
-        """Computes the expected value of Hermitian operator."""
-        pass
-
     def expval_pauli_sum(self, paulis, coeffs, qubitnum=0):
         """Computes the expected value of a sum of products of Pauli operators.
 
