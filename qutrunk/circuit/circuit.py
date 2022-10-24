@@ -1,7 +1,7 @@
 """Circuit Module."""
 import json
 import random
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Callable
 
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
@@ -550,7 +550,7 @@ class QCircuit:
 
     def depth(
         self,
-        counted_gate: Optional[callable] = lambda x: not isinstance(x, BarrierGate),
+        counted_gate: Optional[Callable] = lambda x: not isinstance(x, BarrierGate),
     ) -> int:
         """Return circuit depth (i.e., max length of critical path).
 
