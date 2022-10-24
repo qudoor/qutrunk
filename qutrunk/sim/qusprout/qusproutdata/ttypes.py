@@ -173,16 +173,135 @@ class Amplitude(object):
         return not (self == other)
 
 
+class Matrix(object):
+    """
+    Attributes:
+     - reals
+     - imags
+     - unitary
+
+    """
+
+
+    def __init__(self, reals=None, imags=None, unitary=None,):
+        self.reals = reals
+        self.imags = imags
+        self.unitary = unitary
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.LIST:
+                    self.reals = []
+                    (_etype17, _size14) = iprot.readListBegin()
+                    for _i18 in range(_size14):
+                        _elem19 = []
+                        (_etype23, _size20) = iprot.readListBegin()
+                        for _i24 in range(_size20):
+                            _elem25 = iprot.readDouble()
+                            _elem19.append(_elem25)
+                        iprot.readListEnd()
+                        self.reals.append(_elem19)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.LIST:
+                    self.imags = []
+                    (_etype29, _size26) = iprot.readListBegin()
+                    for _i30 in range(_size26):
+                        _elem31 = []
+                        (_etype35, _size32) = iprot.readListBegin()
+                        for _i36 in range(_size32):
+                            _elem37 = iprot.readDouble()
+                            _elem31.append(_elem37)
+                        iprot.readListEnd()
+                        self.imags.append(_elem31)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.BOOL:
+                    self.unitary = iprot.readBool()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('Matrix')
+        if self.reals is not None:
+            oprot.writeFieldBegin('reals', TType.LIST, 1)
+            oprot.writeListBegin(TType.LIST, len(self.reals))
+            for iter38 in self.reals:
+                oprot.writeListBegin(TType.DOUBLE, len(iter38))
+                for iter39 in iter38:
+                    oprot.writeDouble(iter39)
+                oprot.writeListEnd()
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        if self.imags is not None:
+            oprot.writeFieldBegin('imags', TType.LIST, 2)
+            oprot.writeListBegin(TType.LIST, len(self.imags))
+            for iter40 in self.imags:
+                oprot.writeListBegin(TType.DOUBLE, len(iter40))
+                for iter41 in iter40:
+                    oprot.writeDouble(iter41)
+                oprot.writeListEnd()
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        if self.unitary is not None:
+            oprot.writeFieldBegin('unitary', TType.BOOL, 3)
+            oprot.writeBool(self.unitary)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        if self.reals is None:
+            raise TProtocolException(message='Required field reals is unset!')
+        if self.imags is None:
+            raise TProtocolException(message='Required field imags is unset!')
+        if self.unitary is None:
+            raise TProtocolException(message='Required field unitary is unset!')
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 class Cmdex(object):
     """
     Attributes:
      - amp
+     - mat
 
     """
 
 
-    def __init__(self, amp=None,):
+    def __init__(self, amp=None, mat=None,):
         self.amp = amp
+        self.mat = mat
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -199,6 +318,12 @@ class Cmdex(object):
                     self.amp.read(iprot)
                 else:
                     iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRUCT:
+                    self.mat = Matrix()
+                    self.mat.read(iprot)
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -212,6 +337,10 @@ class Cmdex(object):
         if self.amp is not None:
             oprot.writeFieldBegin('amp', TType.STRUCT, 1)
             self.amp.write(oprot)
+            oprot.writeFieldEnd()
+        if self.mat is not None:
+            oprot.writeFieldBegin('mat', TType.STRUCT, 2)
+            self.mat.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -271,30 +400,30 @@ class Cmd(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.targets = []
-                    (_etype17, _size14) = iprot.readListBegin()
-                    for _i18 in range(_size14):
-                        _elem19 = iprot.readI32()
-                        self.targets.append(_elem19)
+                    (_etype45, _size42) = iprot.readListBegin()
+                    for _i46 in range(_size42):
+                        _elem47 = iprot.readI32()
+                        self.targets.append(_elem47)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
                 if ftype == TType.LIST:
                     self.controls = []
-                    (_etype23, _size20) = iprot.readListBegin()
-                    for _i24 in range(_size20):
-                        _elem25 = iprot.readI32()
-                        self.controls.append(_elem25)
+                    (_etype51, _size48) = iprot.readListBegin()
+                    for _i52 in range(_size48):
+                        _elem53 = iprot.readI32()
+                        self.controls.append(_elem53)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
             elif fid == 4:
                 if ftype == TType.LIST:
                     self.rotation = []
-                    (_etype29, _size26) = iprot.readListBegin()
-                    for _i30 in range(_size26):
-                        _elem31 = iprot.readDouble()
-                        self.rotation.append(_elem31)
+                    (_etype57, _size54) = iprot.readListBegin()
+                    for _i58 in range(_size54):
+                        _elem59 = iprot.readDouble()
+                        self.rotation.append(_elem59)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -331,22 +460,22 @@ class Cmd(object):
         if self.targets is not None:
             oprot.writeFieldBegin('targets', TType.LIST, 2)
             oprot.writeListBegin(TType.I32, len(self.targets))
-            for iter32 in self.targets:
-                oprot.writeI32(iter32)
+            for iter60 in self.targets:
+                oprot.writeI32(iter60)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.controls is not None:
             oprot.writeFieldBegin('controls', TType.LIST, 3)
             oprot.writeListBegin(TType.I32, len(self.controls))
-            for iter33 in self.controls:
-                oprot.writeI32(iter33)
+            for iter61 in self.controls:
+                oprot.writeI32(iter61)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.rotation is not None:
             oprot.writeFieldBegin('rotation', TType.LIST, 4)
             oprot.writeListBegin(TType.DOUBLE, len(self.rotation))
-            for iter34 in self.rotation:
-                oprot.writeDouble(iter34)
+            for iter62 in self.rotation:
+                oprot.writeDouble(iter62)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.desc is not None:
@@ -414,11 +543,11 @@ class Circuit(object):
             if fid == 1:
                 if ftype == TType.LIST:
                     self.cmds = []
-                    (_etype38, _size35) = iprot.readListBegin()
-                    for _i39 in range(_size35):
-                        _elem40 = Cmd()
-                        _elem40.read(iprot)
-                        self.cmds.append(_elem40)
+                    (_etype66, _size63) = iprot.readListBegin()
+                    for _i67 in range(_size63):
+                        _elem68 = Cmd()
+                        _elem68.read(iprot)
+                        self.cmds.append(_elem68)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -435,8 +564,8 @@ class Circuit(object):
         if self.cmds is not None:
             oprot.writeFieldBegin('cmds', TType.LIST, 1)
             oprot.writeListBegin(TType.STRUCT, len(self.cmds))
-            for iter41 in self.cmds:
-                iter41.write(oprot)
+            for iter69 in self.cmds:
+                iter69.write(oprot)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -628,22 +757,22 @@ class Result(object):
             if fid == 1:
                 if ftype == TType.LIST:
                     self.measureSet = []
-                    (_etype45, _size42) = iprot.readListBegin()
-                    for _i46 in range(_size42):
-                        _elem47 = MeasureResult()
-                        _elem47.read(iprot)
-                        self.measureSet.append(_elem47)
+                    (_etype73, _size70) = iprot.readListBegin()
+                    for _i74 in range(_size70):
+                        _elem75 = MeasureResult()
+                        _elem75.read(iprot)
+                        self.measureSet.append(_elem75)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.outcomeSet = []
-                    (_etype51, _size48) = iprot.readListBegin()
-                    for _i52 in range(_size48):
-                        _elem53 = Outcome()
-                        _elem53.read(iprot)
-                        self.outcomeSet.append(_elem53)
+                    (_etype79, _size76) = iprot.readListBegin()
+                    for _i80 in range(_size76):
+                        _elem81 = Outcome()
+                        _elem81.read(iprot)
+                        self.outcomeSet.append(_elem81)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -660,15 +789,15 @@ class Result(object):
         if self.measureSet is not None:
             oprot.writeFieldBegin('measureSet', TType.LIST, 1)
             oprot.writeListBegin(TType.STRUCT, len(self.measureSet))
-            for iter54 in self.measureSet:
-                iter54.write(oprot)
+            for iter82 in self.measureSet:
+                iter82.write(oprot)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.outcomeSet is not None:
             oprot.writeFieldBegin('outcomeSet', TType.LIST, 2)
             oprot.writeListBegin(TType.STRUCT, len(self.outcomeSet))
-            for iter55 in self.outcomeSet:
-                iter55.write(oprot)
+            for iter83 in self.outcomeSet:
+                iter83.write(oprot)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -744,10 +873,10 @@ class InitQubitsReq(object):
             elif fid == 5:
                 if ftype == TType.LIST:
                     self.hosts = []
-                    (_etype59, _size56) = iprot.readListBegin()
-                    for _i60 in range(_size56):
-                        _elem61 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                        self.hosts.append(_elem61)
+                    (_etype87, _size84) = iprot.readListBegin()
+                    for _i88 in range(_size84):
+                        _elem89 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.hosts.append(_elem89)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -780,8 +909,8 @@ class InitQubitsReq(object):
         if self.hosts is not None:
             oprot.writeFieldBegin('hosts', TType.LIST, 5)
             oprot.writeListBegin(TType.STRING, len(self.hosts))
-            for iter62 in self.hosts:
-                oprot.writeString(iter62.encode('utf-8') if sys.version_info[0] == 2 else iter62)
+            for iter90 in self.hosts:
+                oprot.writeString(iter90.encode('utf-8') if sys.version_info[0] == 2 else iter90)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -1456,10 +1585,10 @@ class GetProbOfAllOutcomReq(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.targets = []
-                    (_etype66, _size63) = iprot.readListBegin()
-                    for _i67 in range(_size63):
-                        _elem68 = iprot.readI32()
-                        self.targets.append(_elem68)
+                    (_etype94, _size91) = iprot.readListBegin()
+                    for _i95 in range(_size91):
+                        _elem96 = iprot.readI32()
+                        self.targets.append(_elem96)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -1480,8 +1609,8 @@ class GetProbOfAllOutcomReq(object):
         if self.targets is not None:
             oprot.writeFieldBegin('targets', TType.LIST, 2)
             oprot.writeListBegin(TType.I32, len(self.targets))
-            for iter69 in self.targets:
-                oprot.writeI32(iter69)
+            for iter97 in self.targets:
+                oprot.writeI32(iter97)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -1537,10 +1666,10 @@ class GetProbOfAllOutcomResp(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.pro_outcomes = []
-                    (_etype73, _size70) = iprot.readListBegin()
-                    for _i74 in range(_size70):
-                        _elem75 = iprot.readDouble()
-                        self.pro_outcomes.append(_elem75)
+                    (_etype101, _size98) = iprot.readListBegin()
+                    for _i102 in range(_size98):
+                        _elem103 = iprot.readDouble()
+                        self.pro_outcomes.append(_elem103)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -1561,8 +1690,8 @@ class GetProbOfAllOutcomResp(object):
         if self.pro_outcomes is not None:
             oprot.writeFieldBegin('pro_outcomes', TType.LIST, 2)
             oprot.writeListBegin(TType.DOUBLE, len(self.pro_outcomes))
-            for iter76 in self.pro_outcomes:
-                oprot.writeDouble(iter76)
+            for iter104 in self.pro_outcomes:
+                oprot.writeDouble(iter104)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -1675,10 +1804,10 @@ class GetAllStateResp(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.all_state = []
-                    (_etype80, _size77) = iprot.readListBegin()
-                    for _i81 in range(_size77):
-                        _elem82 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                        self.all_state.append(_elem82)
+                    (_etype108, _size105) = iprot.readListBegin()
+                    for _i109 in range(_size105):
+                        _elem110 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.all_state.append(_elem110)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -1699,8 +1828,8 @@ class GetAllStateResp(object):
         if self.all_state is not None:
             oprot.writeFieldBegin('all_state', TType.LIST, 2)
             oprot.writeListBegin(TType.STRING, len(self.all_state))
-            for iter83 in self.all_state:
-                oprot.writeString(iter83.encode('utf-8') if sys.version_info[0] == 2 else iter83)
+            for iter111 in self.all_state:
+                oprot.writeString(iter111.encode('utf-8') if sys.version_info[0] == 2 else iter111)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -1753,10 +1882,10 @@ class ApplyQFTReq(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.targets = []
-                    (_etype87, _size84) = iprot.readListBegin()
-                    for _i88 in range(_size84):
-                        _elem89 = iprot.readI32()
-                        self.targets.append(_elem89)
+                    (_etype115, _size112) = iprot.readListBegin()
+                    for _i116 in range(_size112):
+                        _elem117 = iprot.readI32()
+                        self.targets.append(_elem117)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -1777,8 +1906,8 @@ class ApplyQFTReq(object):
         if self.targets is not None:
             oprot.writeFieldBegin('targets', TType.LIST, 2)
             oprot.writeListBegin(TType.I32, len(self.targets))
-            for iter90 in self.targets:
-                oprot.writeI32(iter90)
+            for iter118 in self.targets:
+                oprot.writeI32(iter118)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2156,11 +2285,11 @@ class GetExpecPauliProdReq(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.pauli_prod = []
-                    (_etype94, _size91) = iprot.readListBegin()
-                    for _i95 in range(_size91):
-                        _elem96 = PauliProdInfo()
-                        _elem96.read(iprot)
-                        self.pauli_prod.append(_elem96)
+                    (_etype122, _size119) = iprot.readListBegin()
+                    for _i123 in range(_size119):
+                        _elem124 = PauliProdInfo()
+                        _elem124.read(iprot)
+                        self.pauli_prod.append(_elem124)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -2181,8 +2310,8 @@ class GetExpecPauliProdReq(object):
         if self.pauli_prod is not None:
             oprot.writeFieldBegin('pauli_prod', TType.LIST, 2)
             oprot.writeListBegin(TType.STRUCT, len(self.pauli_prod))
-            for iter97 in self.pauli_prod:
-                iter97.write(oprot)
+            for iter125 in self.pauli_prod:
+                iter125.write(oprot)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2382,20 +2511,20 @@ class GetExpecPauliSumReq(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.oper_type_list = []
-                    (_etype101, _size98) = iprot.readListBegin()
-                    for _i102 in range(_size98):
-                        _elem103 = iprot.readI32()
-                        self.oper_type_list.append(_elem103)
+                    (_etype129, _size126) = iprot.readListBegin()
+                    for _i130 in range(_size126):
+                        _elem131 = iprot.readI32()
+                        self.oper_type_list.append(_elem131)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
                 if ftype == TType.LIST:
                     self.term_coeff_list = []
-                    (_etype107, _size104) = iprot.readListBegin()
-                    for _i108 in range(_size104):
-                        _elem109 = iprot.readDouble()
-                        self.term_coeff_list.append(_elem109)
+                    (_etype135, _size132) = iprot.readListBegin()
+                    for _i136 in range(_size132):
+                        _elem137 = iprot.readDouble()
+                        self.term_coeff_list.append(_elem137)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -2416,15 +2545,15 @@ class GetExpecPauliSumReq(object):
         if self.oper_type_list is not None:
             oprot.writeFieldBegin('oper_type_list', TType.LIST, 2)
             oprot.writeListBegin(TType.I32, len(self.oper_type_list))
-            for iter110 in self.oper_type_list:
-                oprot.writeI32(iter110)
+            for iter138 in self.oper_type_list:
+                oprot.writeI32(iter138)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.term_coeff_list is not None:
             oprot.writeFieldBegin('term_coeff_list', TType.LIST, 3)
             oprot.writeListBegin(TType.DOUBLE, len(self.term_coeff_list))
-            for iter111 in self.term_coeff_list:
-                oprot.writeDouble(iter111)
+            for iter139 in self.term_coeff_list:
+                oprot.writeDouble(iter139)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2526,10 +2655,18 @@ Amplitude.thrift_spec = (
     (3, TType.I32, 'startind', None, None, ),  # 3
     (4, TType.I32, 'numamps', None, None, ),  # 4
 )
+all_structs.append(Matrix)
+Matrix.thrift_spec = (
+    None,  # 0
+    (1, TType.LIST, 'reals', (TType.LIST, (TType.DOUBLE, None, False), False), None, ),  # 1
+    (2, TType.LIST, 'imags', (TType.LIST, (TType.DOUBLE, None, False), False), None, ),  # 2
+    (3, TType.BOOL, 'unitary', None, None, ),  # 3
+)
 all_structs.append(Cmdex)
 Cmdex.thrift_spec = (
     None,  # 0
     (1, TType.STRUCT, 'amp', [Amplitude, None], None, ),  # 1
+    (2, TType.STRUCT, 'mat', [Matrix, None], None, ),  # 2
 )
 all_structs.append(Cmd)
 Cmd.thrift_spec = (
