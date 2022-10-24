@@ -41,7 +41,7 @@ class BackendIBM(Backend):
             print(res)
     """
 
-    def __init__(self, token=None, device=None):
+    def __init__(self, token, device=None):
         super().__init__()
         self.circuit = None
         self._token = token
@@ -67,15 +67,15 @@ class BackendIBM(Backend):
         self._allocated_qubits.add(len(circuit.qreg))
 
         for ct in circuit:
-            self.circuit_to_json(ct)
+            self._circuit_to_json(ct)
 
         for measured_id in self._measured_ids:
             self._json.append(
                 {"qubits": [measured_id], "name": "measure", "memory": [measured_id]}
             )
-        print("send circuit:", self._json)
+        # print("send circuit:", self._json)
 
-    def circuit_to_json(self, cmd):
+    def _circuit_to_json(self, cmd):
         """Translates the command and in a local variable.
 
         Args:
@@ -116,7 +116,7 @@ class BackendIBM(Backend):
         info = {}
         info["json"] = self._json
 
-        info["nq"] =  sum(self._allocated_qubits)
+        info["nq"] = sum(self._allocated_qubits)
         info["shots"] = shots
         info["maxCredits"] = 10
         info["backend"] = {"name": self.device}
@@ -130,5 +130,6 @@ class BackendIBM(Backend):
         )
         return result
 
-    def backend_type(self):
+    @property
+    def name(self):
         return "BackendIBM"

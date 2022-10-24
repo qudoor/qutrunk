@@ -85,7 +85,7 @@ class BackendLocalPython:
         self.result = Result()
 
     @timefn
-    def init(self, qubits, show):
+    def init(self, qubits):
         self.sim.create_qureg(qubits)
         self.sim.init_zero_state()
 

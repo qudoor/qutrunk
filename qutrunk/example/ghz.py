@@ -4,27 +4,28 @@ from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import CX, Measure, H, Barrier, All
 
 
-def run_ghz(qubits=5, backend=None):
+def run_ghz(backend=None):
     # Create quantum circuit
     qc = QCircuit(name="ghz", backend=backend)
 
     # Allocate quantum qubits
-    qr = qc.allocate(qubits)
+    qr = qc.allocate(3)
 
     # Create a GHZ state
     H * qr[0]
-    for i in range(qubits - 1):
-        CX * (qr[i], qr[i + 1])
+    CX * (qr[0], qr[1])
+    CX * (qr[0], qr[2])
+
     Barrier * qr
 
-    # Measure all of the qubits
+    # Measure all the qubits
     All(Measure) * qr
 
     # Run quantum circuit with 1024 times
     res = qc.run(shots=1024)
 
     # Print measure results like:
-    # [{"00000": 536}, {"11111": 488}]
+    # [{"000": 527}, {"111": 497}]
     print(res.get_counts())
     return qc
 

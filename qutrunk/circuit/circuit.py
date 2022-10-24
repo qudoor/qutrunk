@@ -1,7 +1,7 @@
 """Circuit Module."""
 import json
 import random
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Callable
 
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
@@ -85,7 +85,6 @@ class QCircuit:
         if resource:
             self.counter = Counter(self)
 
-
     def __iter__(self):
         """Used to iterate commands in quantum circuits."""
         return QCircuitIter(self.cmds)
@@ -102,12 +101,16 @@ class QCircuit:
             # TODO: update description and demo
             qreg: The register of quantum.
         """
+
         if not isinstance(qubits, (int, list)):
             raise TypeError("qubits parameter should be type of int or list.")
 
         qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
         if qubit_size <= 0:
             raise TypeError("Number of qubits should be larger than 0.")
+
+        if qubit_size > 20:
+            raise ValueError("Number of qubits should be less than 20.")
 
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)
@@ -213,7 +216,7 @@ class QCircuit:
         """
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
-        if self.backend.backend_type() == "BackendIBM":
+        if self.backend.name == "BackendIBM":
             # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
             return result
         # TODO: measureSet
@@ -278,19 +281,6 @@ class QCircuit:
         """
         self.backend.send_circuit(self)
         return self.backend.get_prob_amp(index)
-
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
-
-        Returns:
-            The probability of target qubit.
-        """
-        self.backend.send_circuit(self)
-        return self.backend.get_prob_outcome(qubit, outcome)
 
     # TODO:Get the maximum possible value of a qubit.
     def get_prob_all_outcome(self, qubits):
@@ -392,8 +382,10 @@ class QCircuit:
             if param_key not in parameters_table_key
         ]
         if len(params_not_in_circuit) > 0:
-            raise ValueError(f"Cannot bind parameters ({', '.join(map(str, params_not_in_circuit))}) "
-                             f"not present in the circuit.")
+            raise ValueError(
+                f"Cannot bind parameters ({', '.join(map(str, params_not_in_circuit))}) "
+                f"not present in the circuit."
+            )
 
         # update parameter
         for k, v in params.items():
@@ -457,6 +449,7 @@ class QCircuit:
         """
         if format is None or format == "qusl":
             from qutrunk.tools.qusl_parse import qusl_to_circuit
+
             return qusl_to_circuit(file)
 
         if format == "openqasm":
@@ -600,7 +593,7 @@ class QCircuit:
 
     def depth(
         self,
-        counted_gate: Optional[callable] = lambda x: not isinstance(x, BarrierGate),
+        counted_gate: Optional[Callable] = lambda x: not isinstance(x, BarrierGate),
     ) -> int:
         """Return circuit depth (i.e., max length of critical path).
 
@@ -672,7 +665,7 @@ class QCircuitIter:
 
     def __init__(self, cmds):
         self.idx = 0
-        self.__cmds  = cmds
+        self.__cmds = cmds
 
     def __iter__(self):
         return self
@@ -785,10 +778,10 @@ class Result:
     def get_values(self):
         """Get all values"""
         return self.values
-        
+
     def excute_info(self):
         result = {
-            "backend": self.backend.backend_type(),
+            "backend": self.backend.name,
             "task_id": self.task_id,
             "status": self.status,
             "arguments": self.arguments,

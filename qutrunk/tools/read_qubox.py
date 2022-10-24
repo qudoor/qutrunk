@@ -9,10 +9,3 @@ def get_qubox_setting():
     with open(BASE_DIR + "/config/qubox.yaml") as f:
         yaml_content = yaml.load(f, Loader=yaml.FullLoader)
         return yaml_content
-
-
-def get_qulocalbox_setting():
-    """Get local backend configure info."""
-    with open(BASE_DIR + "/config/qulocal.yaml") as f:
-        yaml_content = yaml.load(f, Loader=yaml.FullLoader)
-        return yaml_content
