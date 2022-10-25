@@ -47,7 +47,7 @@ def run_grover(qubits=10, backend=None):
     out = res.get_outcome()
     print("measure result: " + str(int(out, base=2)))
 
-    # Print quantum circuit resource information 
+    # Print quantum circuit resource information
     circuit.show_resource()
 
     # Print quantum circuit execution information

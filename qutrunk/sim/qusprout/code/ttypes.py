@@ -22,10 +22,14 @@ class ErrCode(object):
     COM_INVALID_PARAM = 2
     COM_TIMEOUT = 3
     COM_EXCEPTION = 4
-    QUROOT_MEM_NOT_ENOUGH = 100
-    QUROOT_NOT_INIT = 101
-    QUROOT_NOT_REGISTER = 102
-    QUROOT_NOT_RESOURCE = 103
+    COM_NOT_EXIST = 5
+    COM_IS_EXIST = 6
+    COM_IS_QUEUE = 7
+    COM_MEM_NOT_ENOUGH = 8
+    COM_NOT_INIT = 9
+    COM_NOT_REGISTER = 10
+    COM_NOT_RESOURCE = 11
+    COM_PRASE_ERROR = 12
 
     _VALUES_TO_NAMES = {
         0: "COM_SUCCESS",
@@ -33,10 +37,14 @@ class ErrCode(object):
         2: "COM_INVALID_PARAM",
         3: "COM_TIMEOUT",
         4: "COM_EXCEPTION",
-        100: "QUROOT_MEM_NOT_ENOUGH",
-        101: "QUROOT_NOT_INIT",
-        102: "QUROOT_NOT_REGISTER",
-        103: "QUROOT_NOT_RESOURCE",
+        5: "COM_NOT_EXIST",
+        6: "COM_IS_EXIST",
+        7: "COM_IS_QUEUE",
+        8: "COM_MEM_NOT_ENOUGH",
+        9: "COM_NOT_INIT",
+        10: "COM_NOT_REGISTER",
+        11: "COM_NOT_RESOURCE",
+        12: "COM_PRASE_ERROR",
     }
 
     _NAMES_TO_VALUES = {
@@ -45,10 +53,14 @@ class ErrCode(object):
         "COM_INVALID_PARAM": 2,
         "COM_TIMEOUT": 3,
         "COM_EXCEPTION": 4,
-        "QUROOT_MEM_NOT_ENOUGH": 100,
-        "QUROOT_NOT_INIT": 101,
-        "QUROOT_NOT_REGISTER": 102,
-        "QUROOT_NOT_RESOURCE": 103,
+        "COM_NOT_EXIST": 5,
+        "COM_IS_EXIST": 6,
+        "COM_IS_QUEUE": 7,
+        "COM_MEM_NOT_ENOUGH": 8,
+        "COM_NOT_INIT": 9,
+        "COM_NOT_REGISTER": 10,
+        "COM_NOT_RESOURCE": 11,
+        "COM_PRASE_ERROR": 12,
     }
 
 

@@ -33,4 +33,3 @@ def run_random_byte(backend=None):
 if __name__ == "__main__":
     # Run locally
     circuit = run_random_byte()
-

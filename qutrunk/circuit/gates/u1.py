@@ -2,10 +2,9 @@
 
 import numpy as np
 
-from .basicgate import BasicGate
-from .basicgate import BasicRotateGate
 from qutrunk.circuit import Command
 from qutrunk.circuit.qubit import QuBit
+from .basicgate import BasicGate, BasicRotateGate
 
 
 class U1(BasicGate):
@@ -70,7 +69,7 @@ class U1(BasicGate):
         gate = U1(self.rotation)
         gate.is_inverse = not self.is_inverse
         return gate
-    
+
     def ctrl(self, ctrl_cnt=1):
         """Apply controlled gate.
         
@@ -147,7 +146,7 @@ class CU1(BasicRotateGate):
         # TODO: definition have problem.
         half_alpha = float(self.rotation)
         return np.matrix(
-            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, np.exp(1j * half_alpha)]]
+            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, np.exp(1j * half_alpha)]]
         )
 
     def inv(self):
