@@ -985,29 +985,45 @@ class BackendLocalPython:
         self.sim.cr(cmd.controls[0], cmd.targets[0], ureal, uimag)
 
     def iswap(self, cmd):
-        if len(cmd.rotation) != 1 or len(cmd.targets) != 2:
+        if len(cmd.targets) != 2:
             return
 
-        theta = cmd.rotation[0]
+        ureal = []
+        uimag = []
         if cmd.inverse:
-            theta = -theta
-
-        ureal = np.array(
-            [
-                [1, 0, 0, 0],
-                [0, math.cos(theta), 0, 0],
-                [0, 0, math.cos(theta), 0],
-                [0, 0, 0, 1],
-            ]
-        )
-        uimag = np.array(
-            [
-                [0, 0, 0, 0],
-                [0, 0, -math.sin(theta), 0],
-                [0, -math.sin(theta), 0, 0],
-                [0, 0, 0, 0],
-            ]
-        )
+            ureal = np.array(
+                [
+                    [1, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 1],
+                ]
+            )
+            uimag = np.array(
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, -1, 0],
+                    [0, -1, 0, 0],
+                    [0, 0, 0, 0],
+                ]
+            )
+        else:
+            ureal = np.array(
+                [
+                    [1, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 1],
+                ]
+            )
+            uimag = np.array(
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, 1, 0],
+                    [0, 1, 0, 0],
+                    [0, 0, 0, 0],
+                ]
+            )
 
         self.sim.iswap(cmd.targets[0], cmd.targets[1], ureal, uimag)
 

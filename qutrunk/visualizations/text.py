@@ -43,7 +43,7 @@ from qutrunk.circuit.gates import (
     CU1,
     CU3,
     CR,
-    iSwap,
+    iSwapGate,
     IGate,
     CHGate,
     CSwapGate,
@@ -489,7 +489,7 @@ class TextDrawing:
             gates.append(BoxOnQuWire("CR", conditional=conditional))
             add_connected_gate(node, gates, layer, current_cons)
         # iSwap
-        elif isinstance(op.gate, iSwap):
+        elif isinstance(op.gate, iSwapGate):
             gates = [iEx(conditional=conditional) for _ in range(len(node.qargs))]
             add_connected_gate(node, gates, layer, current_cons)
         else:

@@ -51,5 +51,5 @@ opaque ryy(theta) a,b;
 opaque x1 a;
 opaque y1 a;
 opaque z1 a;
-opaque iswap(theta) a,b;
+opaque iswap a,b;
 opaque cr(theta) a,b;

@@ -37,7 +37,7 @@ def run_gates():
     Y1 * qr[0]
     Z1 * qr[0]
     Swap * (qr[0], qr[1])
-    iSwap(pi / 2) * (qr[0], qr[1])
+    iSwap * (qr[0], qr[1])
     SqrtX * qr[0]
 
     CX * (qr[0], qr[1])
