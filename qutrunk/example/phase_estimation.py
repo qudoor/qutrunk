@@ -3,7 +3,7 @@
 from math import pi
 
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import NOT, Barrier, P
+from qutrunk.circuit.gates import NOT, Barrier, P, All, Measure
 from qutrunk.circuit.ops import QPE
 
 
@@ -24,6 +24,9 @@ def run_qpe(backend=None):
 
     # apply QPE
     QPE(P(pi/4)) * (q1, q2)
+
+    # measure q1
+    All(Measure) * q1
 
     # print circuit
     # qc.print()

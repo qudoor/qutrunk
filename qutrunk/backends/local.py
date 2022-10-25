@@ -1,5 +1,4 @@
 """Python implementation of a quantum computer simulator."""
-import warnings
 
 from qutrunk.backends.backend import Backend
 # TODO:need to improve.
@@ -128,11 +127,6 @@ class BackendLocal(Backend):
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
 
-        warnings.warn(
-            "QuTrunk has implemented the QFT operation",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         return res
 
     def get_expec_pauli_prod(self, pauli_prod_list):
