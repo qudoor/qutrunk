@@ -1,4 +1,6 @@
+import os
 from enum import Enum
+from typing import Optional
 
 from qutrunk.backends.backend import Backend
 from qutrunk.tools.read_qubox import get_qubox_setting
@@ -50,14 +52,26 @@ class BackendQuSprout(Backend):
             print(res.get_counts())
     """
 
-    def __init__(self, exectype=ExecType.SingleProcess):
+    def __init__(self, ip: Optional[str] = None, port: Optional[int] = None, exectype=ExecType.SingleProcess):
         super().__init__()
         self.circuit = None
         self.exectype = exectype
         box_config = get_qubox_setting()
-        self._api_server = QuSproutApiServer(
-            ip=box_config.get("ip"), port=box_config.get("port")
-        )
+
+        if ip and port:
+            _ip = ip
+            _port = port
+        elif ip is None and port is None:
+            _ip = box_config.get("ip")
+            _port = port=box_config.get("port")
+        else:
+            if ip is None:
+                print("Please specify ip in BackendQuSprout()!")
+            else:
+                print("Please specify port in BackendQuSprout()!")
+            os._exit(1)
+
+        self._api_server = QuSproutApiServer(_ip, _port)
 
     def get_prob_amp(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
