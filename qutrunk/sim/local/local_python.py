@@ -136,7 +136,7 @@ class BackendLocalPython:
         return self.result
 
     @timefn
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """
         Get the probability of a state-vector at an index in the full state vector.
 
@@ -146,34 +146,16 @@ class BackendLocalPython:
         Returns:
             the probability of target index
         """
-        return self.sim.get_prob_amp(index)
+        return self.sim.get_prob(index)
 
     @timefn
-    def get_prob_outcome(self, target, outcome):
-        """
-        Get the probability of a specified qubit being measured in the given outcome (0 or 1)
-
-        Args:
-            qubit: the specified qubit to be measured
-            outcome: the qubit measure result(0 or 1)
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            the probability of target qubit
+            An array contains all probabilities of circuit.
         """
-        return self.sim.get_prob_outcome(target, outcome)
-
-    @timefn
-    def get_prob_all_outcome(self, qubits):
-        """
-        Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg
-
-        Args:
-            qubits: the sub-register contained in qureg
-
-        Returns:
-            An array contains probability of target qubits
-        """
-        return self.sim.get_prob_all_outcome(qubits)
+        return self.sim.get_probs(qubits)
 
     @timefn
     def get_all_state(self):

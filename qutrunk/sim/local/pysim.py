@@ -1005,7 +1005,7 @@ class Simulator:
 
         return total_prob
 
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """
         Get the probability of a state-vector at an index in the full state vector.
 
@@ -1024,31 +1024,11 @@ class Simulator:
         # print("in pysim=", real * real + imag * imag)
         return real * real + imag * imag
 
-    def get_prob_outcome(self, qubit, outcome):
-        """
-        Get the probability of a specified qubit being measured in the given outcome (0 or 1)
-
-        Args:
-            qubit: the specified qubit to be measured
-            outcome: the qubit measure result(0 or 1)
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            the probability of target qubit
-        """
-        outcome_prob = self.find_prob_of_zero(qubit)
-        if outcome == 1:
-            outcome_prob = 1.0 - outcome_prob
-        return outcome_prob
-
-    def get_prob_all_outcome(self, qubits):
-        """
-        Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg
-
-        Args:
-            qubits: the sub-register contained in qureg
-
-        Returns:
-            An array contains probability of target qubits
+            An array contains all probabilities of circuit.
         """
         num_outcome_probs = len(qubits)
         outcome_probs = [0] * (2**num_outcome_probs)

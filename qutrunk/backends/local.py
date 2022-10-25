@@ -74,7 +74,7 @@ class BackendLocal(Backend):
             self.circuit.counter.finish()
         return res
 
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
@@ -83,36 +83,18 @@ class BackendLocal(Backend):
         Returns:
             The probability of target index.
         """
-        res, elapsed = self._local_impl.get_prob_amp(index)
+        res, elapsed = self._local_impl.get_prob(index)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            The probability of target qubit.
+            An array contains all probabilities of circuit.
         """
-        res, elapsed = self._local_impl.get_prob_outcome(qubit, outcome)
-        if self.circuit.counter:
-            self.circuit.counter.acc_run_time(elapsed)
-        return res
-
-    def get_prob_all_outcome(self, qubits):
-        """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
-
-        Args:
-            qubits: The sub-register contained in qureg.
-
-        Returns:
-            Array contains probability of target qubits.
-        """
-        res, elapsed = self._local_impl.get_prob_all_outcome(qubits)
+        res, elapsed = self._local_impl.get_probs(qubits)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res

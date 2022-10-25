@@ -39,8 +39,8 @@ def algorithm(file: dict):
         for c in file["cmd"]:
             f.write(c + "\n")
 
-        f.write("outcome = qc.get_prob_qubits([q.index for q in qr])\n")
-        # f.write("print(qc.get_prob_qubits([q.index for q in qr]))\n")
+        f.write("outcome = qc.get_probs()\n")
+        # f.write("print(qc.get_probs())\n")
         f.write("qc.run()\n")
         # f.write("print([int(q) for q in qr])\n")
 

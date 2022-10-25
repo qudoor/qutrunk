@@ -259,8 +259,8 @@ class QCircuit:
         """Return the number of operations in circuit."""
         return len(self.cmds)
 
-    def get_prob_value(self, value):
-        """Probability of obtaining quantum circuit measurements.
+    def get_prob(self, value):
+        """Get probability of the possible measure result of circuit.
 
         Args:
             value: The target value.
@@ -269,41 +269,17 @@ class QCircuit:
             float: The probability of value.
         """
         self.backend.send_circuit(self)
-        return self.backend.get_prob_amp(value)
+        return self.backend.get_prob(value)
 
-    def get_prob_qubit_value(self, qubit, value):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
-
-        Args:
-            qubit: The specified qubit to be measured.
-            value: The qubit measure result(0 or 1).
+    def get_probs(self):
+        """Get all probabilities of circuit.
 
         Returns:
-            The probability of target qubit.
+            An array contains all probabilities of circuit.
         """
-        if qubit < 0 or qubit >= self.num_qubits:
-            raise IndexError("out of the range of qubits.")
-
-        return self.backend.get_prob_outcome(qubit, value)
-
-    # TODO:Get the maximum possible value of a qubit.
-    def get_prob_qubits(self, qubits=None):
-        """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
-
-        Args:
-            qubits: The sub-register contained in qureg.
-
-        Returns:
-            An array contains probability of target qubits.
-        """
-        if qubits is None:
-            qubits = [i for i in range(self.num_qubits)]
-        else:
-            if not all(isinstance(qubit, int) for qubit in qubits):
-                raise TypeError("The argument must be integer.")
-
+        qubits = [i for i in range(self.num_qubits)]
         self.backend.send_circuit(self)
-        return self.backend.get_prob_all_outcome(qubits)
+        return self.backend.get_probs(qubits)
 
     # TODO: need to improve.
     def get_all_state(self):
