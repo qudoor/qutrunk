@@ -30,9 +30,10 @@ class U3(BasicGate):
             phi: U3 gate parameter2.
             lam: U3 gate parameter3.
         """
-        if theta is None or phi is None or lam is None:
-            raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
+
+        if theta is None or phi is None or lam is None:
+            raise ValueError("The argument cannot be empty.")
         self.theta = theta
         self.phi = phi
         self.lam = lam
@@ -55,8 +56,7 @@ class U3(BasicGate):
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(
@@ -129,7 +129,7 @@ class CU3(BasicRotateGate):
             lam: U3 gate parameter 3.
         """
         if theta is None or phi is None or lam is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi
@@ -150,14 +150,14 @@ class CU3(BasicRotateGate):
                 CU3(pi/2,pi/2,pi/2) * (qr[0], qr[1])
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
-            AttributeError: If the qubits should not be two.
+            TypeError: If the argument is not a Qubit object.
+            ValueError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            raise AttributeError("Parameter Error: One controlled and one target qubit are required.")
+            raise ValueError("Parameter Error: One controlled and one target qubit are required.")
 
         controls = [qubits[0].index]
         targets = [qubits[1].index]
@@ -228,7 +228,7 @@ class CU(BasicRotateGate):
             gamma: U gate parameter 4.
         """
         if theta is None or phi is None or lam is None or gamma is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi
@@ -250,12 +250,10 @@ class CU(BasicRotateGate):
                 CU(pi/2,pi/2,pi/2,pi/2) * (qr[0], qr[1])
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO: need to improve.
-            raise AttributeError("Parameter error: One controlled and one target qubit is required.")
+            raise ValueError("Parameter error: One controlled and one target qubit is required.")
 
         self.qubits = qubits
         controls = [qubits[0].index]

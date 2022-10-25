@@ -36,8 +36,7 @@ class HGate(BasicGate):
                 H * qr[0]
         """
         if not isinstance(qubit, QuBit):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)

@@ -14,6 +14,7 @@ _API_URL = "https://api.quantum-computing.ibm.com/api/"
 # TODO: call to get the API version automatically
 CLIENT_APPLICATION = "ibmqprovider/0.4.4"
 
+
 # need to improve:  __all__
 class IBMQ(Session):
     """Manage a session between QuTrunk and the IBMQ web API."""

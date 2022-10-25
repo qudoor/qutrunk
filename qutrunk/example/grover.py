@@ -34,7 +34,7 @@ def run_grover(qubits=10, backend=None):
     # Set inital amplitudes to plus state
     PLUS * qureg
 
-    # Apply quamtum operator(gates)
+    # Apply quantum operator(gates)
     QAA(num_reps, sol_elem) * qureg
 
     # Measure for all qubits

@@ -1,13 +1,14 @@
 """Python implementation of a quantum computer simulator."""
 
 from qutrunk.backends.backend import Backend
+# TODO:need to improve.
 from qutrunk.sim.local.local_python import BackendLocalPython as BackendLocalImpl
 
 
 class BackendLocal(Backend):
-    """
-    The local backend uses the simulator to run the quantum circuit, qutrunk provide two types simulator.
-    C++ simulator is preferred. If C++ simulator is not available, python simulator is used instead.
+    """Python implementation of a quantum computer simulator.
+
+    The local backend uses the simulator to run the quantum circuit.
 
     Example:
         .. code-block:: python
@@ -46,7 +47,6 @@ class BackendLocal(Backend):
 
         if start == 0:
             res, elapsed = self._local_impl.init(len(circuit.qreg))
-            # TODO: circuit is None?
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
 
@@ -74,7 +74,7 @@ class BackendLocal(Backend):
             self.circuit.counter.finish()
         return res
 
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
@@ -83,21 +83,18 @@ class BackendLocal(Backend):
         Returns:
             The probability of target index.
         """
-        res, elapsed = self._local_impl.get_prob_amp(index)
+        res, elapsed = self._local_impl.get_prob(index)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def get_prob_all_outcome(self, qubits):
-        """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
-
-        Args:
-            qubits: The sub-register contained in qureg.
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            Array contains probability of target qubits.
+            An array contains all probabilities of circuit.
         """
-        res, elapsed = self._local_impl.get_prob_all_outcome(qubits)
+        res, elapsed = self._local_impl.get_probs(qubits)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
@@ -111,6 +108,7 @@ class BackendLocal(Backend):
         res, elapsed = self._local_impl.get_all_state()
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
+
         return res
 
     def get_expec_pauli_prod(self, pauli_prod_list):

@@ -1,9 +1,7 @@
 """Quantum Fourier Transform examples."""
 
-import math
-
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import All, H, Measure, P
+from qutrunk.circuit.gates import All, Measure
 from qutrunk.circuit.ops import QFT
 
 

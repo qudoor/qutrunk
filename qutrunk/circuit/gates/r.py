@@ -22,7 +22,7 @@ class R(BasicRotateGate):
 
     def __init__(self, theta, phi):
         if theta is None or phi is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi
@@ -42,11 +42,10 @@ class R(BasicRotateGate):
                 R(theta, phi) * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(

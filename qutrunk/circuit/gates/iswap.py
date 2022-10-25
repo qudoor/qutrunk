@@ -36,10 +36,10 @@ class iSwapGate(BasicGate):
             AttributeError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            raise AttributeError("Parameter Error: Two target bits are required.")
+            raise ValueError("Parameter Error: Two target bits are required.")
 
         self.qubits = qubits
         targets = [q.index for q in qubits]

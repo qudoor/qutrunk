@@ -43,7 +43,7 @@ def apply_bernstein_vazirani(num_qubits, secret):
 
     # infer the output basis state
     ind = 2 * secret + 1
-    prob = circuit.get_prob_amp(ind)
+    prob = circuit.get_prob(ind)
     if 1 - prob < PRECISION:
         prob = 1
 
