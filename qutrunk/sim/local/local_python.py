@@ -220,7 +220,7 @@ class BackendLocalPython:
         Returns:
             the expected value of a sum of products of Pauli operators. 
         """
-        self.sim.get_expec_pauli_sum(oper_type_list, term_coeff_list)
+        return self.sim.get_expec_pauli_sum(oper_type_list, term_coeff_list)
 
     def exec_cmd(self, cmd):
         if str(cmd.gate) == "Measure":

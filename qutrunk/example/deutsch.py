@@ -17,8 +17,8 @@ def deutsch(backend=None):
     CNOT * (qureg[0], qureg[1])
     H * qureg[0]
 
-    # Measure quantum qubits
-    Measure * qureg[0]
+    # Measure all quantum qubits
+    All(Measure) * qureg
 
     # Print quantum circuit
     qc.print()
