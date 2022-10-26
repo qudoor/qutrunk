@@ -9,24 +9,25 @@ from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
 
 
 class ExecType(Enum):
-    """Init exec type for quantum circuit.
+    """
+    Init exec type for quantum circuit.
 
     Args:
         ExecBySingleProcess: Execute by single process.
-        ExecByMpi: Execute by multiple processes.
+
+    It may be extended to multi-process in the future
     """
 
     SingleProcess = 1
-    Mpi = 2
 
 
 class BackendQuSprout(Backend):
     """
-    QuSprout: quamtum circuit simulator, provide multi-threaded OMP, multi node parallel MPI, GPU hardware acceleration.
+    QuSprout: quamtum circuit simulator, provide multi-threaded OMP.
     To use qusprout, make sure the network is connected and the service IP and Port are set correctly.
 
     Args:
-        exectype: SingleProcess: use single calculation node; Mpi: parallel calculation using multiple nodes.
+        exectype: SingleProcess: use single calculation node;
 
     Example:
         .. code-block:: python

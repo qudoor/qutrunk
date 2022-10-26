@@ -44,8 +44,7 @@ class QuSproutApiServer:
             state: Init state.
             value: Init Value.
             density: Enable noise model.
-            exectype: SingleProcess: use single calculation node; \
-                Mpi: parallel calculation using multiple nodes.
+            exectype: SingleProcess: use single calculation node;
         """
         req = qusproutdata.InitQubitsReq(self._taskid, qubits, density, exectype)
         return self._client.initQubits(req)
