@@ -1,1 +1,0 @@
-"""VQE(variational quantum eigensolver) module."""
