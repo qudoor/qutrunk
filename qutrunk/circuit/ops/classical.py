@@ -5,6 +5,7 @@ from qutrunk.circuit.ops import QSP
 from qutrunk.exceptions import QuTrunkError
 from qutrunk.circuit.gates import X
 
+
 class Classical(QSP):
     """Quantum state preparation Operator.
 
@@ -33,7 +34,7 @@ class Classical(QSP):
         return "Classical"
 
     def __mul__(self, qureg: Qureg):
-        if qureg.circuit.gates_len > 0:
+        if qureg.circuit.num_gates > 0:
             raise QuTrunkError("Classical should be applied at the beginning of circuit.")
 
         super().__mul__(qureg)

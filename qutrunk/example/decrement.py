@@ -1,4 +1,5 @@
-"""Self-increment operation and Self-decrement operation example."""
+"""Self-decrement operation example."""
+
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Measure, All
 from qutrunk.circuit.ops import Classical
@@ -22,7 +23,8 @@ def decrement(num_qubits, init_value):
 
 if __name__ == "__main__":
     # Run locally
-    circuit = decrement(4, 0)
+    circuit = decrement(4, 1)
 
     # Draw quantum circuit
     circuit.draw()
+

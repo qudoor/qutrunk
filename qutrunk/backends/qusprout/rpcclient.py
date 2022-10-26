@@ -77,7 +77,7 @@ class QuSproutApiServer:
         return res.result
 
     @timefn
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
@@ -91,29 +91,11 @@ class QuSproutApiServer:
         return res.amp
 
     @timefn
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1)
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            The probability of target qubit
-        """
-        req = qusproutdata.GetProbOfOutcomeReq(self._taskid, qubit, outcome)
-        res = self._client.getProbOfOutcome(req)
-        return res.pro_outcome
-
-    @timefn
-    def get_prob_all_outcome(self, qubits):
-        """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
-
-        Args:
-            qubits: The sub-register contained in qureg.
-
-        Returns:
-            An array contains probability of target qubits.
+            An array contains all probabilities of circuit.
         """
         req = qusproutdata.GetProbOfAllOutcomReq(self._taskid, qubits)
         res = self._client.getProbOfAllOutcome(req)

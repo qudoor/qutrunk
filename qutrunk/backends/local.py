@@ -1,14 +1,14 @@
-from enum import Enum
+"""Python implementation of a quantum computer simulator."""
 
 from qutrunk.backends.backend import Backend
-from qutrunk.tools.read_qubox import get_qulocalbox_setting
+# TODO:need to improve.
 from qutrunk.sim.local.local_python import BackendLocalPython as BackendLocalImpl
 
 
 class BackendLocal(Backend):
-    """
-    The local backend uses the simulator to run the quantum circuit, qutrunk provide two types simulator.
-    C++ simulator is preferred. If C++ simulator is not available, python simulator is used instead.
+    """Python implementation of a quantum computer simulator.
+
+    The local backend uses the simulator to run the quantum circuit.
 
     Example:
         .. code-block:: python
@@ -33,8 +33,6 @@ class BackendLocal(Backend):
         super().__init__()
         self.circuit = None
         self._local_impl = BackendLocalImpl()
-        box_config = get_qulocalbox_setting()
-        self._show_quantum_gate = box_config.get("show_quantum_gate")
 
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to local backend.
@@ -48,10 +46,7 @@ class BackendLocal(Backend):
         stop = len(circuit.cmds)
 
         if start == 0:
-            res, elapsed = self._local_impl.init(
-                len(circuit.qreg),
-                self._show_quantum_gate,
-            )
+            res, elapsed = self._local_impl.init(len(circuit.qreg))
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
 
@@ -73,12 +68,13 @@ class BackendLocal(Backend):
             result: The Result object contain circuit running outcome.
         """
         res, elapsed = self._local_impl.run(shots)
+        # TODO: circuit is None?
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
         return res
 
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
@@ -87,36 +83,18 @@ class BackendLocal(Backend):
         Returns:
             The probability of target index.
         """
-        res, elapsed = self._local_impl.get_prob_amp(index)
+        res, elapsed = self._local_impl.get_prob(index)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            The probability of target qubit.
+            An array contains all probabilities of circuit.
         """
-        res, elapsed = self._local_impl.get_prob_outcome(qubit, outcome)
-        if self.circuit.counter:
-            self.circuit.counter.acc_run_time(elapsed)
-        return res
-
-    def get_prob_all_outcome(self, qubits):
-        """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
-
-        Args:
-            qubits: The sub-register contained in qureg.
-
-        Returns:
-            Array contains probability of target qubits.
-        """
-        res, elapsed = self._local_impl.get_prob_all_outcome(qubits)
+        res, elapsed = self._local_impl.get_probs(qubits)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
@@ -130,17 +108,7 @@ class BackendLocal(Backend):
         res, elapsed = self._local_impl.get_all_state()
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
-        return res
 
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qreg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        res, elapsed = self._local_impl.qft(qubits)
-        if self.circuit.counter:
-            self.circuit.counter.acc_run_time(elapsed)
         return res
 
     def get_expec_pauli_prod(self, pauli_prod_list):
@@ -177,5 +145,6 @@ class BackendLocal(Backend):
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def backend_type(self):
+    @property
+    def name(self):
         return "BackendLocalPython"

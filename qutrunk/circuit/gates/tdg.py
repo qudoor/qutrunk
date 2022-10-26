@@ -37,7 +37,7 @@ class TdgGate(BasicGate):
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)

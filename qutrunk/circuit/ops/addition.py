@@ -6,7 +6,7 @@ from qutrunk.circuit.gates import X, MCX
 
 
 class ADD(Operator):
-    """Self-increment operation.
+    """Addition operation.
 
     Example:
         .. code-block:: python
