@@ -59,7 +59,7 @@ class QFTOps(Operator):
         if not all(isinstance(qb, QuBit) for qb in qubits):
             raise TypeError("The operand must be Qureg or Iterable of QuBit.")
 
-        with OperatorContext(qubits[0].circuit) as oc:
+        with OperatorContext(qubits[0].circuit):
             qb_cnt = len(qubits)
             for ctrl_qb_num in reversed(range(qb_cnt)):
                 H * qubits[ctrl_qb_num]

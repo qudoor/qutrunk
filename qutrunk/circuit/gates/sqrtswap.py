@@ -57,4 +57,5 @@ class SqrtSwapGate(BasicGate):
         gate.is_inverse = not self.is_inverse
         return gate
 
+
 SqrtSwap = SqrtSwapGate()

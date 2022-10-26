@@ -51,8 +51,7 @@ class Simulator:
         self.total_num_amps = 0  # numAmpsPerChunk
 
     def create_qureg(self, num_qubits):
-        """
-        Allocate resource
+        """Allocate resource.
 
         Args:
             num_qubits: number of qubits
@@ -60,6 +59,7 @@ class Simulator:
         self.qubits = num_qubits
         num_amps = 2**num_qubits
         self.total_num_amps = num_amps
+        # TODO: need to improve.
         self.real = [0] * num_amps
         self.imag = [0] * num_amps
 
@@ -72,6 +72,7 @@ class Simulator:
     def init_zero_state(self):
         """Init zero state"""
         self.init_blank_state()
+        # TODO:??
         self.real[0] = 1.0
 
     def init_plus_state(self):
@@ -1004,7 +1005,7 @@ class Simulator:
 
         return total_prob
 
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """
         Get the probability of a state-vector at an index in the full state vector.
 
@@ -1019,33 +1020,15 @@ class Simulator:
 
         real = self.real[index]
         imag = self.imag[index]
+        # TODO:doing
+        # print("in pysim=", real * real + imag * imag)
         return real * real + imag * imag
 
-    def get_prob_outcome(self, qubit, outcome):
-        """
-        Get the probability of a specified qubit being measured in the given outcome (0 or 1)
-
-        Args:
-            qubit: the specified qubit to be measured
-            outcome: the qubit measure result(0 or 1)
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            the probability of target qubit
-        """
-        outcome_prob = self.find_prob_of_zero(qubit)
-        if outcome == 1:
-            outcome_prob = 1.0 - outcome_prob
-        return outcome_prob
-
-    def get_prob_all_outcome(self, qubits):
-        """
-        Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg
-
-        Args:
-            qubits: the sub-register contained in qureg
-
-        Returns:
-            An array contains probability of target qubits
+            An array contains all probabilities of circuit.
         """
         num_outcome_probs = len(qubits)
         outcome_probs = [0] * (2**num_outcome_probs)
@@ -1061,6 +1044,7 @@ class Simulator:
 
         return outcome_probs
 
+    # TODO: to matrix
     def get_all_state(self):
         """
         Get the current state vector of probability amplitudes for a set of qubits

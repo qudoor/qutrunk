@@ -44,10 +44,10 @@ class CReg:
         return f"creg {self.name}[{self.size}];"
 
     def __getitem__(self, idx):
-        """Return a Cbit instance.
+        """Return a CBit instance.
 
         Args:
-            idx: The index of Cbit.
+            idx: The index of CBit.
 
         Returns:
             CBit instance.

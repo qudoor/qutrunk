@@ -34,10 +34,10 @@ class ZGate(BasicGate, Observable):
                 Z * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)
@@ -122,11 +122,11 @@ class MCZ(BasicGate):
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
         """
-        if isinstance(qubits, QuBit) or len(qubits) <= self.ctrl_cnt:
-            raise AttributeError("The parameter miss controlled or target qubit(s).")
-
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise AttributeError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
+
+        if len(qubits) <= self.ctrl_cnt:
+            raise ValueError("The parameter miss controlled or target qubit(s).")
 
         if isinstance(qubits, Qureg):
             temp = []

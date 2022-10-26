@@ -5,6 +5,7 @@ from typing import Union
 from qutrunk.circuit.ops.operator import Operator, OperatorContext
 from qutrunk.circuit import Qureg
 
+
 class QSP(Operator):
     """Quantum state preparation Operator.
 

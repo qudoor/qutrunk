@@ -5,8 +5,7 @@ from uuid import uuid4
 
 
 class Parameter:
-    """
-    Parameter Class for variable parameters.
+    """Parameter Class for variable parameters.
 
     Args:
         name(str): the name of Parameter.

@@ -59,7 +59,7 @@ class BackendQuSprout(Backend):
             ip=box_config.get("ip"), port=box_config.get("port")
         )
 
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
@@ -68,36 +68,18 @@ class BackendQuSprout(Backend):
         Returns:
             The probability of target index.
         """
-        res, elapsed = self._api_server.get_prob_amp(index)
+        res, elapsed = self._api_server.get_prob(index)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def get_prob_all_outcome(self, qubits):
-        """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
-
-        Args:
-            qubits: The sub-register contained in qureg.
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            An array contains probability of target qubits.
+            An array contains all probabilities of circuit.
         """
-        res, elapsed = self._api_server.get_prob_all_outcome(qubits)
-        if self.circuit.counter:
-            self.circuit.counter.acc_run_time(elapsed)
-        return res
-
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
-
-        Returns:
-            The probability of target qubit.
-        """
-        res, elapsed = self._api_server.get_prob_outcome(qubit, outcome)
+        res, elapsed = self._api_server.get_probs(qubits)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
@@ -154,7 +136,7 @@ class BackendQuSprout(Backend):
         # 服务端初始化
         if start == 0:
             res, elapsed = self._api_server.init(
-                circuit.qubits_len, circuit.density, self.exectype.value
+                circuit.num_qubits, circuit.density, self.exectype.value
             )
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
