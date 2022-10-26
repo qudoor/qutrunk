@@ -19,7 +19,7 @@ class Plus(QSP):
             circuit = QCircuit()
             qureg = circuit.allocate(2)
             PLUS * qureg
-            print(circuit.get_all_state())
+            print(circuit.get_statevector())
     """
 
     def __init__(self):

@@ -59,7 +59,7 @@ class SwapGate(BasicGate):
         return np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = SwapGate()
         gate.is_inverse = not self.is_inverse
         return gate

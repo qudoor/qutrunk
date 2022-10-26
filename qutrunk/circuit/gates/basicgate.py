@@ -44,7 +44,7 @@ class BasicGate:
 
     # TODO: need to improve.
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         # note: 状态相关方法需要重新生成一个新对象
         raise NotImplementedError
 

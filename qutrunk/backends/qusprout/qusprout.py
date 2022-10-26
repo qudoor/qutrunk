@@ -84,13 +84,13 @@ class BackendQuSprout(Backend):
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def get_all_state(self):
+    def get_statevector(self):
         """Get the current state vector of probability amplitudes for a set of qubits.
 
         Returns:
             Array contains all amplitudes of state vector
         """
-        res, elapsed = self._api_server.get_all_state()
+        res, elapsed = self._api_server.get_statevector()
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res

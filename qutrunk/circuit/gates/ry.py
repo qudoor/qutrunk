@@ -65,7 +65,7 @@ class Ry(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Ry(self.rotation)
         gate.is_inverse = not self.is_inverse 
         return gate
@@ -146,7 +146,7 @@ class CRy(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = CRy(self.rotation)
         gate.is_inverse = not self.is_inverse 
         return gate

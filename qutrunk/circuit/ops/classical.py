@@ -24,7 +24,7 @@ class Classical(QSP):
             circuit = QCircuit()
             qureg = circuit.allocate(2)
             Classical("0100") * qureg | Classical(4) * qureg
-            print(circuit.get_all_state())
+            print(circuit.get_statevector())
     """
 
     def __init__(self, state: Union[str, int]):

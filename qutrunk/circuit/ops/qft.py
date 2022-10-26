@@ -25,7 +25,7 @@ class QFTOps(Operator):
             QFT * qubits
 
             print(circuit.draw(line_length=1000))
-            state = circuit.get_all_state()
+            state = circuit.get_statevector()
             print(state)
 
             All(Measure) * qreg

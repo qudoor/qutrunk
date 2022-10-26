@@ -8,6 +8,9 @@ from qutrunk.circuit.gates import X, MCX
 class ADD(Operator):
     """Addition operation.
 
+    Args:
+        number: Addend.
+
     Example:
         .. code-block:: python
 
@@ -25,7 +28,7 @@ class ADD(Operator):
             print(res.get_outcome())
     """
 
-    def __init__(self, number):
+    def __init__(self, number: int):
         super().__init__()
         if number < 0:
             raise ValueError("number must be more than zero.")

@@ -53,7 +53,7 @@ class X1Gate(BasicGate):
         return np.matrix([[factor, -1j * factor], [-1j * factor, factor]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = X1Gate()
         gate.is_inverse = not self.is_inverse
         return gate

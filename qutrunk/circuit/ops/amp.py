@@ -26,7 +26,7 @@ class AMP(QSP):
             circuit = QCircuit()
             qureg = circuit.allocate(2)
             AMP([1-2j, 2+3j, 3-4j, 0.5+0.7j], 1, 2) * qureg
-            print(circuit.get_all_state())
+            print(circuit.get_statevector())
     """
 
     def __init__(

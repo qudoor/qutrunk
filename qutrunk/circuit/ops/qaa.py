@@ -30,7 +30,7 @@ class QAA(Operator):
         and then the state value of 7 is selected as the marker value.
         Three times of QAA iterative calculation are performed.
         The result obtained after the operation is that the probability of
-        the corresponding state of 7 exceeds 96%
+        the corresponding state of 7 exceeds 96%.
     """
 
     def __init__(self, iterations, marked_index):

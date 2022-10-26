@@ -54,7 +54,7 @@ class TGate(BasicGate):
         return np.matrix([[1, 0], [0, cmath.exp(1j * cmath.pi / 4)]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = TGate()
         gate.is_inverse = not self.is_inverse
         return gate

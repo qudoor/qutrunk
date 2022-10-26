@@ -38,7 +38,6 @@ class Decrement(Operator):
 
         num_qubits = len(qr)
 
-
         with OperatorContext(qr[0].circuit):
             X * qr[0]
             ctrl = []

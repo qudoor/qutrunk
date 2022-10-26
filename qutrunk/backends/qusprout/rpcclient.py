@@ -102,7 +102,7 @@ class QuSproutApiServer:
         return res.pro_outcomes
 
     @timefn
-    def get_all_state(self):
+    def get_statevector(self):
         """Get the current state vector of probability amplitudes for a set of qubits.
 
         Returns:

@@ -78,7 +78,15 @@ class Power(BasicGate):
 
 
 class Matrix(BasicGate):
-    """Custom matrix gate."""
+    """Custom matrix gate.
+
+    Example:
+            .. code-block:: python
+
+                Matrix([[0.5, 0.5], [0.5, -0.5]]) * qr[0]  -- No controlled bit
+                Matrix([[0.5, 0.5], [0.5, -0.5]], 1) * (qr[0], qr[1])  -- qr[0] is controlled bit
+                Matrix([[0.5, 0.5], [0.5, -0.5]], 2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
+    """
 
     def __init__(self, matrix, ctrl_cnt=0):
         super().__init__()
@@ -151,7 +159,7 @@ class Matrix(BasicGate):
         self.__or__(qubit)
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Matrix(self.matrix, self.ctrl_cnt)
         gate.is_inverse = not self.is_inverse
         return gate
@@ -180,11 +188,14 @@ class Matrix(BasicGate):
         return True
 
     def is_unitary(self, mat):
-        """
-        Test a matrix is unitary or not
-        m = [[1, 0], [0, 1]]
-        m = np.matrix(m)
-        print(is_unitary(m))
+        """Test a matrix is unitary or not.
+
+         Example:
+            .. code-block:: python
+
+                m = [[1, 0], [0, 1]]
+                m = np.matrix(m)
+                print(is_unitary(m))
         """
         return np.allclose(np.eye(mat.shape[0]), mat.H * mat)
 
@@ -197,13 +208,13 @@ class Gate(BasicGate):
     Example:
         .. code-block:: python
 
-        @Gate
-        def my_gate(a, b, c, d):
-            return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
-                << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
-                << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
+            @Gate
+            def my_gate(a, b, c, d):
+                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
+                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
+                    << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
 
-        my_gate * (q[3], q[1], q[0], q[2])
+            my_gate * (q[3], q[1], q[0], q[2])
     """
 
     def __init__(self, func: Optional[callable] = None):

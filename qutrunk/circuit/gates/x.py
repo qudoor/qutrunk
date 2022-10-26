@@ -69,7 +69,7 @@ class XGate(BasicGate, Observable):
         return puali_list
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = XGate()
         gate.is_inverse = not self.is_inverse
         return gate
@@ -144,7 +144,7 @@ class MCX(BasicGate):
             return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = MCX(self.ctrl_cnt)
         gate.is_inverse = not self.is_inverse
         return gate

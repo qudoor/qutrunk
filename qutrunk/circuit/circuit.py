@@ -99,8 +99,7 @@ class QCircuit:
                     and each value item represents the size of corresponding subqureg.
 
         Returns:
-            # TODO: update description and demo
-            qreg: The register of quantum.
+            The register of quantum.
         """
 
         if not isinstance(qubits, (int, list)):
@@ -202,7 +201,7 @@ class QCircuit:
             shots: Run times of the circuit, default: 1.
 
         Returns:
-            result: The Result object contain circuit running outcome.
+            The Result object contain circuit running outcome.
         """
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
@@ -281,11 +280,10 @@ class QCircuit:
         self.backend.send_circuit(self)
         return self.backend.get_probs(qubits)
 
-    # TODO: need to improve.
-    def get_all_state(self):
-        """Get the current state vector of probability amplitudes for a set of qubits."""
+    def get_statevector(self):
+        """Get state vector of circuit."""
         self.backend.send_circuit(self)
-        return self.backend.get_all_state()
+        return self.backend.get_statevector()
 
     def find_bit(self, bit):
         """Find locations in the circuit.
@@ -296,7 +294,7 @@ class QCircuit:
             bit: QuBit or CBit.
 
         Returns:
-            index: The index of QuBit or CBit in circuit.
+            The index of QuBit or CBit in circuit.
         """
         try:
             if isinstance(bit, QuBit):
@@ -316,7 +314,7 @@ class QCircuit:
             name(str): Parameter name.
 
         Returns:
-            p: Parameter object
+            Parameter object
         """
         p = Parameter(name)
         self.parameters[name] = p
@@ -339,9 +337,6 @@ class QCircuit:
 
         Raises:
             ValueError: parameters variable contains parameters not present in the circuit.
-
-        Returns:
-            QCircuit:Quantum circuit
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
@@ -381,8 +376,7 @@ class QCircuit:
         Reverses the circuit and returns an error message.
 
         Returns:
-            QCircuit: The inverted circuit.
-            qreg: The register of quantum.
+            tuple: (QCircuit,qreg)
 
         Raises:
             ValueError: if the circuit cannot be inverted.
@@ -409,7 +403,7 @@ class QCircuit:
             format(str): The format of file content.
 
         Return:
-            QCircuit: The QCircuit object for the input qusl or OpenQASM.
+            The QCircuit object for the input qusl or OpenQASM.
 
         """
         if format is None or format == "qusl":
@@ -744,6 +738,7 @@ class Result:
         return self.values
 
     def excute_info(self):
+        """The resourece of run."""
         result = {
             "backend": self.backend.name,
             "task_id": self.task_id,
