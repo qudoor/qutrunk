@@ -65,7 +65,7 @@ class BackendLocal(Backend):
             shots: Circuit run times, for sampling, default: 1.
 
         Returns:
-            result: The Result object contain circuit running outcome.
+            list: The Result object contain circuit running outcome.
         """
         res, elapsed = self._local_impl.run(shots)
         # TODO: circuit is None?
@@ -81,7 +81,7 @@ class BackendLocal(Backend):
             index: Index in state vector of probability amplitudes.
 
         Returns:
-            The probability of target index.
+            float:The probability of target index.
         """
         res, elapsed = self._local_impl.get_prob(index)
         if self.circuit.counter:
@@ -92,7 +92,7 @@ class BackendLocal(Backend):
         """Get all probabilities of circuit.
 
         Returns:
-            An array contains all probabilities of circuit.
+            list: An array contains all probabilities of circuit.
         """
         res, elapsed = self._local_impl.get_probs(qubits)
         if self.circuit.counter:
@@ -103,7 +103,7 @@ class BackendLocal(Backend):
         """Get the current state vector of probability amplitudes for entire qubits.
 
         Returns:
-            Array contains all amplitudes of state vector
+            list: Array contains all amplitudes of state vector.
         """
         res, elapsed = self._local_impl.get_all_state()
         if self.circuit.counter:
@@ -119,7 +119,7 @@ class BackendLocal(Backend):
                 the Pauli codes (0=PAULI_I, 1=PAULI_X, 2=PAULI_Y, 3=PAULI_Z) to apply to the corresponding qubits.
 
         Returns:
-            The expected value of a product of Pauli operators.
+            float:The expected value of a product of Pauli operators.
         """
         res, elapsed = self._local_impl.get_expec_pauli_prod(pauli_prod_list)
         if self.circuit.counter:
@@ -136,7 +136,7 @@ class BackendLocal(Backend):
             term_coeff_list: The coefficients of each term in the sum of Pauli products.
 
         Returns:
-            The expected value of a sum of products of Pauli operators.
+            float:The expected value of a sum of products of Pauli operators.
         """
         res, elapsed = self._local_impl.get_expec_pauli_sum(
             oper_type_list, term_coeff_list
@@ -147,4 +147,5 @@ class BackendLocal(Backend):
 
     @property
     def name(self):
+        """The name of Backend."""
         return "BackendLocalPython"
