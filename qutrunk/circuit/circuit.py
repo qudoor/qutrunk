@@ -9,6 +9,7 @@ from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
 from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
+from qutrunk.exceptions import QuTrunkError
 
 
 class QCircuit:
@@ -59,8 +60,8 @@ class QCircuit:
         self.qubit_indices = {}
         self.cbit_indices = {}
 
-        # {Parameter: value}
-        self.parameters = {}
+        # 参数字典表 {Parameter: value}
+        self.param_dict = {}
 
         # use local backend(default)
         if backend is None:
@@ -139,6 +140,19 @@ class QCircuit:
             cmd: The command append to circuit.
         """
         self.cmds.append(cmd)
+
+    def append_circuit(self, circuit):
+        """Append target circuit to current circuit.
+
+        Note: The target circuit must have the same qubits as current circuit.
+
+        Args:
+            circuit: The target circuit append to current circuit.
+        """
+        if circuit.num_qubits != self.num_qubits:
+            raise QuTrunkError("The target circuit must have the same qubits as current circuit.")
+        for cmd in circuit.cmds:
+            self.append_cmd(cmd)
 
     def append_statement(self, statement):
         """Append the origin statement when apply gate or operator.
@@ -312,9 +326,9 @@ class QCircuit:
         except KeyError:
             raise Exception(f"Could not locate provided bit:{bit}")
 
-    def parameter(self, name):
+    def parameter(self, name: str):
         """
-        get a new object of Parameter.
+        Get a new object of Parameter.
 
         Args:
             name(str): Parameter name.
@@ -323,8 +337,24 @@ class QCircuit:
             p: Parameter object
         """
         p = Parameter(name)
-        self.parameters[name] = p
+        self.param_dict[name] = p
         return p
+
+    def parameters(self, names: list)->tuple:
+        """
+        Get a collection of Parameter.
+
+        Args:
+            names(list): A list of Parameter name.
+
+        Returns:
+            Tuple contains Parameter object
+        """ 
+        params = []
+        for name in names:
+            params.append(self.parameter(name))
+
+        return tuple(params)
 
     def get_parameter(self, name):
         """get the object of Parameter.
@@ -332,7 +362,7 @@ class QCircuit:
         Args:
             name(str): Parameter name.
         """
-        return self.parameters[name]
+        return self.param_dict[name]
 
     def bind_parameters(self, params):
         """
@@ -349,8 +379,8 @@ class QCircuit:
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-
-        parameters_table_key = self.parameters.keys()
+        # 1 参数是否在参数表中
+        parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key
             for param_key in params.keys()
@@ -364,8 +394,14 @@ class QCircuit:
 
         # update parameter
         for k, v in params.items():
-            param = self.parameters[k]
+            param = self.param_dict[k]
             param.update(v)
+
+        # note: 绑定参数后意味着线路已经改变，需要重新构建线路
+        new_circuit = QCircuit(backend=self.backend, name=self.name)
+        new_circuit.allocate(qubits=self.num_qubits)
+        new_circuit.set_cmds(self.cmds)
+        return new_circuit
 
     def get_parameter_value(self, name):
         """get the value of Parameter.
@@ -373,7 +409,7 @@ class QCircuit:
         Args:
             name(str): Parameter name.
         """
-        for k, v in self.parameters.items():
+        for k, v in self.param_dict.items():
             if name == k:
                 return v.value
 
@@ -431,41 +467,42 @@ class QCircuit:
             dag = ast_to_dag(ast)
             return dag_to_circuit(dag)
 
-    # TODO: need to improve.
-    def expval(self, obs_data):
+    def expval_pauli(self, paulis: Union[list, object]):
         """Computes the expected value of a product of Pauli operators.
 
         Args:
-            pauliprodlist:
+            paulis:
                 oper_type (int): Pauli operators.
                 target (int): indices of the target qubits.
 
         Returns:
             The expected value of a product of Pauli operators.
         """
+        pauli_list = []
+        if not isinstance(paulis, list):
+            pauli_list.append(paulis)
+        else:
+            pauli_list = paulis 
         self.backend.send_circuit(self)
-        expect = self.backend.get_expec_pauli_prod(obs_data)
+        expect = self.backend.get_expec_pauli_prod(pauli_list)
         return expect
 
-    # TODO: need to improve.
-    def expval_sum(self, pauli_coeffi: Observable, qubitnum=0):
+    def expval_pauli_sum(self, paulis, coeffs, qubitnum=0):
         """Computes the expected value of a sum of products of Pauli operators.
 
         Args:
-            pauliprodlist:
-                oper_type (int): Pauli operators.
-                term_coeff (float): The coefficients of each term in the sum of Pauli products.
+            paulis (list[int]): Pauli operators.
+            coeffs (list[float]): The coefficients of each term in the sum of Pauli products.
 
         Returns:
             Returns the operation type and the coefficients of each term in the sum of Pauli products.
         """
         self.backend.send_circuit(self)
-        pauli_type_list, coeffi_list = pauli_coeffi.obs_data()
-        if (qubitnum != 0) and (len(coeffi_list) * qubitnum) != len(pauli_type_list):
+        if (qubitnum != 0) and (len(coeffs) * qubitnum) != len(paulis):
             raise AttributeError(
                 "Parameter error: The number of parameters is not correct."
             )
-        return self.backend.get_expec_pauli_sum(pauli_type_list, coeffi_list)
+        return self.backend.get_expec_pauli_sum(paulis, coeffs)
 
     def _dump_qusl(self, file, unroll=True):
         with open(file, "w", encoding="utf-8") as f:
