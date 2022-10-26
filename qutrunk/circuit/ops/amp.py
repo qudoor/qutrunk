@@ -5,6 +5,7 @@ from qutrunk.circuit.command import Command, CmdEx, Amplitude
 from qutrunk.circuit import Qureg
 from qutrunk.circuit.ops import QSP
 
+
 class AMP(QSP):
     """Quantum state preparation Operator.
 
@@ -28,8 +29,13 @@ class AMP(QSP):
             print(circuit.get_all_state())
     """
 
-    def __init__(self, classicvector: list, startind: Optional[int] = None, numamps: Optional[int] = None):
-        super().__init__('AMP')
+    def __init__(
+        self,
+        classicvector: list,
+        startind: Optional[int] = None,
+        numamps: Optional[int] = None,
+    ):
+        super().__init__("AMP")
         self.classicvector = classicvector
         self.startind = startind
         self.numamps = numamps
@@ -40,14 +46,16 @@ class AMP(QSP):
     def _check_state(self, qureg: Qureg):
         if self.startind is None:
             self.startind = 0
-        
+
         if self.numamps is None or self.numamps > len(self.classicvector):
             self.numamps = len(self.classicvector)
 
-        if 0 <= len(self.classicvector) <= 2 ** len(qureg)  \
-            and 0 <= self.startind < 2 ** len(qureg) \
-            and 0 <= self.numamps <= 2 ** len(qureg) \
-            and (self.startind + self.numamps) <= 2 ** len(qureg):
+        if (
+            0 <= len(self.classicvector) <= 2 ** len(qureg)
+            and 0 <= self.startind < 2 ** len(qureg)
+            and 0 <= self.numamps <= 2 ** len(qureg)
+            and (self.startind + self.numamps) <= 2 ** len(qureg)
+        ):
             return True
 
         return False
@@ -62,13 +70,15 @@ class AMP(QSP):
             reals.append(normalized_element.real)
             imags.append(normalized_element.imag)
 
-        cmd = Command(self, cmdex=CmdEx(Amplitude()))
+        cmd = Command(self, cmdex=CmdEx(amp=Amplitude()))
         cmd.cmdex.amp.reals = reals
         cmd.cmdex.amp.imags = imags
         cmd.cmdex.amp.startind = self.startind
         cmd.cmdex.amp.numamps = self.numamps
-        
+
         self.commit(qureg.circuit, cmd)
 
     def _append_statement(self, qureg: Qureg):
-        qureg.circuit.append_statement(f"AMP({self.classicvector}, {self.startind}, {self.numamps}) * q")
+        qureg.circuit.append_statement(
+            f"AMP({self.classicvector}, {self.startind}, {self.numamps}) * q"
+        )

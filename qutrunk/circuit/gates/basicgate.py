@@ -8,14 +8,17 @@ class BasicGate:
         self.is_inverse = False
         self.name = ""
 
+    # TODO: need to improve.
     def __str__(self):
         """The string description of a quantum logic gate."""
         return ""
 
+    # TODO: need to improve.
     def __or__(self, qubit):
         """Quantum logic gate operation. Overwrite | operator to achieve quantum logic gate operation."""
         pass
 
+    # TODO: need to improve.
     def __mul__(self, qubits):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
         pass
@@ -39,11 +42,13 @@ class BasicGate:
         if statement != "":
             circuit.append_statement(statement)
 
+    # TODO: need to improve.
     def inv(self):
         """Apply inverse gate"""
         # note: 状态相关方法需要重新生成一个新对象
         raise NotImplementedError
 
+    # TODO: need to improve.
     def ctrl(self, ctrl_cnt=1):
         """Apply controlled gate.
         
@@ -68,6 +73,7 @@ class BasicPhaseGate(BasicGate):
         super().__init__()
 
 
+# TODO: need to improve.
 class Observable:
     """Base class representing observables. It's usually PauliX, PauliY, PauliZ, PauliI."""
 

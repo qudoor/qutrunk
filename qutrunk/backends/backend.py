@@ -1,7 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class Backend(metaclass=ABCMeta):
+class Backend(ABC):
     """Basic simulator: All simulators are derived from this class."""
 
     @abstractmethod
@@ -13,8 +13,8 @@ class Backend(metaclass=ABCMeta):
             final: True if quantum circuit finish, default False, \
                 when final==True The backend program will release the computing resources.
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
-    def backend_type(self):
-        pass
+    def name(self):
+        raise NotImplementedError

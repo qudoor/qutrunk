@@ -1,4 +1,5 @@
 """Bell state example."""
+
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, CNOT, Measure
 
@@ -41,4 +42,3 @@ if __name__ == "__main__":
 
     # Draw quantum circuit
     circuit.draw()
-

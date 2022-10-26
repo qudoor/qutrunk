@@ -37,9 +37,10 @@ class Decrement(Operator):
             raise TypeError("The operand must be Qureg.")
 
         num_qubits = len(qr)
-        X * qr[0]
+
 
         with OperatorContext(qr[0].circuit):
+            X * qr[0]
             ctrl = []
             for i in range(1, num_qubits):
                 for j in range(i):

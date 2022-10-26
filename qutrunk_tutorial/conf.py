@@ -16,6 +16,7 @@
 import os
 import sys
 
+# TODO:have some problem.
 sys.path.append(os.path.relpath("..\qutrunk"))
 # mac need abs path
 sys.path.append(os.path.abspath("../qutrunk"))

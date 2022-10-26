@@ -5,7 +5,7 @@ class QuTrunkError(Exception):
         """Set the error message.
 
         Args:
-            *message: Error message.
+            message: Error message.
         """
         super().__init__(" ".join(message))
         self.message = " ".join(message)

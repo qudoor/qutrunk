@@ -1,10 +1,12 @@
+"""All gate operations supported by qutrunk."""
+
 from math import pi
 
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import *
 
 
-@def_gate
+@Gate
 def my_gate(a, b):
     return Gate() << (H, a) << (CNOT, (a, b))
 
@@ -35,7 +37,7 @@ def run_gates():
     Y1 * qr[0]
     Z1 * qr[0]
     Swap * (qr[0], qr[1])
-    iSwap(pi / 2) * (qr[0], qr[1])
+    iSwap * (qr[0], qr[1])
     SqrtX * qr[0]
 
     CX * (qr[0], qr[1])
@@ -69,7 +71,9 @@ def run_gates():
     Barrier * qr
 
     Power(2, H) * qr[0]
+
     my_gate * (qr[0], qr[1])
+    Barrier * qr
     Power(2, my_gate) * (qr[0], qr[1])
 
     # Measure all quantum qubits
@@ -91,5 +95,3 @@ if __name__ == "__main__":
     # Run locally
     circuit = run_gates()
 
-    # Draw quantum circuit 
-    circuit.draw(line_length=3000)

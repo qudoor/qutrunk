@@ -16,9 +16,9 @@ from .u3 import U3, CU3, CU
 from .u3 import U3 as U
 from .barrier import Barrier, BarrierGate
 from .basicgate import BasicGate, Observable, PauliType
-from .meta import All, Power, def_gate, Gate
+from .meta import All, Power, Gate
 from .cr import CR
-from .iswap import iSwap
+from .iswap import iSwap, iSwapGate
 from .measure import Measure, MeasureGate
 from .s import S, SGate
 from .sdg import Sdg, SdgGate
