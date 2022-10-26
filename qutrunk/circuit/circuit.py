@@ -279,7 +279,15 @@ class QCircuit:
         """
         qubits = [i for i in range(self.num_qubits)]
         self.backend.send_circuit(self)
-        return self.backend.get_probs(qubits)
+        probs = self.backend.get_probs(qubits)
+        
+        out_probs = []
+        for i in range(len(probs)):
+            prob = {}
+            prob["idx"] = i
+            prob["prob"] = probs[i]
+            out_probs.append(prob)
+        return out_probs
 
     # TODO: need to improve.
     def get_all_state(self):
