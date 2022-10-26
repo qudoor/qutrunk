@@ -85,11 +85,7 @@ class QCircuit:
 
         if resource:
             self.counter = Counter(self)
-
-    def __iter__(self):
-        """Used to iterate commands in quantum circuits."""
-        return QCircuitIter(self.cmds)
-
+    
     def allocate(self, qubits: Union[int, list]):
         """Allocate qubit in quantum circuit.
 
@@ -626,31 +622,6 @@ class QCircuit:
     def in_op(self):
         """Get circuit Operator Context."""
         return self._in_op
-
-
-class QCircuitIter:
-    """The iterator for circuit.
-
-    Args:
-       cmds: Commands to iterate.
-    """
-
-    def __init__(self, cmds):
-        self.idx = 0
-        self.__cmds = cmds
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        try:
-            cmd = self.__cmds[self.idx]
-        except IndexError:
-            raise StopIteration
-
-        self.idx += 1
-        return cmd
-
 
 class Result:
     """Result of quantum operation.
