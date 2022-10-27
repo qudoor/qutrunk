@@ -19,11 +19,7 @@ QuTrunk
    :caption: API
 
    Bpp/backends
-   Cpp1/converters
    Cpp2/circuit  
    Epp1/example   
-   Spp/sim
-   Tpp/tools
-   Vpp/visualizations
-   
+
   
