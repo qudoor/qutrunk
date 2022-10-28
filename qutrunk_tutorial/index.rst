@@ -19,6 +19,8 @@ QuTrunk
    :caption: API
 
    Bpp/backends
+   Cpp3/gates
+   Cpp4/ops
    Cpp2/circuit  
    Epp1/example   
 
