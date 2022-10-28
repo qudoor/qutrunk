@@ -283,6 +283,7 @@ class QCircuit:
     def get_statevector(self):
         """Get state vector of circuit."""
         self.backend.send_circuit(self)
+        # TODO: to complex
         return self.backend.get_statevector()
 
     def find_bit(self, bit):
