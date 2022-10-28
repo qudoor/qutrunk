@@ -115,9 +115,16 @@ class BackendQuSprout(Backend):
                 _amp = None
                 _mat = None
                 if cmd.cmdex.amp is not None:
-                    _amp = qusproutdata.Amplitude(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)
+                    _amp = qusproutdata.Amplitude(
+                        cmd.cmdex.amp.reals,
+                        cmd.cmdex.amp.imags,
+                        cmd.cmdex.amp.startind,
+                        cmd.cmdex.amp.numamps,
+                    )
                 if cmd.cmdex.mat is not None:
-                    _mat = qusproutdata.Matrix(cmd.cmdex.mat.reals, cmd.cmdex.mat.imags, cmd.cmdex.mat.unitary)
+                    _mat = qusproutdata.Matrix(
+                        cmd.cmdex.mat.reals, cmd.cmdex.mat.imags, cmd.cmdex.mat.unitary
+                    )
                 cmdex = qusproutdata.Cmdex(amp=_amp, mat=_mat)
 
             c = qusproutdata.Cmd(
@@ -127,7 +134,7 @@ class BackendQuSprout(Backend):
                 cmd.rotation,
                 cmd.qasm(),
                 cmd.inverse,
-                cmdex
+                cmdex,
             )
             cmds.append(c)
 
@@ -170,14 +177,6 @@ class BackendQuSprout(Backend):
         self._api_server.close()
 
         return res
-
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        self._api_server.apply_QFT(qubits)
 
     def get_expec_pauli_prod(self, pauli_prod_list):
         """Computes the expected value of a product of Pauli operators.

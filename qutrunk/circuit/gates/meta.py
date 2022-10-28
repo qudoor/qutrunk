@@ -204,17 +204,6 @@ class Gate(BasicGate):
     """Definition of custom gate.
 
     Implement by composing some basic logic gates or define specific matrix.
-
-    Example:
-        .. code-block:: python
-
-            @Gate
-            def my_gate(a, b, c, d):
-                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
-                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
-                    << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
-
-            my_gate * (q[3], q[1], q[0], q[2])
     """
 
     def __init__(self, func: Optional[callable] = None):

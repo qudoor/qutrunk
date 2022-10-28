@@ -18,7 +18,7 @@ class QuSproutApiServer:
         port: port, default: 9090.
     """
 
-    def __init__(self, ip='localhost', port=9090):
+    def __init__(self, ip="localhost", port=9090):
         socket = TSocket.TSocket(ip, port)
         self._transport = TTransport.TBufferedTransport(socket)
         protocol = TBinaryProtocol.TBinaryProtocol(self._transport)
@@ -117,20 +117,6 @@ class QuSproutApiServer:
         """Cancel current job."""
         req = qusproutdata.CancelCmdReq(self._taskid)
         return self._client.cancelCmd(req)
-
-    @timefn
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        if qubits:
-            req = qusproutdata.ApplyQFTReq(self._taskid, qubits)
-            self._client.applyQFT(req)
-        else:
-            req = qusproutdata.ApplyFullQFTReq(self._taskid)
-            self._client.applyFullQFT(req)
 
     @timefn
     def get_expec_pauli_prod(self, pauli_prod_list):
