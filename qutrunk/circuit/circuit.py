@@ -299,7 +299,12 @@ class QCircuit:
     def get_all_state(self):
         """Get the current state vector of probability amplitudes for a set of qubits."""
         self.backend.send_circuit(self)
-        return self.backend.get_all_state()
+        state = self.backend.get_all_state()
+        state_vector = []
+        for item in state:
+            real, imag = item.split(",")
+            state_vector.append(complex(float(real), float(imag)))
+        return state_vector
 
     def find_bit(self, bit):
         """Find locations in the circuit.
@@ -324,13 +329,13 @@ class QCircuit:
 
     def parameter(self, name: str):
         """
-        Get a new object of Parameter.
+        Allocate one Parameter object.
 
         Args:
             name(str): Parameter name.
 
         Returns:
-            p: Parameter object
+            object: Parameter.
         """
         p = Parameter(name)
         self.param_dict[name] = p
@@ -338,13 +343,13 @@ class QCircuit:
 
     def parameters(self, names: list)->tuple:
         """
-        Get a collection of Parameter.
+        Allocate a batch of parameters.
 
         Args:
-            names(list): A list of Parameter name.
+            names(list): A list of parameter's name.
 
         Returns:
-            Tuple contains Parameter object
+            tuple: a batch of parameters. 
         """ 
         params = []
         for name in names:
@@ -352,17 +357,18 @@ class QCircuit:
 
         return tuple(params)
 
-    def get_parameter(self, name):
-        """get the object of Parameter.
+    def get_parameters(self):
+        """Get all parameters of circuit.
 
         Args:
-            name(str): Parameter name.
+            list: all parameters in circuit.
         """
-        return self.param_dict[name]
+        param_values = [param.value for param in self.param_dict.values()]
+        return param_values
 
     def bind_parameters(self, params):
         """
-        Assign numeric parameters to parameters.
+        Assign specific value to parameters.
 
         Args:
             params (dict): {parameter: value, ...}.
@@ -392,24 +398,13 @@ class QCircuit:
         for k, v in params.items():
             param = self.param_dict[k]
             param.update(v)
+            
 
         # note: 绑定参数后意味着线路已经改变，需要重新构建线路
         new_circuit = QCircuit(backend=self.backend, name=self.name)
         new_circuit.allocate(qubits=self.num_qubits)
         new_circuit.set_cmds(self.cmds)
         return new_circuit
-
-    def get_parameter_value(self, name):
-        """get the value of Parameter.
-
-        Args:
-            name(str): Parameter name.
-        """
-        for k, v in self.param_dict.items():
-            if name == k:
-                return v.value
-
-        return None
 
     def inverse(self):
         """Invert this circuit.
