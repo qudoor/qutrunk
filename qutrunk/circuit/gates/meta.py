@@ -102,13 +102,6 @@ class Matrix(BasicGate):
         Args:
             qubit: The quantum bit to apply X gate.
 
-        Example:
-            .. code-block:: python
-
-                Matrix([[0.5, 0.5], [0.5, -0.5]]) * qr[0]  -- No controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 1) * (qr[0], qr[1])  -- qr[0] is controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
-
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
         """
@@ -204,6 +197,17 @@ class Gate(BasicGate):
     """Definition of custom gate.
 
     Implement by composing some basic logic gates or define specific matrix.
+
+    Example:
+        .. code-block:: python
+
+            @Gate
+            def my_gate(a, b, c, d):
+                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
+                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
+                    << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
+
+            my_gate * (q[3], q[1], q[0], q[2])
     """
 
     def __init__(self, func: Optional[callable] = None):

@@ -163,7 +163,7 @@ class BackendQuSprout(Backend):
             shots: Circuit run times, for sampling, default: 1.
 
         Returns:
-            result: The Result object contain circuit running outcome.
+            The Result object contain circuit running outcome.
         """
         res, elapsed = self._api_server.run(shots)
         if self.circuit.counter:

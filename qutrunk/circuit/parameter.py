@@ -1,6 +1,5 @@
-"""
-Parameter Class for variable parameters.
-"""
+"""Parameter Class for variable parameters."""
+
 from uuid import uuid4
 
 
@@ -13,6 +12,7 @@ class Parameter:
 
     def __new__(cls, name):
         obj = object.__new__(cls)
+        # TODO:??
         obj._uuid = uuid4()
         obj._hash = hash(obj._uuid)
 
