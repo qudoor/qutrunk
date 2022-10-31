@@ -302,7 +302,7 @@ class QCircuit:
         result = []
         for item in state_vector:
             r = item.split(",")
-            result.append(float(r[0]) + complex(float(r[1])))
+            result.append(complex(float(r[0]), float(r[1])))
         return result
 
     def get_statevector(self):
