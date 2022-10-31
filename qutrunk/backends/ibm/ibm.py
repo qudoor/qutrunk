@@ -66,7 +66,7 @@ class BackendIBM(Backend):
         """
         self._allocated_qubits.add(len(circuit.qreg))
 
-        for ct in circuit:
+        for ct in circuit.cmds:
             self._circuit_to_json(ct)
 
         for measured_id in self._measured_ids:
@@ -113,6 +113,14 @@ class BackendIBM(Backend):
             )
 
     def run(self, shots=1):
+        """Run quantum circuit.
+
+        Args:
+            shots: Circuit run times, for sampling, default: 1.
+
+        Returns:
+            JSON: The Result object contain circuit running outcome.
+        """
         info = {}
         info["json"] = self._json
 
@@ -132,4 +140,5 @@ class BackendIBM(Backend):
 
     @property
     def name(self):
+        """The name of Backend."""
         return "BackendIBM"

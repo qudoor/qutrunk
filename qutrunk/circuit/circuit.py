@@ -60,7 +60,7 @@ class QCircuit:
         self.qubit_indices = {}
         self.cbit_indices = {}
 
-        # 参数字典表 {Parameter: value}
+        # 参数字典{Parameter: value}
         self.param_dict = {}
 
         # use local backend(default)
@@ -86,11 +86,7 @@ class QCircuit:
 
         if resource:
             self.counter = Counter(self)
-
-    def __iter__(self):
-        """Used to iterate commands in quantum circuits."""
-        return QCircuitIter(self.cmds)
-
+    
     def allocate(self, qubits: Union[int, list]):
         """Allocate qubit in quantum circuit.
 
@@ -100,8 +96,7 @@ class QCircuit:
                     and each value item represents the size of corresponding subqureg.
 
         Returns:
-            # TODO: update description and demo
-            qreg: The register of quantum.
+            The register of quantum.
         """
 
         if not isinstance(qubits, (int, list)):
@@ -216,7 +211,7 @@ class QCircuit:
             shots: Run times of the circuit, default: 1.
 
         Returns:
-            result: The Result object contain circuit running outcome.
+            The Result object contain circuit running outcome.
         """
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
@@ -293,18 +288,27 @@ class QCircuit:
         """
         qubits = [i for i in range(self.num_qubits)]
         self.backend.send_circuit(self)
-        return self.backend.get_probs(qubits)
+        probs = self.backend.get_probs(qubits)
+        
+        out_probs = []
+        for i in range(len(probs)):
+            prob = {}
+            prob["idx"] = i
+            prob["prob"] = probs[i]
+            out_probs.append(prob)
+        return out_probs
 
-    # TODO: need to improve.
-    def get_all_state(self):
-        """Get the current state vector of probability amplitudes for a set of qubits."""
+    def _to_complex(self, state_vector):
+        result = []
+        for item in state_vector:
+            r = item.split(",")
+            result.append(float(r[0]) + complex(float(r[1])))
+        return result
+
+    def get_statevector(self):
+        """Get state vector of circuit."""
         self.backend.send_circuit(self)
-        state = self.backend.get_all_state()
-        state_vector = []
-        for item in state:
-            real, imag = item.split(",")
-            state_vector.append(complex(float(real), float(imag)))
-        return state_vector
+        return self._to_complex(self.backend.get_statevector())
 
     def find_bit(self, bit):
         """Find locations in the circuit.
@@ -315,7 +319,7 @@ class QCircuit:
             bit: QuBit or CBit.
 
         Returns:
-            index: The index of QuBit or CBit in circuit.
+            The index of QuBit or CBit in circuit.
         """
         try:
             if isinstance(bit, QuBit):
@@ -335,7 +339,7 @@ class QCircuit:
             name(str): Parameter name.
 
         Returns:
-            object: Parameter.
+            Parameter object
         """
         p = Parameter(name)
         self.param_dict[name] = p
@@ -375,13 +379,10 @@ class QCircuit:
 
         Raises:
             ValueError: parameters variable contains parameters not present in the circuit.
-
-        Returns:
-            QCircuit:Quantum circuit
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-        # 1 参数是否在参数表中
+        # 1 参数是否在参数表�
         parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key
@@ -412,8 +413,7 @@ class QCircuit:
         Reverses the circuit and returns an error message.
 
         Returns:
-            QCircuit: The inverted circuit.
-            qreg: The register of quantum.
+            tuple: (QCircuit,qreg)
 
         Raises:
             ValueError: if the circuit cannot be inverted.
@@ -440,7 +440,7 @@ class QCircuit:
             format(str): The format of file content.
 
         Return:
-            QCircuit: The QCircuit object for the input qusl or OpenQASM.
+            The QCircuit object for the input qusl or OpenQASM.
 
         """
         if format is None or format == "qusl":
@@ -495,7 +495,7 @@ class QCircuit:
             )
         return self.backend.get_expec_pauli_sum(paulis, coeffs)
 
-    def _dump_qusl(self, file, unroll=True):
+    def _dump_qusl(self, file):
         with open(file, "w", encoding="utf-8") as f:
             qusl_data = {}
             qusl_data["target"] = "QuSL"
@@ -505,12 +505,8 @@ class QCircuit:
             qusl_data["meta"] = meta
 
             inst = []
-            if unroll:
-                for c in self:
-                    inst.append(c.qusl() + "\n")
-            else:
-                for stm in self.statements:
-                    inst.append(stm + "\n")
+            for c in self.cmds:
+                inst.append(c.qusl() + "\n")
 
             qusl_data["code"] = inst
             f.write(json.dumps(qusl_data))
@@ -518,46 +514,34 @@ class QCircuit:
     def _dump_openqasm(self, file):
         with open(file, "w", encoding="utf-8") as f:
             f.write("OPENQASM 2.0;\n")
-            f.write('include "qulib1.inc";\n')
+            f.write('include "qelib1.inc";\n')
             f.write(f"qreg q[{str(len(self.qreg))}];\n")
             f.write(f"creg c[{str(len(self.qreg))}];\n")
-            for c in self:
+            for c in self.cmds:
                 f.write(c.qasm() + ";\n")
 
-    def dump(self, file=None, format=None, unroll=True):
+    def dump(self, file=None, format=None):
         """Serialize Quantum circuit as a JSON formatted stream to file.
 
         Args:
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
             file: Dump the qutrunk instruction to file(json format).
         """
         if file is None:
             raise Exception("file argument need to be supplied.")
 
         if format is None or format == "qusl":
-            self._dump_qusl(file, unroll)
+            self._dump_qusl(file)
 
         if format == "openqasm":
             self._dump_openqasm(file)
 
-    def _print_qusl(self, unroll):
-        """Print quantum circuit in qutrunk form.
-
-        Args:
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
-        """
+    def _print_qusl(self):
+        """Print quantum circuit in qutrunk form."""
         print(f"qreg q[{str(len(self.qreg))}]")
         print(f"creg c[{str(len(self.qreg))}]")
-        if unroll:
-            for c in self:
-                print(c.qusl())
-        else:
-            for stm in self.statements:
-                print(stm)
+
+        for c in self.cmds:
+            print(c.qusl())
 
     def _print_qasm(self):
         """Print quantum circuit in OpenQASM form."""
@@ -565,20 +549,17 @@ class QCircuit:
         print('include "qulib1.inc";')
         print(f"qreg q[{str(len(self.qreg))}];")
         print(f"creg c[{str(len(self.qreg))}];")
-        for c in self:
+        for c in self.cmds:
             print(c.qasm() + ";")
 
-    def print(self, format=None, unroll=True):
+    def print(self, format=None):
         """Print quantum circuit.
 
         Args:
             format(str): The format of needed to print, Default to qusl. options are "qusl" or "openqasm".
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
         """
         if format is None or format == "qusl":
-            self._print_qusl(unroll)
+            self._print_qusl()
 
         if format == "openqasm":
             self._print_qasm()
@@ -635,45 +616,6 @@ class QCircuit:
         """Show resource of the circuit use."""
         if self.counter:
             self.counter.show_verbose()
-
-    # TODO: need to improve.
-    def enter_op(self):
-        """Mark circuit in Operator Context."""
-        self._in_op = True
-
-    # TODO: need to improve.
-    def exit_op(self):
-        """Mark circuit out Operator Context."""
-        self._in_op = False
-
-    # TODO: need to improve.
-    def in_op(self):
-        """Get circuit Operator Context."""
-        return self._in_op
-
-
-class QCircuitIter:
-    """The iterator for circuit.
-
-    Args:
-       cmds: Commands to iterate.
-    """
-
-    def __init__(self, cmds):
-        self.idx = 0
-        self.__cmds = cmds
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        try:
-            cmd = self.__cmds[self.idx]
-        except IndexError:
-            raise StopIteration
-
-        self.idx += 1
-        return cmd
 
 
 class Result:
@@ -776,6 +718,7 @@ class Result:
         return self.values
 
     def excute_info(self):
+        """The resourece of run."""
         result = {
             "backend": self.backend.name,
             "task_id": self.task_id,

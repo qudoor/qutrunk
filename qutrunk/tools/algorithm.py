@@ -12,9 +12,9 @@ outcome = qc.get_probs()
 qc.run()
 Tree = lambda: defaultdict(Tree)
 tree = Tree()
-for index, item in enumerate(outcome):
-    i = str(bin(index))[2:]
-    tree['probs'][i]['probability'] = item
+for _, item in enumerate(outcome):
+    i = str(bin(item['idx']))[2:]
+    tree['probs'][i]['probability'] = item['prob']
     tree['probs'][i]['angle'] = 0
 print(json.dumps(tree))
 with open(file=r'result.json', mode='w', encoding='utf-8') as f:

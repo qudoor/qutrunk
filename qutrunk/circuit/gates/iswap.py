@@ -21,7 +21,7 @@ class iSwapGate(BasicGate):
         return "iSwap"
 
     def __or__(self, qubits):
-        """Quantum logic gate operation
+        """Quantum logic gate operation.
 
         Args:
             qubit: The quantum bit to aplly iSwap gate.
@@ -53,14 +53,13 @@ class iSwapGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.matrix(
-            [[1, 0, 0, 0], [0, 0, 1j, 0], [0, 1j, 0, 0], [0, 0, 0, 1]]
-        )
+        return np.matrix([[1, 0, 0, 0], [0, 0, 1j, 0], [0, 1j, 0, 0], [0, 0, 0, 1]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = iSwapGate()
-        gate.is_inverse = not self.is_inverse 
+        gate.is_inverse = not self.is_inverse
         return gate
-		
+
+
 iSwap = iSwapGate()

@@ -52,7 +52,7 @@ class SqrtXdgGate(BasicGate):
         return np.matrix([[1 - 1j, 1 + 1j], [1 + 1j, 1 - 1j]]) / 2
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = SqrtXdgGate()
         gate.is_inverse = not self.is_inverse
         return gate

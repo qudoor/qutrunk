@@ -241,13 +241,13 @@ circuit导出成QuSL
     Measure * qr[1]
 
     # print circuit
-    qc.print("bell_pair.qusl")
+    qc.dump(file="bell_pair.qusl")
 
 导出QuSL格式文件，内容如下
 
 .. code-block::
 
-    {"target": "QuSL", "version": "1.0", "meta": {"circuit_name": "circuit-23694", "qubits": "2"}, "code": ["H * q[0]\n", "MCX * (q[0], q[1])\n", "Measure * q[0]\n", "Measure * q[1]\n"]}
+    {"target": "QuSL", "version": "1.0", "meta": {"circuit_name": "circuit-19817", "qubits": "2"}, "code": ["H * q[0]\n", "MCX(1) * (q[0], q[1])\n", "Measure * q[0]\n", "Measure * q[1]\n"]}
 
 
 解析并运行QuSL量子线路
@@ -255,18 +255,12 @@ circuit导出成QuSL
 
 .. code-block:: 
 
-	import os
-
 	from qutrunk.circuit import QCircuit
 
-	BASE_DIR = os.getcwd()
-	file_path = BASE_DIR + '/qutrunk/example/bell_pair.qusl'
-
-    circuit = QCircuit.load(file_path, "qusl")
+	qc = QCircuit()
+	circuit = qc.load(file="bell_pair.qusl")
 	circuit.print()
-	result = circuit.run(shots=100)
-	print(result.get_counts())   
-	
+
 运行结果如下
 
 .. code-block::
@@ -277,4 +271,3 @@ circuit导出成QuSL
 	MCX(1) * (q[0], q[1])
 	Measure * q[0]
 	Measure * q[1]
-	[{"00": 50}, {"11": 50}]

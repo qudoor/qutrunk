@@ -37,14 +37,10 @@ class BasicGate:
             statement: The origin statement that generate target cmd.
         """
         circuit.append_cmd(cmd)
-        # TODO: need to improve
-        statement = "" if circuit.in_op() else cmd.qusl()
-        if statement != "":
-            circuit.append_statement(statement)
 
     # TODO: need to improve.
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         # note: 状态相关方法需要重新生成一个新对象
         raise NotImplementedError
 

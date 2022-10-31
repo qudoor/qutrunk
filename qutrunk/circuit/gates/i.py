@@ -61,7 +61,7 @@ class IGate(BasicGate, Observable):
         return pauli
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = IGate()
         gate.is_inverse = not self.is_inverse 
         return gate

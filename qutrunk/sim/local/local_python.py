@@ -158,11 +158,9 @@ class BackendLocalPython:
         return self.sim.get_probs(qubits)
 
     @timefn
-    def get_all_state(self):
-        """
-        Get the current state vector of probability amplitudes for a set of qubits
-        """
-        return self.sim.get_all_state()
+    def get_statevector(self):
+        """Get state vector of circuit."""
+        return self.sim.get_statevector()
 
     @timefn
     def qft(self, qubits):
