@@ -298,11 +298,17 @@ class QCircuit:
             out_probs.append(prob)
         return out_probs
 
+    def _to_complex(self, state_vector):
+        result = []
+        for item in state_vector:
+            r = item.split(",")
+            result.append(float(r[0]) + complex(float(r[1])))
+        return result
+
     def get_statevector(self):
         """Get state vector of circuit."""
         self.backend.send_circuit(self)
-        # TODO: to complex
-        return self.backend.get_statevector()
+        return self._to_complex(self.backend.get_statevector())
 
     def find_bit(self, bit):
         """Find locations in the circuit.
