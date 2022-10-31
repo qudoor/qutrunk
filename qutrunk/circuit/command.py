@@ -90,7 +90,7 @@ class Command:
             if isinstance(r, Parameter):
                 # map index to parameter
                 self.parameters[i] = r
-                r.set_host(self)
+                r.host = self
 
         # Command extention data
         # TODO: extra

@@ -66,7 +66,7 @@ class BackendIBM(Backend):
         """
         self._allocated_qubits.add(len(circuit.qreg))
 
-        for ct in circuit:
+        for ct in circuit.cmds:
             self._circuit_to_json(ct)
 
         for measured_id in self._measured_ids:

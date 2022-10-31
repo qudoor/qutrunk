@@ -62,12 +62,10 @@ class YGate(BasicGate, Observable):
             The observed data list, each item contains op type and target qubit, \
                 e.g: [{"oper_type": 1, "target": 0}].
         """
-        puali_list = []
         pauli = {}
         pauli["oper_type"] = PauliType.POT_PAULI_Y.value
         pauli["target"] = target.index
-        puali_list.append(pauli)
-        return puali_list
+        return pauli
 
     def inv(self):
         """Apply inverse gate."""
