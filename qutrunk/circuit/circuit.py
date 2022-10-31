@@ -60,7 +60,7 @@ class QCircuit:
         self.qubit_indices = {}
         self.cbit_indices = {}
 
-        # 参数字典�{Parameter: value}
+        # 参数字典{Parameter: value}
         self.param_dict = {}
 
         # use local backend(default)
@@ -375,7 +375,7 @@ class QCircuit:
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-        # 1 参数是否在参数表�
+        # 1 参数是否在参数表�
         parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key
@@ -393,7 +393,7 @@ class QCircuit:
             param = self.param_dict[k]
             param.update(v)
 
-        # note: 绑定参数后意味着线路已经改变，需要重新构建线�
+        # note: 绑定参数后意味着线路已经改变，需要重新构建线路
         new_circuit = QCircuit(backend=self.backend, name=self.name)
         new_circuit.allocate(qubits=self.num_qubits)
         new_circuit.set_cmds(self.cmds)
