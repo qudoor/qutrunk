@@ -1,7 +1,7 @@
 """Self-decrement operation."""
 
 from qutrunk.circuit import Qureg
-from qutrunk.circuit.ops.operator import Operator, OperatorContext
+from qutrunk.circuit.ops.operator import Operator
 from qutrunk.circuit.gates import X, MCX
 
 

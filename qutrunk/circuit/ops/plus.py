@@ -44,8 +44,5 @@ class Plus(QSP):
         """Process plus state."""
         All(H) * qureg
 
-    def _append_statement(self, qureg: Qureg):
-        qureg.circuit.append_statement("PLUS * q")
-
 
 PLUS = Plus()

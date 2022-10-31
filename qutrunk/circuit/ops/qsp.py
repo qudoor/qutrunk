@@ -39,6 +39,3 @@ class QSP(Operator):
     def _process_state(self):
         pass
 
-    @abstractmethod
-    def _append_statement(self):
-        pass
