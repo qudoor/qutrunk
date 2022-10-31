@@ -77,8 +77,3 @@ class AMP(QSP):
         cmd.cmdex.amp.numamps = self.numamps
 
         self.commit(qureg.circuit, cmd)
-
-    def _append_statement(self, qureg: Qureg):
-        qureg.circuit.append_statement(
-            f"AMP({self.classicvector}, {self.startind}, {self.numamps}) * q"
-        )

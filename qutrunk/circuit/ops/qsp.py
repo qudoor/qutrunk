@@ -31,8 +31,6 @@ class QSP(Operator):
         with OperatorContext(qureg.circuit) as oc:
             self._process_state(qureg)
 
-        self._append_statement(qureg)
-
     @abstractmethod
     def _check_state(self):
         pass

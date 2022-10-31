@@ -68,6 +68,3 @@ class Classical(QSP):
         for i, _ in enumerate(qureg):
             if bit_strs[i] == "1":
                 X * qureg[i]
-
-    def _append_statement(self, qureg: Qureg):
-        qureg.circuit.append_statement(f"Classical('{self.state}') * q")
