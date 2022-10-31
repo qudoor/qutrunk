@@ -70,7 +70,7 @@ class ZGate(BasicGate, Observable):
         return pauli 
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = ZGate()
         gate.is_inverse = not self.is_inverse
         return gate
@@ -150,7 +150,7 @@ class MCZ(BasicGate):
             return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = MCZ(self.ctrl_cnt)
         gate.is_inverse = not self.is_inverse
         return gate

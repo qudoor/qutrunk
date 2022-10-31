@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Union
 
-from qutrunk.circuit.ops.operator import Operator, OperatorContext
+from qutrunk.circuit.ops.operator import Operator
 from qutrunk.circuit import Qureg
 
 
@@ -28,10 +28,7 @@ class QSP(Operator):
         if not self._check_state(qureg):
             raise ValueError(f"Invalid ('{self.state}') state.")
 
-        with OperatorContext(qureg.circuit) as oc:
-            self._process_state(qureg)
-
-        self._append_statement(qureg)
+        self._process_state(qureg)
 
     @abstractmethod
     def _check_state(self):
@@ -41,6 +38,3 @@ class QSP(Operator):
     def _process_state(self):
         pass
 
-    @abstractmethod
-    def _append_statement(self):
-        pass

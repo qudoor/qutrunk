@@ -19,7 +19,7 @@ class Plus(QSP):
             circuit = QCircuit()
             qureg = circuit.allocate(2)
             PLUS * qureg
-            print(circuit.get_all_state())
+            print(circuit.get_statevector())
     """
 
     def __init__(self):
@@ -43,9 +43,6 @@ class Plus(QSP):
     def _process_state(self, qureg: Qureg):
         """Process plus state."""
         All(H) * qureg
-
-    def _append_statement(self, qureg: Qureg):
-        qureg.circuit.append_statement("PLUS * q")
 
 
 PLUS = Plus()
