@@ -599,21 +599,6 @@ class QCircuit:
         if self.counter:
             self.counter.show_verbose()
 
-    # TODO: need to improve.
-    def enter_op(self):
-        """Mark circuit in Operator Context."""
-        self._in_op = True
-
-    # TODO: need to improve.
-    def exit_op(self):
-        """Mark circuit out Operator Context."""
-        self._in_op = False
-
-    # TODO: need to improve.
-    def in_op(self):
-        """Get circuit Operator Context."""
-        return self._in_op
-
 
 class QCircuitIter:
     """The iterator for circuit.
