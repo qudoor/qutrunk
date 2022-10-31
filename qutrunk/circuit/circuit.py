@@ -499,7 +499,7 @@ class QCircuit:
             )
         return self.backend.get_expec_pauli_sum(paulis, coeffs)
 
-    def _dump_qusl(self, file, unroll=True):
+    def _dump_qusl(self, file):
         with open(file, "w", encoding="utf-8") as f:
             qusl_data = {}
             qusl_data["target"] = "QuSL"
@@ -509,12 +509,8 @@ class QCircuit:
             qusl_data["meta"] = meta
 
             inst = []
-            if unroll:
-                for c in self:
-                    inst.append(c.qusl() + "\n")
-            else:
-                for stm in self.statements:
-                    inst.append(stm + "\n")
+            for c in self.cmds:
+                inst.append(c.qusl() + "\n")
 
             qusl_data["code"] = inst
             f.write(json.dumps(qusl_data))
@@ -522,46 +518,34 @@ class QCircuit:
     def _dump_openqasm(self, file):
         with open(file, "w", encoding="utf-8") as f:
             f.write("OPENQASM 2.0;\n")
-            f.write('include "qulib1.inc";\n')
+            f.write('include "qelib1.inc";\n')
             f.write(f"qreg q[{str(len(self.qreg))}];\n")
             f.write(f"creg c[{str(len(self.qreg))}];\n")
-            for c in self:
+            for c in self.cmds:
                 f.write(c.qasm() + ";\n")
 
-    def dump(self, file=None, format=None, unroll=True):
+    def dump(self, file=None, format=None):
         """Serialize Quantum circuit as a JSON formatted stream to file.
 
         Args:
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
             file: Dump the qutrunk instruction to file(json format).
         """
         if file is None:
             raise Exception("file argument need to be supplied.")
 
         if format is None or format == "qusl":
-            self._dump_qusl(file, unroll)
+            self._dump_qusl(file)
 
         if format == "openqasm":
             self._dump_openqasm(file)
 
-    def _print_qusl(self, unroll):
-        """Print quantum circuit in qutrunk form.
-
-        Args:
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
-        """
+    def _print_qusl(self):
+        """Print quantum circuit in qutrunk form."""
         print(f"qreg q[{str(len(self.qreg))}]")
         print(f"creg c[{str(len(self.qreg))}]")
-        if unroll:
-            for c in self:
-                print(c.qusl())
-        else:
-            for stm in self.statements:
-                print(stm)
+
+        for c in self.cmds:
+            print(c.qusl())
 
     def _print_qasm(self):
         """Print quantum circuit in OpenQASM form."""
@@ -569,20 +553,17 @@ class QCircuit:
         print('include "qulib1.inc";')
         print(f"qreg q[{str(len(self.qreg))}];")
         print(f"creg c[{str(len(self.qreg))}];")
-        for c in self:
+        for c in self.cmds:
             print(c.qasm() + ";")
 
-    def print(self, format=None, unroll=True):
+    def print(self, format=None):
         """Print quantum circuit.
 
         Args:
             format(str): The format of needed to print, Default to qusl. options are "qusl" or "openqasm".
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
         """
         if format is None or format == "qusl":
-            self._print_qusl(unroll)
+            self._print_qusl()
 
         if format == "openqasm":
             self._print_qasm()
