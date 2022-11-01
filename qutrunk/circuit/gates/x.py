@@ -67,7 +67,7 @@ class XGate(BasicGate, Observable):
         return pauli
 
     def inv(self):
-        """Apply inverse gate."""
+        """Return inverted NOT gate (itself)."""
         gate = XGate()
         gate.is_inverse = not self.is_inverse
         return gate

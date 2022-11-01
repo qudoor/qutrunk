@@ -70,7 +70,7 @@ class ZGate(BasicGate, Observable):
         return pauli 
 
     def inv(self):
-        """Apply inverse gate."""
+        """Return inverted Z gate (itself)."""
         gate = ZGate()
         gate.is_inverse = not self.is_inverse
         return gate

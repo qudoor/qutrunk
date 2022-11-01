@@ -57,7 +57,7 @@ class HGate(BasicGate):
         self.__str__()
 
     def inv(self):
-        """Apply inverse gate."""
+        """Return inverted H gate (itself)."""
         gate = HGate()
         gate.is_inverse = not self.is_inverse 
         return gate

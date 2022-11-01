@@ -1,6 +1,5 @@
 import numpy as np
 
-
 from qutrunk.circuit.gates import Y
 from qutrunk.circuit import QCircuit
 from qutrunk.test.global_parameters import ZERO_STATE
