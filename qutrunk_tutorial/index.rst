@@ -9,10 +9,12 @@ QuTrunk
 
 .. toctree::
    :maxdepth: 1
-   :caption: 量子门
+   :caption: 使用教程
 
-   Gate/gate1  
-   Gate/gate2  
+   circuit 
+   gate
+   operator
+   backend
 
 .. toctree::
    :maxdepth: 1
