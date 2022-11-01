@@ -1054,6 +1054,7 @@ class Simulator:
         for i in range(self.total_num_amps):
             real = self.real[i]
             imag = self.imag[i]
+            # TODO: need to improve.
             if self.real[i] > -1e-15 and self.real[i] < 1e-15:
                 real = 0
             if self.imag[i] > -1e-15 and self.imag[i] < 1e-15:

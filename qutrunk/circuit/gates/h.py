@@ -49,7 +49,7 @@ class HGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return 1.0 / cmath.sqrt(2.0) * np.matrix([[1, 1], [1, -1]])
+        return 1.0 / cmath.sqrt(2.0) * np.array([[1, 1], [1, -1]])
 
     @property
     def label(self):
