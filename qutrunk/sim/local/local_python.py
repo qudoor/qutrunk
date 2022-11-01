@@ -540,11 +540,10 @@ class BackendLocalPython:
         self.sim.pauli_x(cmd.targets[0])
 
     def y(self, cmd):
-        """
-        The single-qubit Pauli-Y gate.
+        """The single-qubit Pauli-Y gate.
 
-            Args:
-                cmd: the Command object.
+        Args:
+            cmd: the Command object.
         """
         targets_len = len(cmd.targets)
         if targets_len != 1:
@@ -661,6 +660,7 @@ class BackendLocalPython:
     def cy(self, cmd):
         # inverse is the same
         if len(cmd.targets) != 1 or len(cmd.controls) != 1:
+            # TODO: need to improve.
             return
 
         self.sim.cy(cmd.controls[0], cmd.targets[0])
