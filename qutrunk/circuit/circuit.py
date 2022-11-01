@@ -331,7 +331,7 @@ class QCircuit:
         except KeyError:
             raise Exception(f"Could not locate provided bit:{bit}")
 
-    def parameter(self, name: str):
+    def create_parameter(self, name: str):
         """
         Allocate one Parameter object.
 
@@ -345,7 +345,7 @@ class QCircuit:
         self.param_dict[name] = p
         return p
 
-    def parameters(self, names: list)->tuple:
+    def create_parameters(self, names: list)->tuple:
         """
         Allocate a batch of parameters.
 
@@ -357,7 +357,7 @@ class QCircuit:
         """ 
         params = []
         for name in names:
-            params.append(self.parameter(name))
+            params.append(self.create_parameter(name))
 
         return tuple(params)
 
