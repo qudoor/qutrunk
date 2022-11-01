@@ -20,10 +20,10 @@ QuTrunk
    :maxdepth: 1
    :caption: API
 
-   Bpp/backends
-   Cpp3/gates
+   Cpp2/circuit
+   Cpp3/gates 
    Cpp4/ops
-   Cpp2/circuit  
+   Bpp/backends 
    Epp1/example   
 
   
