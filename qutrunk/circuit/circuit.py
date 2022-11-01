@@ -49,8 +49,6 @@ class QCircuit:
     ):
         self.qreg = None
         self.creg = None
-        # record the original statement: gate or operator
-        self.statements = []
         self.cmds = []
         self.cmd_cursor = 0
         self.counter = None
@@ -152,14 +150,6 @@ class QCircuit:
             raise QuTrunkError("The target circuit must have the same qubits as current circuit.")
         for cmd in circuit.cmds:
             self.append_cmd(cmd)
-
-    def append_statement(self, statement):
-        """Append the origin statement when apply gate or operator.
-
-        Args:
-            statement: The statement when apply gate or operator.
-        """
-        self.statements.append(statement)
 
     # TODO: need to improve.
     def forward(self, num):
