@@ -48,7 +48,7 @@ class XGate(BasicGate, Observable):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.matrix([[0, 1], [1, 0]])
+        return np.array([[0, 1], [1, 0]])
 
     def __call__(self, target):
         """
