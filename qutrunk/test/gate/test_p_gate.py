@@ -22,7 +22,7 @@ def test_p_gate():
 
 
 def test_p_inverse_gate():
-    """Test P gate."""
+    """Test the inverse of P gate."""
     # local backend
     circuit = QCircuit()
     qr = circuit.allocate(1)
