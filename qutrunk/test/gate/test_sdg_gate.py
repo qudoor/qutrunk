@@ -20,7 +20,7 @@ def test_sdg_gate():
     assert np.allclose(result_backend, result_math)
 
 
-def test_s_inverse_gate():
+def test_sdg_inverse_gate():
     """Test the inverse of Sdg gate."""
     # local backend
     circuit = QCircuit()
