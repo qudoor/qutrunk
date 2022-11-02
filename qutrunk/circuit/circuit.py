@@ -381,7 +381,7 @@ class QCircuit:
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-        # 1 参数是否在参数表�
+        # 1 参数是否在参数表
         parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key
