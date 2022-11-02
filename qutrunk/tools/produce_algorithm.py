@@ -47,9 +47,9 @@ def algorithm(file: dict):
         f.write("Tree = lambda: defaultdict(Tree)\n")
         f.write("tree = Tree()\n")
         c = [
-            "for index, item in enumerate(outcome):\n",
-            "    i = str(bin(index))[2:]\n",
-            "    tree['probs'][i]['probability'] = item\n",
+            "for _, item in enumerate(outcome):\n",
+            "    i = str(bin(item['idx']))[2:]\n",
+            "    tree['probs'][i]['probability'] = item['prob']\n",
             "    tree['probs'][i]['angle'] = 0\n",
         ]
         f.writelines(c)

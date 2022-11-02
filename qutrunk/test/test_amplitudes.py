@@ -28,7 +28,7 @@ def test_amplitudes_local():
         res[startind] = ','.join([str(qr.circuit.cmds[0].cmdex.amp.reals[i]), str(qr.circuit.cmds[0].cmdex.amp.imags[i])])
         startind += 1
 
-    res_box = circuit.get_all_state()
+    res_box = circuit.get_statevector()
 
     # 检查数据是否一致
     assert check_all_state(res, res_box)
@@ -57,7 +57,7 @@ def test_amplitudes_qusprout():
         res[startind] = ','.join([str(qr.circuit.cmds[0].cmdex.amp.reals[i]), str(qr.circuit.cmds[0].cmdex.amp.imags[i])])
         startind += 1
 
-    res_box = circuit.get_all_state()
+    res_box = circuit.get_statevector()
 
     # 检查数据是否一致
     assert check_all_state(res, res_box)

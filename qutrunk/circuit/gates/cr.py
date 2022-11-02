@@ -77,7 +77,7 @@ class CR(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         # note: 状态相关方法需要重新生成一个新对象
         gate = CR(self.rotation)
         gate.is_inverse = not self.is_inverse 

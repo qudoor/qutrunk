@@ -8,7 +8,7 @@ from qutrunk.circuit.ops import Classical
 PRECISION = 1e-10
 
 
-def apply_oracle(qr, num_qubits, secret):
+def _apply_oracle(qr, num_qubits, secret):
     bits = secret
     for q in range(1, num_qubits):
         # extract the (q-1)-th bit of secret
@@ -35,7 +35,7 @@ def apply_bernstein_vazirani(num_qubits, secret):
     for q in range(num_qubits):
         H * qr[q]
 
-    apply_oracle(qr, num_qubits, secret)
+    _apply_oracle(qr, num_qubits, secret)
 
     # H all qubits, including the ancilla
     for q in range(num_qubits):

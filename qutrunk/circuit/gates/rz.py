@@ -66,7 +66,7 @@ class Rz(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Rz(self.rotation)
         gate.is_inverse = not self.is_inverse 
         return gate

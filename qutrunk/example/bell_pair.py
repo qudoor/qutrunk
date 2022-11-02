@@ -19,7 +19,7 @@ def run_bell_pair(backend=None):
 
     # Print quantum circuit
     qc.print()
-    # qc.dump(file="bell_pair.qusl")
+    # qc.dump(file="bell_pair.qasm", format="openqasm")
 
     # Run quantum circuit with 100 times
     res = qc.run(shots=100)

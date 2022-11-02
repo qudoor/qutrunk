@@ -4,10 +4,10 @@ qutrunk.example package
 Submodules
 ----------
 
-qutrunk.example.allgates module
+qutrunk.example.addition module
 -------------------------------
 
-.. automodule:: qutrunk.example.allgates
+.. automodule:: qutrunk.example.addition
    :members:
    :undoc-members:
    :show-inheritance:
@@ -76,6 +76,22 @@ qutrunk.example.openqasm\_parse module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.example.phase\_estimation module
+----------------------------------------
+
+.. automodule:: qutrunk.example.phase_estimation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+qutrunk.example.phase\_kickback module
+--------------------------------------
+
+.. automodule:: qutrunk.example.phase_kickback
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qutrunk.example.qft module
 --------------------------
 
@@ -96,14 +112,6 @@ qutrunk.example.random\_byte module
 -----------------------------------
 
 .. automodule:: qutrunk.example.random_byte
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.teleport module
--------------------------------
-
-.. automodule:: qutrunk.example.teleport
    :members:
    :undoc-members:
    :show-inheritance:

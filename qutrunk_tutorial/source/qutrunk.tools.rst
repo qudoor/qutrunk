@@ -44,6 +44,14 @@ qutrunk.tools.get\_config module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.tools.platform module
+-----------------------------
+
+.. automodule:: qutrunk.tools.platform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qutrunk.tools.produce\_algorithm module
 ---------------------------------------
 

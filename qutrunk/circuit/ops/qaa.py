@@ -1,6 +1,6 @@
 """Definition of the quantum amplitude amplification Operator."""
 
-from .operator import Operator, OperatorContext
+from .operator import Operator
 from qutrunk.circuit import Qureg
 from qutrunk.circuit.gates import X, MCZ, All, H
 
@@ -30,7 +30,7 @@ class QAA(Operator):
         and then the state value of 7 is selected as the marker value.
         Three times of QAA iterative calculation are performed.
         The result obtained after the operation is that the probability of
-        the corresponding state of 7 exceeds 96%
+        the corresponding state of 7 exceeds 96%.
     """
 
     def __init__(self, iterations, marked_index):
@@ -46,17 +46,12 @@ class QAA(Operator):
         if self.marked_index < 0 or self.marked_index >= 2 ** len(qureg):
             raise ValueError("The marked index value exceed 2 ** len(qureg).")
 
-        with OperatorContext(qureg.circuit):
-            for i in range(self.iterations):
-                self._flip_process(qureg)
-                self._imag_process(qureg)
-                # show intermediate process
-                prob_amp = qureg.circuit.get_prob(self.marked_index)
-                print(f"prob of state |{self.marked_index}> = {prob_amp}")
-
-        qureg.circuit.append_statement(
-            f"QAA({self.iterations}, {self.marked_index}) * q"
-        )
+        for i in range(self.iterations):
+            self._flip_process(qureg)
+            self._imag_process(qureg)
+            # show intermediate process
+            prob_amp = qureg.circuit.get_prob(self.marked_index)
+            print(f"prob of state |{self.marked_index}> = {prob_amp}")
 
     def _flip_process(self, qureg):
         """Flit the phase of target qubit.

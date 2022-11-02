@@ -14,13 +14,13 @@ def test_cu_gate():
     circuit = QCircuit()
     qr = circuit.allocate(2)
     CU(pi / 2, pi / 2, pi / 2, pi / 2) * (qr[0], qr[1])
-    res = circuit.get_all_state()
+    res = circuit.get_statevector()
 
     # 使用BackendQuSprout量子计算模拟器
     circuit_box = QCircuit(backend=BackendQuSprout())
     qr_box = circuit_box.allocate(2)
     CU(pi / 2, pi / 2, pi / 2, pi / 2) * (qr_box[0], qr_box[1])
-    res_box = circuit_box.get_all_state()
+    res_box = circuit_box.get_statevector()
 
     # 检查数据是否一致
     assert check_all_state(res, res_box)
@@ -32,7 +32,7 @@ def test_cu_inverse_gate():
     circuit = QCircuit()
     qr = circuit.allocate(2)
     # 获取原始数据
-    org_res = circuit.get_all_state()
+    org_res = circuit.get_statevector()
 
     # 进行逆操作
     CU(pi / 2, pi / 2, pi / 2, pi / 2) * (qr[0], qr[1])
@@ -40,7 +40,7 @@ def test_cu_inverse_gate():
     circuit.cmds[1].inverse = True
 
     # 获取逆操作后数据
-    final_res = circuit.get_all_state()
+    final_res = circuit.get_statevector()
 
     # 检查逆操作前后数据是否一致
     assert check_all_state_inverse(org_res, final_res)
