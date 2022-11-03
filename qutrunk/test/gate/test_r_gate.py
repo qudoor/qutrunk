@@ -35,8 +35,6 @@ def test_r_inverse_gate():
     theta = -pi / 2
     phi = pi / 2
 
-    cos = np.cos(theta / 2)
-
     a00 = np.cos(theta / 2)
     a01 = complex(np.sin(-phi) * np.sin(theta / 2), -1 * np.cos(-phi) * np.sin(theta / 2))
     a10 = complex(np.sin(phi) * np.sin(theta / 2), -1 * np.cos(phi) * np.sin(theta / 2))
