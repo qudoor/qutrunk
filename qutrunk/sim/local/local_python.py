@@ -716,6 +716,7 @@ class BackendLocalPython:
         lam = cmd.rotation[1]
 
         if cmd.inverse:
+            # TODO: need to improve.
             phi1 = -lam - pi
             lam1 = -phi + pi
             phi = phi1
