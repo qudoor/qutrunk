@@ -13,14 +13,14 @@ class Increment(Operator):
 
             from qutrunk.circuit import QCircuit
             from qutrunk.circuit.gates import Measure, All
-            from qutrunk.circuit.ops import QSP
+            from qutrunk.circuit.ops import Classical
             from qutrunk.circuit.ops import INC
 
             circuit = QCircuit()
             qr = circuit.allocate(4)
-            QSP(0) * qr
+            Classical(0) * qr
             INC * qr
-            All(H) * qr
+            All(Measure) * qr
             res = circuit.run()
             print(res.get_outcome())
 

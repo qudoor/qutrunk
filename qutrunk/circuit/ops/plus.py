@@ -1,10 +1,10 @@
 from qutrunk.circuit.gates import All, H
 from qutrunk.circuit import Qureg
-from qutrunk.circuit.ops import QSP
+from qutrunk.circuit.ops import Operator
 from qutrunk.exceptions import QuTrunkError
 
 
-class Plus(QSP):
+class Plus(Operator):
     """Quantum state preparation Operator.
 
     Init the quantum state to plus state.
@@ -23,7 +23,7 @@ class Plus(QSP):
     """
 
     def __init__(self):
-        super().__init__("+")
+        super().__init__()
 
     def __str__(self):
         return "PLUS"
@@ -32,13 +32,10 @@ class Plus(QSP):
         if qureg.circuit.num_gates > 0:
             raise QuTrunkError("PLUS should be applied at the beginning of circuit.")
 
-        super().__mul__(qureg)
+        if not isinstance(qureg, Qureg):
+            raise TypeError("the operand must be Qureg.")
 
-    def _check_state(self, qureg: Qureg):
-        if self.state == "+":
-            return True
-
-        return False
+        self._process_state(qureg)
 
     def _process_state(self, qureg: Qureg):
         """Process plus state."""

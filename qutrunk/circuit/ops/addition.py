@@ -9,21 +9,21 @@ class ADD(Operator):
     """Addition operation.
 
     Args:
-        number: Addend.
+        number: The value added to circuit.
 
     Example:
         .. code-block:: python
 
             from qutrunk.circuit import QCircuit
             from qutrunk.circuit.gates import Measure, All
-            from qutrunk.circuit.ops import QSP
+            from qutrunk.circuit.ops import Classical
             from qutrunk.circuit.ops import ADD
 
             circuit = QCircuit()
             qr = circuit.allocate(4)
-            QSP(0) * qr
+            Classical(0) * qr
             ADD(3) * qr
-            All(H) * qr
+            All(Measure) * qr
             res = circuit.run()
             print(res.get_outcome())
     """
@@ -31,7 +31,7 @@ class ADD(Operator):
     def __init__(self, number: int):
         super().__init__()
         if number < 0:
-            raise ValueError("number must be more than zero.")
+            raise ValueError("number must be greater than zero.")
         self.number = number
 
     def __mul__(self, qr: Qureg):

@@ -3,18 +3,18 @@ from typing import Optional
 
 from qutrunk.circuit.command import Command, CmdEx, Amplitude
 from qutrunk.circuit import Qureg
-from qutrunk.circuit.ops import QSP
+from qutrunk.circuit.ops import Operator 
 
 
-class AMP(QSP):
+class AMP(Operator):
     """Quantum state preparation Operator.
 
     Init the quantum state to specific amplitude state.
 
     Args:
         classicvector: The amplitude state list.
-        startind: The amplitude start index
-        numamps: The number of amplitude
+        startind: The amplitude start index.
+        numamps: The number of amplitude.
 
     Example:
         .. code-block:: python
@@ -35,13 +35,23 @@ class AMP(QSP):
         startind: Optional[int] = None,
         numamps: Optional[int] = None,
     ):
-        super().__init__("AMP")
+        super().__init__()
         self.classicvector = classicvector
         self.startind = startind
         self.numamps = numamps
 
     def __str__(self):
         return "AMP"
+
+    def __mul__(self, qureg: Qureg):
+        """Apply the AMP encode operator."""
+        if not isinstance(qureg, Qureg):
+            raise TypeError("the operand must be Qureg.")
+
+        if not self._check_state(qureg):
+            raise ValueError(f"Invalid state: {self.classicvector}, {self.startind}, {self.numamps}")
+
+        self._process_state(qureg)
 
     def _check_state(self, qureg: Qureg):
         if self.startind is None:

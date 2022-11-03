@@ -23,7 +23,7 @@ class QPE(Operator):
                 return int("".join(map(str, reversed(itrable))), base=2)
 
             # allocate
-            qc = QCircuit(backend=backend)
+            qc = QCircuit()
             q1, q2 = qc.allocate([3, 1])
 
             # Prepare our eigenstate |psi>
