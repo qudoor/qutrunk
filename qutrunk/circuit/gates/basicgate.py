@@ -95,6 +95,23 @@ class PauliType(Enum):
     PAULI_Y = 2
     PAULI_Z = 3
 
+# todo: 用于封装circuit.expval_pauli方法的参数调用
+class PauliOps:
+    """A list of Pauli Operator."""
+    def __init__(self):
+        self.pauli_ops = []
+
+    def append(self, op):
+        """Append Pauli Operator."""
+        self.pauli_ops.append(op)
+
+    def __lshift__(self, op):
+        self.append(op)
+        return self
+
+    def __getitem__(self, index):
+        return self.pauli_ops[index]
+
 class PauliTerm:
     """Pauli Term consist of Pauli operator and coefficients."""
     def __init__(self, coeff, paulis):
@@ -119,6 +136,10 @@ class PauliTerms:
     def append(self, term):
         """Append Pauli Term."""
         self.pauli_term_list.append(term)
+
+    def __lshift__(self, term):
+        self.append(term)
+        return self
 
     def __getitem__(self, index):
         return self.pauli_term_list[index]
