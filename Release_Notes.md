@@ -1,6 +1,4 @@
-# QuTrunk
-
-### 发布记录
+# QuTrunk发布记录
 
 ---
 <p id="0"></p >
@@ -77,6 +75,6 @@ QuTrunk 是启科量子自主研发的一款免费、开源、跨平台的量子
 ---
 <p id="4"></p >
 
-## For More Information
+## 更多资讯
 为了找到最新的产品信息, 有用的资源, 请访问: http://www.developer.queco.cn/.
 [Back to Top](#0)
