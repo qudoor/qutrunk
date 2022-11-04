@@ -54,7 +54,6 @@ qutrunk_gate_names_to_braket_gates: Dict[str, Callable] = {
     "x1": lambda: [gates.Rx(pi / 2)],
     "y1": lambda: [gates.Ry(pi / 2)],
     "z1": lambda: [gates.Rz(pi / 2)],
-    # todo iSwap? iSwap(-pi/2)
     "iswap": lambda: [gates.Unitary(np.array(i_gates.iSwap.matrix), "iSwap")],
     "sqrtx": lambda: [gates.V()],
     "cr": lambda theta: [gates.Unitary(np.array(i_gates.CR(theta).matrix), "CR")],
