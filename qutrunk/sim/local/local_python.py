@@ -260,6 +260,7 @@ class BackendLocalPython:
         # inverse is the same.
         """
         if len(cmd.targets) != 1 or len(cmd.controls) != 1:
+            # TODO: need to improve.
             return
 
         factor = 1 / math.sqrt(2)
