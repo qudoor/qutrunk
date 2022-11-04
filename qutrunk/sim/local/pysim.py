@@ -1430,7 +1430,7 @@ class Simulator:
             pauli_prod_list = []
             for i in range(num_qb):
                 temp = {}
-                temp["oper_type"] = oper_type_list[t * i]
+                temp["oper_type"] = oper_type_list[t + i] 
                 temp["target"] = targs[i]
                 pauli_prod_list.append(temp)
             value += term_coeff_list[t] * self.get_expec_pauli_prod(pauli_prod_list)

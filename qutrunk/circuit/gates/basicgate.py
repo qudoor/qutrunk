@@ -90,7 +90,36 @@ class Observable:
 class PauliType(Enum):
     """PauliType."""
 
-    POT_PAULI_I = 0
-    POT_PAULI_X = 1
-    POT_PAULI_Y = 2
-    POT_PAULI_Z = 3
+    PAULI_I = 0
+    PAULI_X = 1
+    PAULI_Y = 2
+    PAULI_Z = 3
+
+class PauliTerm:
+    """Pauli Term consist of Pauli operator and coefficients."""
+    def __init__(self, coeff, paulis):
+        self.coeff = coeff
+        self.paulis = [op.value for op in paulis]
+
+    def padding(self, len, op=PauliType.PAULI_I):
+        """Fill paulis by specific pauli operator in len times.
+        
+        Args:
+            len: Times to fill op.
+            op: The target operator filled to paulis, defaul: PauliI.
+        """
+        for i in range(len):
+            self.paulis.append(op.value)
+
+class PauliTerms:
+    """A list of PauliTerm."""
+    def __init__(self):
+        self.pauli_term_list = []
+
+    def append(self, term):
+        """Append Pauli Term."""
+        self.pauli_term_list.append(term)
+
+    def __getitem__(self, index):
+        return self.pauli_term_list[index]
+        

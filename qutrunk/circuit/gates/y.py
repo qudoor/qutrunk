@@ -63,7 +63,7 @@ class YGate(BasicGate, Observable):
                 e.g: [{"oper_type": 1, "target": 0}].
         """
         pauli = {}
-        pauli["oper_type"] = PauliType.POT_PAULI_Y.value
+        pauli["oper_type"] = PauliType.PAULI_Y.value
         pauli["target"] = target.index
         return pauli
 
