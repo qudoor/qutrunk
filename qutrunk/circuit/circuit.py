@@ -308,7 +308,8 @@ class QCircuit:
     def get_statevector(self):
         """Get state vector of circuit."""
         self.backend.send_circuit(self)
-        return self._to_complex(self.backend.get_statevector())
+        result = self._to_complex(self.backend.get_statevector())
+        return np.array(result)
 
     def find_bit(self, bit):
         """Find locations in the circuit.
