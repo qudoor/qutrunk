@@ -6,7 +6,7 @@ import numpy as np
 
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
-from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable, PauliTerms
+from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable, PauliCoeffs
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 from qutrunk.exceptions import QuTrunkError
@@ -468,12 +468,12 @@ class QCircuit:
         expect = self.backend.get_expec_pauli_prod(pauli_list)
         return expect
 
-    def expval_pauli_sum(self, pauli_terms: PauliTerms):
+    def expval_pauli_sum(self, pauli_coeffs: PauliCoeffs):
         """Computes the expected value of a sum of products of Pauli operators.
 
         Args:
-            pauli_terms (PauliTerms): Maintain a list of PauliTerm, each PauliTerm consist of one coefficient \
-                and a series of pauli operators, PauliTerms is used to calculate the sum of Pauli products.
+            pauli_coeffs (PauliCoeffs): Maintain a list of PauliCoeff, each PauliCoeff consist of one coefficient \
+                and a series of pauli operators, PauliCoeffs is used to calculate the sum of Pauli products.
 
          .. note::
 
@@ -489,7 +489,7 @@ class QCircuit:
         self.backend.send_circuit(self)
         paulis = []
         coeffs = []
-        for term in pauli_terms:
+        for term in pauli_coeffs:
             if len(term.paulis) > self.num_qubits:
                 raise ValueError("The length of paulis in each term should be equal to self.num_qubits")
             if len(term.paulis) < self.num_qubits:
