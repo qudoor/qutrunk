@@ -3,7 +3,6 @@
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
-
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -14,8 +13,9 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 import sys
-from pathlib import Path
-qutrunk_path = Path.cwd().parent / "qutrunk"
+from os import path
+# qutrunk_path = Path.cwd().parent / "qutrunk"
+qutrunk_path = path.join(path.dirname(path.dirname(path.abspath(__file__))), "qutrunk")
 print("qutrunk_path=", qutrunk_path)
 sys.path.insert(0, qutrunk_path)
 # TODO:have some problem.
