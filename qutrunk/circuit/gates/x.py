@@ -62,7 +62,7 @@ class XGate(BasicGate, Observable):
                 e.g: [{"oper_type": 1, "target": 0}].
         """
         pauli = {}
-        pauli["oper_type"] = PauliType.POT_PAULI_X.value
+        pauli["oper_type"] = PauliType.PAULI_X.value
         pauli["target"] = target.index
         return pauli
 

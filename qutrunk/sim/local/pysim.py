@@ -1425,12 +1425,14 @@ class Simulator:
             targs.append(q)
 
         value = 0
+        idx = 0
         num_sum_terms = len(term_coeff_list)
         for t in range(num_sum_terms):
             pauli_prod_list = []
             for i in range(num_qb):
                 temp = {}
-                temp["oper_type"] = oper_type_list[t * i]
+                temp["oper_type"] = oper_type_list[idx]
+                idx += 1
                 temp["target"] = targs[i]
                 pauli_prod_list.append(temp)
             value += term_coeff_list[t] * self.get_expec_pauli_prod(pauli_prod_list)
