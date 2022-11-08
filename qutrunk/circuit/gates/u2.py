@@ -7,29 +7,20 @@ from qutrunk.circuit.qubit import QuBit
 
 
 class U2(BasicGate):
-    """U2 gate.
-
-    Args:
-        theta: U2 gate parameter1.
-        phi: U2 gate parameter2.
-
+    """U2 gate, single-qubit rotation about the X+Z axis.
+    
     Example:
         .. code-block:: python
 
             U2(pi/2, pi/2) * qr[0]
     """
 
-    def __init__(self, theta, phi):
-        """
-        Args:
-            theta: U2 gate parameter1.
-            phi: U2 gate parameter2.
-        """
-        if theta is None or phi is None:
+    def __init__(self, phi, lam):
+        if phi is None or lam is None:
             raise ValueError("The argument cannot be empty.")
         super().__init__()
-        self.theta = theta
         self.phi = phi
+        self.lam = lam
 
     def __str__(self):
         return "U2"
@@ -53,7 +44,7 @@ class U2(BasicGate):
 
         targets = [qubit.index]
         cmd = Command(
-            self, targets, rotation=[self.theta, self.phi], inverse=self.is_inverse
+            self, targets, rotation=[self.phi, self.lam], inverse=self.is_inverse
         )
         self.commit(qubit.circuit, cmd)
 
@@ -66,8 +57,8 @@ class U2(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         isqrt2 = 1 / np.sqrt(2)
-        phi = self.theta
-        lam = self.phi
+        phi = self.phi
+        lam = self.lam
         return np.matrix(
             [
                 [isqrt2, -np.exp(1j * lam) * isqrt2],
@@ -77,6 +68,6 @@ class U2(BasicGate):
 
     def inv(self):
         """Apply inverse gate."""
-        gate = U2(self.theta, self.phi)
+        gate = U2(self.phi, self.lam)
         gate.is_inverse = not self.is_inverse
         return gate
