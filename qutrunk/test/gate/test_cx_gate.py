@@ -1,8 +1,7 @@
 import numpy as np
 
-from qutrunk.circuit.gates import CX
+from qutrunk.circuit.gates import CX, X
 from qutrunk.circuit import QCircuit
-from qutrunk.test.global_parameters import ZERO_STATE_2D
 
 
 def test_not_gate():
@@ -10,10 +9,11 @@ def test_not_gate():
     # local backend
     circuit = QCircuit()
     qr = circuit.allocate(2)
+    X * qr[0]
     CX * (qr[0], qr[1])
-    CX * (qr[0], qr[1])
-    result = circuit.get_statevector()
-    result_backend = np.array(result)
+    CX.inv() * (qr[0], qr[1])
+    result_backend = circuit.get_statevector()
 
     # initial state
-    assert np.allclose(result_backend, ZERO_STATE_2D)
+    result = np.array([0, 1, 0, 0])
+    assert np.allclose(result_backend, result)
