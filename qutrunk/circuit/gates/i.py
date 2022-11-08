@@ -56,7 +56,7 @@ class IGate(BasicGate, Observable):
                 e.g: [{"oper_type": 1, "target": 0}].
         """
         pauli = {}
-        pauli["oper_type"] = PauliType.POT_PAULI_I.value
+        pauli["oper_type"] = PauliType.PAULI_I.value
         pauli["target"] = target.index
         return pauli
 

@@ -90,7 +90,57 @@ class Observable:
 class PauliType(Enum):
     """PauliType."""
 
-    POT_PAULI_I = 0
-    POT_PAULI_X = 1
-    POT_PAULI_Y = 2
-    POT_PAULI_Z = 3
+    PAULI_I = 0
+    PAULI_X = 1
+    PAULI_Y = 2
+    PAULI_Z = 3
+
+# todo: 用于封装circuit.expval_pauli方法的参数调用
+class PauliOps:
+    """A list of Pauli Operator."""
+    def __init__(self):
+        self.pauli_ops = []
+
+    def append(self, op):
+        """Append Pauli Operator."""
+        self.pauli_ops.append(op)
+
+    def __lshift__(self, op):
+        self.append(op)
+        return self
+
+    def __getitem__(self, index):
+        return self.pauli_ops[index]
+
+class PauliCoeff:
+    """Pauli Coeff consist of Pauli operator and coefficients."""
+    def __init__(self, coeff, paulis):
+        self.coeff = coeff
+        self.paulis = [op.value for op in paulis]
+
+    def padding(self, len, op=PauliType.PAULI_I):
+        """Fill paulis by specific pauli operator in len times.
+        
+        Args:
+            len: Times to fill op.
+            op: The target operator filled to paulis, defaul: PauliI.
+        """
+        for i in range(len):
+            self.paulis.append(op.value)
+
+class PauliCoeffs:
+    """A list of PauliCoeff."""
+    def __init__(self):
+        self.pauli_term_list = []
+
+    def append(self, term):
+        """Append PaulCoeff term."""
+        self.pauli_term_list.append(term)
+
+    def __lshift__(self, term):
+        self.append(term)
+        return self
+
+    def __getitem__(self, index):
+        return self.pauli_term_list[index]
+        

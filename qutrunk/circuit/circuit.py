@@ -6,7 +6,7 @@ import numpy as np
 
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
-from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable
+from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable, PauliCoeffs
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 from qutrunk.exceptions import QuTrunkError
@@ -49,8 +49,6 @@ class QCircuit:
     ):
         self.qreg = None
         self.creg = None
-        # record the original statement: gate or operator
-        self.statements = []
         self.cmds = []
         self.cmd_cursor = 0
         self.counter = None
@@ -152,14 +150,6 @@ class QCircuit:
             raise QuTrunkError("The target circuit must have the same qubits as current circuit.")
         for cmd in circuit.cmds:
             self.append_cmd(cmd)
-
-    def append_statement(self, statement):
-        """Append the origin statement when apply gate or operator.
-
-        Args:
-            statement: The statement when apply gate or operator.
-        """
-        self.statements.append(statement)
 
     # TODO: need to improve.
     def forward(self, num):
@@ -332,9 +322,9 @@ class QCircuit:
         except KeyError:
             raise Exception(f"Could not locate provided bit:{bit}")
 
-    def parameter(self, name: str):
+    def create_parameter(self, name: str):
         """
-        Get a new object of Parameter.
+        Allocate one Parameter object.
 
         Args:
             name(str): Parameter name.
@@ -346,33 +336,34 @@ class QCircuit:
         self.param_dict[name] = p
         return p
 
-    def parameters(self, names: list)->tuple:
+    def create_parameters(self, names: list)->tuple:
         """
-        Get a collection of Parameter.
+        Allocate a batch of parameters.
 
         Args:
-            names(list): A list of Parameter name.
+            names(list): A list of parameter's name.
 
         Returns:
-            Tuple contains Parameter object
+            tuple: a batch of parameters. 
         """ 
         params = []
         for name in names:
-            params.append(self.parameter(name))
+            params.append(self.create_parameter(name))
 
         return tuple(params)
 
-    def get_parameter(self, name):
-        """get the object of Parameter.
+    def get_parameters(self):
+        """Get all parameters of circuit.
 
         Args:
-            name(str): Parameter name.
+            list: all parameters in circuit.
         """
-        return self.param_dict[name]
+        param_values = [param.value for param in self.param_dict.values()]
+        return param_values
 
     def bind_parameters(self, params):
         """
-        Assign numeric parameters to parameters.
+        Assign specific value to parameters.
 
         Args:
             params (dict): {parameter: value, ...}.
@@ -399,24 +390,13 @@ class QCircuit:
         for k, v in params.items():
             param = self.param_dict[k]
             param.update(v)
+            
 
         # note: 绑定参数后意味着线路已经改变，需要重新构建线路
         new_circuit = QCircuit(backend=self.backend, name=self.name)
         new_circuit.allocate(qubits=self.num_qubits)
         new_circuit.set_cmds(self.cmds)
         return new_circuit
-
-    def get_parameter_value(self, name):
-        """get the value of Parameter.
-
-        Args:
-            name(str): Parameter name.
-        """
-        for k, v in self.param_dict.items():
-            if name == k:
-                return v.value
-
-        return None
 
     def inverse(self):
         """Invert this circuit.
@@ -489,21 +469,35 @@ class QCircuit:
         expect = self.backend.get_expec_pauli_prod(pauli_list)
         return expect
 
-    def expval_pauli_sum(self, paulis, coeffs, qubitnum=0):
+    def expval_pauli_sum(self, pauli_coeffs: PauliCoeffs):
         """Computes the expected value of a sum of products of Pauli operators.
 
         Args:
-            paulis (list[int]): Pauli operators.
-            coeffs (list[float]): The coefficients of each term in the sum of Pauli products.
+            pauli_coeffs (PauliCoeffs): Maintain a list of PauliCoeff, each PauliCoeff consist of one coefficient \
+                and a series of pauli operators, PauliCoeffs is used to calculate the sum of Pauli products.
+
+         .. note::
+
+            The length of paulis in each term should be equal to self.num_qubits, otherwise \
+                PauliI operator will be filled automatically.
 
         Returns:
-            Returns the operation type and the coefficients of each term in the sum of Pauli products.
+            Returns the sum of Pauli products.
+
+        Raises:
+            ValueError: If the length of paulis in each term greater than self.num_qubits.
         """
         self.backend.send_circuit(self)
-        if (qubitnum != 0) and (len(coeffs) * qubitnum) != len(paulis):
-            raise AttributeError(
-                "Parameter error: The number of parameters is not correct."
-            )
+        paulis = []
+        coeffs = []
+        for term in pauli_coeffs:
+            if len(term.paulis) > self.num_qubits:
+                raise ValueError("The length of paulis in each term should be equal to self.num_qubits")
+            if len(term.paulis) < self.num_qubits:
+                term.padding(self.num_qubits - len(term.paulis))
+            coeffs.append(term.coeff)
+            paulis.extend(term.paulis)
+
         return self.backend.get_expec_pauli_sum(paulis, coeffs)
 
     def _dump_qusl(self, file):

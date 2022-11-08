@@ -195,8 +195,10 @@ QuSL量子汇编提供三个层面的量子操作语句实现，分别是：基�
     qubits = list(qreg)[::-2]
     QFT * qubits
 	
-    //QSP: 量子态制备算子
-    QSP("+") * qreg (对qreg中的所有量子比特进行QSP操作)
+    //AMP: 通过振幅编码制备任意量子态
+    circuit = QCircuit()
+    qureg = circuit.allocate(2)
+    AMP([1-2j, 2+3j, 3-4j, 0.5+0.7j], 1, 2) * qureg
 
 
 3.Meta: 量子元操作（需要配合其他基础量子门实现特定运算，一般不单独使用）

@@ -60,6 +60,30 @@ class QFTOps(Operator):
 
 
 class IQFTOps(Operator):
+    """Inverse Quantum Fourier Transfer Operator.
+
+    Example:
+        .. code-block:: python
+
+            from qutrunk.circuit import QCircuit
+            from qutrunk.circuit.gates import All, Measure
+            from qutrunk.circuit.ops import IQFT
+
+            circuit = QCircuit()
+            qreg = circuit.allocate(5)
+
+            IQFT * qreg
+
+            print(circuit.draw(line_length=1000))
+            state = circuit.get_statevector()
+            print(state)
+
+            All(Measure) * qreg
+
+            res = circuit.run(shots=1000)
+            print(res.get_counts())
+
+    """
     def __init__(self):
         super().__init__()
 
