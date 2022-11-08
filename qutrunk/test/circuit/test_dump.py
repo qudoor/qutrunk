@@ -34,7 +34,7 @@ def test_dump_openqasm():
     Measure * qreg[1]
 
     qc.dump(file="b.qasm", format="openqasm")
-    expect_out = ['OPENQASM 2.0;\n', 'include "qulib1.inc";\n', 'qreg q[2];\n', 'creg c[2];\n', 'h q[0];\n',
+    expect_out = ['OPENQASM 2.0;\n', 'include "qelib1.inc";\n', 'qreg q[2];\n', 'creg c[2];\n', 'h q[0];\n',
                   'cx q[0],q[1];\n', 'measure q[0] -> c[0];\n', 'measure q[1] -> c[1];\n']
 
     with open("b.qasm", "r") as stream:
