@@ -4,7 +4,7 @@ from qutrunk.circuit.gates import CX, X
 from qutrunk.circuit import QCircuit
 
 
-def test_not_gate():
+def test_cx_gate():
     """Test CX gate."""
     # local backend
     circuit = QCircuit()
