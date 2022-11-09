@@ -13,10 +13,11 @@ def test_dump_qusl():
     Measure * qreg[0]
     Measure * qreg[1]
 
-    qc.dump(file="a.qusl", format="qusl")
+    qc.dump(file="bell_pair.qusl", format="qusl")
     expect_out = '"code": ["H * q[0]\\n", "MCX(1) * (q[0], q[1])\\n", "Measure * q[0]\\n", "Measure * q[1]\\n"]'
 
-    with open("a.qusl", "r") as stream:
+    # TODO: json??
+    with open("bell_pair.qusl", "r") as stream:
         container = stream.readline()
         circuit_out = container[container.rfind("code") - 1:-1]
 
@@ -33,11 +34,11 @@ def test_dump_openqasm():
     Measure * qreg[0]
     Measure * qreg[1]
 
-    qc.dump(file="b.qasm", format="openqasm")
+    qc.dump(file="bell_pair.qasm", format="openqasm")
     expect_out = ['OPENQASM 2.0;\n', 'include "qelib1.inc";\n', 'qreg q[2];\n', 'creg c[2];\n', 'h q[0];\n',
                   'cx q[0],q[1];\n', 'measure q[0] -> c[0];\n', 'measure q[1] -> c[1];\n']
 
-    with open("b.qasm", "r") as stream:
+    with open("bell_pair.qasm", "r") as stream:
         circuit_out = stream.readlines()
 
     assert circuit_out == expect_out
