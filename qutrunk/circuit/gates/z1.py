@@ -44,7 +44,7 @@ class Z1Gate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.matrix(
+        return np.array(
             [[np.exp(-1j * cmath.pi / 4), 0], [0, np.exp(1j * cmath.pi / 4)]]
         )
 

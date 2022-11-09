@@ -53,7 +53,7 @@ class U3(BasicGate):
                 U3(pi/2,pi/2,pi/2) * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
             raise TypeError("The argument must be Qubit object.")

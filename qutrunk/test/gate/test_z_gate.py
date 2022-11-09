@@ -1,50 +1,37 @@
-import pytest
+import numpy as np
 
-from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Z
-from qutrunk.backends import BackendQuSprout
-from check_all_state import check_all_state
-from check_all_state_inverse import check_all_state_inverse
+from qutrunk.circuit import QCircuit
+from qutrunk.test.global_parameters import ZERO_STATE
 
 
 def test_z_gate():
-    """测试Z门"""
-    # 使用本地量子计算模拟器
+    """Test Z gate."""
+    # local backend
     circuit = QCircuit()
     qr = circuit.allocate(1)
     Z * qr[0]
-    res = circuit.get_statevector()
+    result = circuit.get_statevector()
 
-    # 使用BackendQuSprout量子计算模拟器
-    circuit_box = QCircuit(backend=BackendQuSprout())
-    qr_box = circuit_box.allocate(1)
-    Z * qr_box[0]
-    res_box = circuit_box.get_statevector()
+    result_backend = np.array(result).reshape(-1, 1)
 
-    # 检查数据是否一致
-    assert check_all_state(res, res_box)
+    # math
+    result_math = np.dot(Z.matrix, ZERO_STATE)
+
+    assert np.allclose(result_backend, result_math)
 
 
 def test_z_inverse_gate():
-    """测试反转电路"""
-    # 使用本地量子计算模拟器
+    """Test the inverse of Z gate."""
+    # local backend
     circuit = QCircuit()
-    qr = circuit.allocate(2)
-    # 获取原始数据
-    org_res = circuit.get_statevector()
+    qr = circuit.allocate(1)
+    Z.inv() * qr[0]
+    result = circuit.get_statevector()
 
-    # 进行逆操作
-    Z * qr[0]
-    Z * qr[0]
-    circuit.cmds[1].inverse = True
+    result_backend = np.array(result).reshape(-1, 1)
 
-    # 获取逆操作后数据
-    final_res = circuit.get_statevector()
+    # math
+    result_math = np.dot(Z.matrix, ZERO_STATE)
 
-    # 检查逆操作前后数据是否一致
-    assert check_all_state_inverse(org_res, final_res)
-
-
-if __name__ == "__main__":
-    """运行test文件"""
-    pytest.main(["-v", "-s", "./test_z_gate.py"])
+    assert np.allclose(result_backend, result_math)

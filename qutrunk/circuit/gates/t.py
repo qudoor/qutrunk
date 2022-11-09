@@ -1,3 +1,5 @@
+"""T gate."""
+
 import cmath
 
 import numpy as np
@@ -51,10 +53,10 @@ class TGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.matrix([[1, 0], [0, cmath.exp(1j * cmath.pi / 4)]])
+        return np.array([[1, 0], [0, cmath.exp(1j * cmath.pi / 4)]])
 
     def inv(self):
-        """Apply inverse gate."""
+        """Apply inverse gate(TdgGate)."""
         gate = TGate()
         gate.is_inverse = not self.is_inverse
         return gate

@@ -1,50 +1,20 @@
-import pytest
+import numpy as np
 
+from qutrunk.circuit.gates import X, CSwap
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import CSwap
-from qutrunk.backends import BackendQuSprout
-from check_all_state import check_all_state
-from check_all_state_inverse import check_all_state_inverse
 
 
-def test_cswap_gate():
-    """测试CSwap门"""
-    # 使用本地量子计算模拟器
+def test_csqrtx_gate():
+    """Test CSwap gate."""
+    # local backend
     circuit = QCircuit()
     qr = circuit.allocate(3)
+
+    X * qr[0]
     CSwap * (qr[0], qr[1], qr[2])
-    res = circuit.get_statevector()
+    CSwap.inv() * (qr[0], qr[1], qr[2])
+    result_backend = circuit.get_statevector()
 
-    # 使用BackendQuSprout量子计算模拟器
-    circuit_box = QCircuit(backend=BackendQuSprout())
-    qr_box = circuit_box.allocate(3)
-    CSwap * (qr_box[0], qr_box[1], qr_box[2])
-    res_box = circuit_box.get_statevector()
-
-    # 检查数据是否一致
-    assert check_all_state(res, res_box)
-
-
-def test_cswap_inverse_gate():
-    """测试反转电路"""
-    # 使用本地量子计算模拟器
-    circuit = QCircuit()
-    qr = circuit.allocate(3)
-    # 获取原始数据
-    org_res = circuit.get_statevector()
-
-    # 进行逆操作
-    CSwap * (qr[0], qr[1], qr[2])
-    CSwap * (qr[0], qr[1], qr[2])
-    circuit.cmds[1].inverse = True
-
-    # 获取逆操作后数据
-    final_res = circuit.get_statevector()
-
-    # 检查逆操作前后数据是否一致
-    assert check_all_state_inverse(org_res, final_res)
-
-
-if __name__ == "__main__":
-    """运行test文件"""
-    pytest.main(["-v", "-s", "./test_cswap_gate.py"])
+    # initial state
+    result = np.array([0, 1, 0, 0, 0, 0, 0, 0])
+    assert np.allclose(result_backend, result)

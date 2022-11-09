@@ -1,6 +1,6 @@
 import math
 
-from qutrunk.test.gate.global_parameters import PRECISION
+from qutrunk.test.global_parameters import PRECISION
 
 
 def check_all_state_inverse(res, res_box):

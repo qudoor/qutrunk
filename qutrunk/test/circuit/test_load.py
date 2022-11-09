@@ -15,7 +15,7 @@ def test_load_qusl():
 
     expect_in = qc.cmds
 
-    circuit_in = qc.load(file="a.qusl", format="qusl")
+    circuit_in = qc.load(file="bell_pair.qusl", format="qusl")
 
     assert expect_in == circuit_in.cmds
 
@@ -32,7 +32,7 @@ def test_load_openqasm():
 
     expect_in = qc.cmds
 
-    circuit_in = qc.load(file="b.qasm", format="openqasm")
+    circuit_in = qc.load(file="bell_pair.qasm", format="openqasm")
 
     assert expect_in == circuit_in.cmds
 
