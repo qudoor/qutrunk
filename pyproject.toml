@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qutrunk"
-version = "0.1.11"
+version = "0.1.12"
 description = "qutrunk is an open source library for quantum computing."
 authors = ["qudoorzh2022 <qudoorzh2022@163.com>"]
 license = "Apache-2.0"
@@ -24,7 +24,7 @@ classifiers = [
 python = ">=3.8, <3.11"
 pyyaml = "^6.0"
 thrift = "^0.15.0"
-numpy = "^1.21.0"
+numpy = "^1.21.6"
 ply = "^3.11"
 requests = "^2.27.1"
 networkx = "^2.8"
