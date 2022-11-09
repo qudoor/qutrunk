@@ -54,7 +54,7 @@ class SGate(BasicGate):
         return np.matrix([[1, 0], [0, 1j]])
 
     def inv(self):
-        """Apply inverse gate."""
+        """Apply inverse gate(SdgGate)."""
         gate = SGate()
         gate.is_inverse = not self.is_inverse
         return gate

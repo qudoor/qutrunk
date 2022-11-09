@@ -1,51 +1,48 @@
-import pytest
+import numpy as np
 from numpy import pi
 
-from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import R
-from qutrunk.backends import BackendQuSprout
-from check_all_state import check_all_state
-from check_all_state_inverse import check_all_state_inverse
+from qutrunk.circuit import QCircuit
+from qutrunk.test.global_parameters import ZERO_STATE
 
 
 def test_r_gate():
-    """测试R门"""
-    # 使用本地量子计算模拟器
+    """Test R gate."""
+    # local backend
     circuit = QCircuit()
     qr = circuit.allocate(1)
     R(pi / 2, pi / 2) * qr[0]
-    res = circuit.get_statevector()
+    result = circuit.get_statevector()
+    result_backend = np.array(result).reshape(-1, 1)
 
-    # 使用BackendQuSprout量子计算模拟器
-    circuit_box = QCircuit(backend=BackendQuSprout())
-    qr_box = circuit_box.allocate(1)
-    R(pi / 2, pi / 2) * qr_box[0]
-    res_box = circuit_box.get_statevector()
+    # math
+    r = R(pi / 2, pi / 2)
+    result_math = np.dot(r.matrix, ZERO_STATE)
 
-    # 检查数据是否一致
-    assert check_all_state(res, res_box)
+    assert np.allclose(result_backend, result_math)
 
 
 def test_r_inverse_gate():
-    """测试反转电路"""
-    # 使用本地量子计算模拟器
+    """Test the inverse of R gate."""
+    # local backend
     circuit = QCircuit()
     qr = circuit.allocate(1)
-    # 获取原始数据
-    org_res = circuit.get_statevector()
+    R(pi / 2, pi / 2).inv() * qr[0]
+    result = circuit.get_statevector()
+    result_backend = np.array(result).reshape(-1, 1)
 
-    # 进行逆操作
-    R(pi / 2, pi / 2) * qr[0]
-    R(pi / 2, pi / 2) * qr[0]
-    circuit.cmds[1].inverse = True
+    # math
+    theta = -pi / 2
+    phi = pi / 2
 
-    # 获取逆操作后数据
-    final_res = circuit.get_statevector()
+    a00 = np.cos(theta / 2)
+    a01 = complex(np.sin(-phi) * np.sin(theta / 2), -1 * np.cos(-phi) * np.sin(theta / 2))
+    a10 = complex(np.sin(phi) * np.sin(theta / 2), -1 * np.cos(phi) * np.sin(theta / 2))
+    a11 = np.cos(theta / 2)
+    m = np.array([
+        [a00, a01],
+        [a10, a11],
+    ])
+    result_math = np.dot(m, ZERO_STATE)
 
-    # 检查逆操作前后数据是否一致
-    assert check_all_state_inverse(org_res, final_res)
-
-
-if __name__ == "__main__":
-    """运行test文件"""
-    pytest.main(["-v", "-s", "./test_r_gate.py"])
+    assert np.allclose(result_backend, result_math)

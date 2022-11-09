@@ -285,7 +285,8 @@ class QCircuit:
     def get_statevector(self):
         """Get state vector of circuit."""
         self.backend.send_circuit(self)
-        return self._to_complex(self.backend.get_statevector())
+        result = self._to_complex(self.backend.get_statevector())
+        return np.array(result)
 
     def find_bit(self, bit):
         """Find locations in the circuit.
@@ -359,7 +360,7 @@ class QCircuit:
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-        # 1 参数是否在参数表�
+        # 1 参数是否在参数表
         parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key

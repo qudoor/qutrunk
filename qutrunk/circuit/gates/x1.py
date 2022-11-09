@@ -24,7 +24,7 @@ class X1Gate(BasicGate):
         """Quantum logic gate operation.
 
         Args:
-            qubit: The quantum bit to aplly X1 gate.
+            qubit: The quantum bit to apply X1 gate.
 
         Example:
             .. code-block:: python
@@ -50,7 +50,7 @@ class X1Gate(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         factor = 1 / np.sqrt(2)
-        return np.matrix([[factor, -1j * factor], [-1j * factor, factor]])
+        return np.array([[factor, -1j * factor], [-1j * factor, factor]])
 
     def inv(self):
         """Apply inverse gate."""

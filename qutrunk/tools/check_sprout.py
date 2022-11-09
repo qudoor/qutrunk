@@ -1,13 +1,13 @@
 """Run the quantum circuit using QuSprout as the backend."""
+from typing import Optional
 
+from qutrunk.circuit import QCircuit
+from qutrunk.backends import BackendQuSprout
+from qutrunk.circuit.gates import H, CNOT, Measure
 
-def run_check_sprout():
-    from qutrunk.circuit import QCircuit
-    from qutrunk.backends import BackendQuSprout
-    from qutrunk.circuit.gates import H, CNOT, Measure
-
+def run_check_sprout(ip: Optional[str] = None, port: Optional[int] = None):
     # allocate
-    qc = QCircuit(backend=BackendQuSprout())
+    qc = QCircuit(backend=BackendQuSprout(ip, port))
     qr = qc.allocate(2)
 
     # apply gate

@@ -68,7 +68,7 @@ class YGate(BasicGate, Observable):
         return pauli
 
     def inv(self):
-        """Apply inverse gate."""
+        """Return inverted Y gate (itself)."""
         gate = YGate()
         gate.is_inverse = not self.is_inverse
         return gate

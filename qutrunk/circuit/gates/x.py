@@ -48,7 +48,7 @@ class XGate(BasicGate, Observable):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.matrix([[0, 1], [1, 0]])
+        return np.array([[0, 1], [1, 0]])
 
     def __call__(self, target):
         """
@@ -67,7 +67,7 @@ class XGate(BasicGate, Observable):
         return pauli
 
     def inv(self):
-        """Apply inverse gate."""
+        """Return inverted NOT gate (itself)."""
         gate = XGate()
         gate.is_inverse = not self.is_inverse
         return gate

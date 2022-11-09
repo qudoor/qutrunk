@@ -1,4 +1,5 @@
 """U2 gate."""
+
 import numpy as np
 
 from .basicgate import BasicGate
@@ -16,9 +17,10 @@ class U2(BasicGate):
     """
 
     def __init__(self, phi, lam):
-        if phi is None or lam is None:
+        if lam is None or phi is None:
             raise ValueError("The argument cannot be empty.")
         super().__init__()
+        self.lam = lam
         self.phi = phi
         self.lam = lam
 
@@ -59,7 +61,7 @@ class U2(BasicGate):
         isqrt2 = 1 / np.sqrt(2)
         phi = self.phi
         lam = self.lam
-        return np.matrix(
+        return np.array(
             [
                 [isqrt2, -np.exp(1j * lam) * isqrt2],
                 [np.exp(1j * phi) * isqrt2, np.exp(1j * (phi + lam)) * isqrt2],
