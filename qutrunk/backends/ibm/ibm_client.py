@@ -14,7 +14,8 @@ _API_URL = "https://api.quantum-computing.ibm.com/api/"
 # TODO: call to get the API version automatically
 CLIENT_APPLICATION = "ibmqprovider/0.4.4"
 
-# need to improve:  __all__
+
+# TODO: exclude in API document.
 class IBMQ(Session):
     """Manage a session between QuTrunk and the IBMQ web API."""
 
@@ -88,8 +89,8 @@ class IBMQ(Session):
         """Run the quantum code to the IBMQ machine.
 
          Args:
-            info (dict): Dictionary sent by the backend containing the code to run.
-            device (str): Name of the ibm device to use.
+             info (dict): Dictionary sent by the backend containing the code to run.
+             device (str): Name of the ibm device to use.
 
         Returns:
             Execution Id.

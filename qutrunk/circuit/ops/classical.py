@@ -1,11 +1,12 @@
 from typing import Union
 
 from qutrunk.circuit import Qureg
-from qutrunk.circuit.ops import QSP
+from qutrunk.circuit.ops import Operator
 from qutrunk.exceptions import QuTrunkError
 from qutrunk.circuit.gates import X
 
-class Classical(QSP):
+
+class Classical(Operator):
     """Quantum state preparation Operator.
 
     Init the quantum state to classical state.
@@ -21,22 +22,30 @@ class Classical(QSP):
             from qutrunk.circuit.gates import H, All, Measure
 
             circuit = QCircuit()
-            qureg = circuit.allocate(2)
-            Classical("0100") * qureg | Classical(4) * qureg
-            print(circuit.get_all_state())
+            qureg = circuit.allocate(3)
+            Classical("0100") * qureg 
+            # Classical(4) * qureg
+            print(circuit.get_statevector())
     """
 
     def __init__(self, state: Union[str, int]):
-        super().__init__(state)
+        super().__init__()
+        self.state = state
 
     def __str__(self):
         return "Classical"
 
     def __mul__(self, qureg: Qureg):
-        if qureg.circuit.gates_len > 0:
-            raise QuTrunkError("Classical should be applied at the beginning of circuit.")
+        if qureg.circuit.num_gates > 0:
+            raise QuTrunkError("Classical operator should be applied at the beginning of circuit.")
 
-        super().__mul__(qureg)
+        if not isinstance(qureg, Qureg):
+            raise TypeError("the operand must be Qureg.")
+
+        if not self._check_state(qureg):
+            raise ValueError(f"Invalid state: {self.state}")
+
+        self._process_state(qureg)
 
     def _check_state(self, qureg: Qureg):
         if isinstance(self.state, str):
@@ -67,6 +76,3 @@ class Classical(QSP):
         for i, _ in enumerate(qureg):
             if bit_strs[i] == "1":
                 X * qureg[i]
-
-    def _append_statement(self, qureg: Qureg):
-        qureg.circuit.append_statement(f"Classical('{self.state}') * q")

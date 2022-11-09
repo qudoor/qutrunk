@@ -1,4 +1,5 @@
 """addition example."""
+
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Measure, All
 from qutrunk.circuit.ops import Classical
@@ -21,4 +22,5 @@ def run_addition(num_qubits, init_value, number=0):
 
 
 if __name__ == "__main__":
-    circuit = run_addition(4, 0, 5)
+    circuit = run_addition(4, 3, 3)
+

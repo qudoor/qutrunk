@@ -8,14 +8,17 @@ class BasicGate:
         self.is_inverse = False
         self.name = ""
 
+    # TODO: need to improve.
     def __str__(self):
         """The string description of a quantum logic gate."""
         return ""
 
+    # TODO: need to improve.
     def __or__(self, qubit):
         """Quantum logic gate operation. Overwrite | operator to achieve quantum logic gate operation."""
         pass
 
+    # TODO: need to improve.
     def __mul__(self, qubits):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
         pass
@@ -34,16 +37,14 @@ class BasicGate:
             statement: The origin statement that generate target cmd.
         """
         circuit.append_cmd(cmd)
-        # TODO: need to improve
-        statement = "" if circuit.in_op() else cmd.qusl()
-        if statement != "":
-            circuit.append_statement(statement)
 
+    # TODO: need to improve.
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         # note: 状态相关方法需要重新生成一个新对象
         raise NotImplementedError
 
+    # TODO: need to improve.
     def ctrl(self, ctrl_cnt=1):
         """Apply controlled gate.
         
@@ -68,6 +69,7 @@ class BasicPhaseGate(BasicGate):
         super().__init__()
 
 
+# TODO: need to improve.
 class Observable:
     """Base class representing observables. It's usually PauliX, PauliY, PauliZ, PauliI."""
 
@@ -88,7 +90,57 @@ class Observable:
 class PauliType(Enum):
     """PauliType."""
 
-    POT_PAULI_I = 0
-    POT_PAULI_X = 1
-    POT_PAULI_Y = 2
-    POT_PAULI_Z = 3
+    PAULI_I = 0
+    PAULI_X = 1
+    PAULI_Y = 2
+    PAULI_Z = 3
+
+# todo: 用于封装circuit.expval_pauli方法的参数调用
+class PauliOps:
+    """A list of Pauli Operator."""
+    def __init__(self):
+        self.pauli_ops = []
+
+    def append(self, op):
+        """Append Pauli Operator."""
+        self.pauli_ops.append(op)
+
+    def __lshift__(self, op):
+        self.append(op)
+        return self
+
+    def __getitem__(self, index):
+        return self.pauli_ops[index]
+
+class PauliCoeff:
+    """Pauli Coeff consist of Pauli operator and coefficients."""
+    def __init__(self, coeff, paulis):
+        self.coeff = coeff
+        self.paulis = [op.value for op in paulis]
+
+    def padding(self, len, op=PauliType.PAULI_I):
+        """Fill paulis by specific pauli operator in len times.
+        
+        Args:
+            len: Times to fill op.
+            op: The target operator filled to paulis, defaul: PauliI.
+        """
+        for i in range(len):
+            self.paulis.append(op.value)
+
+class PauliCoeffs:
+    """A list of PauliCoeff."""
+    def __init__(self):
+        self.pauli_term_list = []
+
+    def append(self, term):
+        """Append PaulCoeff term."""
+        self.pauli_term_list.append(term)
+
+    def __lshift__(self, term):
+        self.append(term)
+        return self
+
+    def __getitem__(self, index):
+        return self.pauli_term_list[index]
+        

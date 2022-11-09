@@ -26,7 +26,7 @@ class U2(BasicGate):
             phi: U2 gate parameter2.
         """
         if theta is None or phi is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.theta = theta
         self.phi = phi
@@ -46,10 +46,10 @@ class U2(BasicGate):
                 U2(pi/2, pi/2) * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(
@@ -76,7 +76,7 @@ class U2(BasicGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = U2(self.theta, self.phi)
         gate.is_inverse = not self.is_inverse
         return gate

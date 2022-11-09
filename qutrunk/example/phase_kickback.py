@@ -1,4 +1,5 @@
 """Phase Kickback example."""
+
 from math import pi
 
 from qutrunk.circuit import QCircuit

@@ -35,7 +35,7 @@ class YGate(BasicGate, Observable):
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)
@@ -62,15 +62,13 @@ class YGate(BasicGate, Observable):
             The observed data list, each item contains op type and target qubit, \
                 e.g: [{"oper_type": 1, "target": 0}].
         """
-        puali_list = []
         pauli = {}
-        pauli["oper_type"] = PauliType.POT_PAULI_Y.value
+        pauli["oper_type"] = PauliType.PAULI_Y.value
         pauli["target"] = target.index
-        puali_list.append(pauli)
-        return puali_list
+        return pauli
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = YGate()
         gate.is_inverse = not self.is_inverse
         return gate
@@ -118,7 +116,7 @@ class CYGate(BasicGate):
                 CY * (qr[0], qr[1])
         """
         if len(qubits) != 2:
-            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
+            raise ValueError("Parameter error: One controlled and one target qubit are required.")
 
         self.qubits = qubits
         controls = [qubits[0].index]

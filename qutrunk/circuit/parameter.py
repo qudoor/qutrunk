@@ -1,12 +1,10 @@
-"""
-Parameter Class for variable parameters.
-"""
+"""Parameter Class for variable parameters."""
+
 from uuid import uuid4
 
 
 class Parameter:
-    """
-    Parameter Class for variable parameters.
+    """Parameter Class for variable parameters.
 
     Args:
         name(str): the name of Parameter.
@@ -14,6 +12,7 @@ class Parameter:
 
     def __new__(cls, name):
         obj = object.__new__(cls)
+        # TODO:??
         obj._uuid = uuid4()
         obj._hash = hash(obj._uuid)
 
@@ -22,7 +21,7 @@ class Parameter:
     def __init__(self, name):
         self.name = name
         self.value = None
-        self.host = None
+        self._host = None
 
     def __copy__(self):
         return self
@@ -52,13 +51,19 @@ class Parameter:
     def __repr__(self):
         return f"{self.__class__.__name__}({self.name})"
 
-    def set_host(self, host):
+    @property
+    def host(self):
+        """Get parameter host."""
+        return self._host
+
+    @host.setter
+    def host(self, host):
         """Set parameter host.
         
         Args:
             host: The Host using this parameter. 
         """
-        self.host = host
+        self._host = host
 
     def update(self, value):
         """Update parameter value.
@@ -67,6 +72,6 @@ class Parameter:
             value: Parameter value.
         """
         self.value = value
-        if self.host:
-            self.host.update_parameter(self)
+        if self._host:
+            self._host.update_parameter(self)
 

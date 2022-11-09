@@ -34,14 +34,13 @@ class SwapGate(BasicGate):
                 Swap * (qr[0], qr[1])
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO:need to improve.
-            raise AttributeError(
+            raise ValueError(
                 "Parameter error: Two target qubits are required."
             )
 
@@ -60,7 +59,7 @@ class SwapGate(BasicGate):
         return np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = SwapGate()
         gate.is_inverse = not self.is_inverse
         return gate
@@ -108,11 +107,10 @@ class CSwapGate(BasicGate):
                 CSwap * (qr[0], qr[1], qr[2])
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 3:
-            # TODO:need to improve.
-            raise AttributeError(
+            raise ValueError(
                 "Parameter error: One controlled and two target qubits are required."
             )
 

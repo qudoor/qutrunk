@@ -99,7 +99,7 @@ class Qureg:
         return self.qubits.index(qubit)
 
     def to_cl(self):
-        """Get measure result of Qureg"""
+        """Get measure result of Qureg."""
         res = []
         for i in range(len(self.qubits)):
             res.append(self.circuit.creg[i].value)

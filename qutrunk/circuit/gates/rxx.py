@@ -21,7 +21,7 @@ class Rxx(BasicRotateGate):
 
     def __init__(self, alpha):
         if alpha is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -44,12 +44,10 @@ class Rxx(BasicRotateGate):
             AttributeError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            # TODO:need to improve.
-            raise AttributeError("The parameter must be Qubit object.")
+            raise TypeError("The parameter must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO:need to improve.
-            raise AttributeError("Parameter Error: Two target bits are required.")
+            raise TypeError("Parameter Error: Two target bits are required.")
 
         targets = [q.index for q in qubits]
         cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)
@@ -92,7 +90,7 @@ class Rxx(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Rxx(self.rotation)
         gate.is_inverse = not self.is_inverse 
         return gate

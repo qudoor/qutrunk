@@ -1,4 +1,5 @@
 """Bell state example."""
+
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, CNOT, Measure
 
@@ -18,7 +19,7 @@ def run_bell_pair(backend=None):
 
     # Print quantum circuit
     qc.print()
-    # qc.dump(file="bell_pair.qusl")
+    # qc.dump(file="bell_pair.qasm", format="openqasm")
 
     # Run quantum circuit with 100 times
     res = qc.run(shots=100)
@@ -41,4 +42,3 @@ if __name__ == "__main__":
 
     # Draw quantum circuit
     circuit.draw()
-

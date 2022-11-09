@@ -61,6 +61,14 @@ qutrunk.circuit.counter module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.circuit.parameter module
+--------------------------------
+
+.. automodule:: qutrunk.circuit.parameter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qutrunk.circuit.qubit module
 ----------------------------
 

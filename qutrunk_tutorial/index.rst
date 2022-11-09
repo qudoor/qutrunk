@@ -8,19 +8,20 @@ QuTrunk
    
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: 量子门
+
+   Gate/gate1  
+   Gate/gate2  
+
+.. toctree::
+   :maxdepth: 1
    :caption: API
 
    Bpp/backends
-   Cpp1/converters
-   Cpp2/circuit
-   Dpp/dagcircuit 
-   Epp1/example
-   Epp2/exceptions
-   Qpp1/qasm
-   Qpp2/qutrunk
-   Spp/sim
-   Tpp/tools
-   Vpp/visualizations
-   
+   Cpp3/gates
+   Cpp4/ops
+   Cpp2/circuit  
+   Epp1/example   
 
+  

@@ -36,8 +36,7 @@ class HGate(BasicGate):
                 H * qr[0]
         """
         if not isinstance(qubit, QuBit):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)
@@ -58,7 +57,7 @@ class HGate(BasicGate):
         self.__str__()
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = HGate()
         gate.is_inverse = not self.is_inverse 
         return gate
@@ -144,7 +143,7 @@ class CHGate(BasicGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = CHGate()
         gate.is_inverse = not self.is_inverse 
         return gate

@@ -13,7 +13,7 @@ def test_depth():
     H * qreg[0]
     H * qreg[1]
     H * qreg[2]
-    iSwap(pi / 2) * (qreg[0], qreg[4])
+    iSwap * (qreg[0], qreg[4])
     T * qreg[1]
     H * qreg[0]
     Swap * (qreg[1], qreg[4])

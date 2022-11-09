@@ -22,7 +22,7 @@ class Rz(BasicRotateGate):
 
     def __init__(self, alpha):
         if alpha is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -44,8 +44,7 @@ class Rz(BasicRotateGate):
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)
@@ -67,7 +66,7 @@ class Rz(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Rz(self.rotation)
         gate.is_inverse = not self.is_inverse 
         return gate
@@ -99,7 +98,7 @@ class CRz(BasicRotateGate):
 
     def __init__(self, angle):
         if angle is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.rotation = angle
 
@@ -118,12 +117,10 @@ class CRz(BasicRotateGate):
                 CRz(pi/2) * (qr[0], qr[1])
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO:need to improve.
-            raise AttributeError(
+            raise ValueError(
                 "Parameter error: One controlled and one target qubit are required."
             )
 

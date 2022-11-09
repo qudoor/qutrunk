@@ -73,7 +73,7 @@ class BackendQuSprout(Backend):
 
         self._api_server = QuSproutApiServer(_ip, _port)
 
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
@@ -82,47 +82,29 @@ class BackendQuSprout(Backend):
         Returns:
             The probability of target index.
         """
-        res, elapsed = self._api_server.get_prob_amp(index)
+        res, elapsed = self._api_server.get_prob(index)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def get_prob_all_outcome(self, qubits):
-        """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
-
-        Args:
-            qubits: The sub-register contained in qureg.
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            An array contains probability of target qubits.
+            An array contains all probabilities of circuit.
         """
-        res, elapsed = self._api_server.get_prob_all_outcome(qubits)
+        res, elapsed = self._api_server.get_probs(qubits)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1).
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
-
-        Returns:
-            The probability of target qubit.
-        """
-        res, elapsed = self._api_server.get_prob_outcome(qubit, outcome)
-        if self.circuit.counter:
-            self.circuit.counter.acc_run_time(elapsed)
-        return res
-
-    def get_all_state(self):
+    def get_statevector(self):
         """Get the current state vector of probability amplitudes for a set of qubits.
 
         Returns:
             Array contains all amplitudes of state vector
         """
-        res, elapsed = self._api_server.get_all_state()
+        res, elapsed = self._api_server.get_statevector()
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
@@ -147,9 +129,16 @@ class BackendQuSprout(Backend):
                 _amp = None
                 _mat = None
                 if cmd.cmdex.amp is not None:
-                    _amp = qusproutdata.Amplitude(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)
+                    _amp = qusproutdata.Amplitude(
+                        cmd.cmdex.amp.reals,
+                        cmd.cmdex.amp.imags,
+                        cmd.cmdex.amp.startind,
+                        cmd.cmdex.amp.numamps,
+                    )
                 if cmd.cmdex.mat is not None:
-                    _mat = qusproutdata.Matrix(cmd.cmdex.mat.reals, cmd.cmdex.mat.imags, cmd.cmdex.mat.unitary)
+                    _mat = qusproutdata.Matrix(
+                        cmd.cmdex.mat.reals, cmd.cmdex.mat.imags, cmd.cmdex.mat.unitary
+                    )
                 cmdex = qusproutdata.Cmdex(amp=_amp, mat=_mat)
 
             c = qusproutdata.Cmd(
@@ -159,7 +148,7 @@ class BackendQuSprout(Backend):
                 cmd.rotation,
                 cmd.qasm(),
                 cmd.inverse,
-                cmdex
+                cmdex,
             )
             cmds.append(c)
 
@@ -168,7 +157,7 @@ class BackendQuSprout(Backend):
         # 服务端初始化
         if start == 0:
             res, elapsed = self._api_server.init(
-                circuit.qubits_len, circuit.density, self.exectype.value
+                circuit.num_qubits, circuit.density, self.exectype.value
             )
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
@@ -188,7 +177,7 @@ class BackendQuSprout(Backend):
             shots: Circuit run times, for sampling, default: 1.
 
         Returns:
-            result: The Result object contain circuit running outcome.
+            The Result object contain circuit running outcome.
         """
         res, elapsed = self._api_server.run(shots)
         if self.circuit.counter:
@@ -202,14 +191,6 @@ class BackendQuSprout(Backend):
         self._api_server.close()
 
         return res
-
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        self._api_server.apply_QFT(qubits)
 
     def get_expec_pauli_prod(self, pauli_prod_list):
         """Computes the expected value of a product of Pauli operators.

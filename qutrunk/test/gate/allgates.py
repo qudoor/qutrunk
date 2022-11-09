@@ -37,7 +37,7 @@ def run_gates():
     Y1 * qr[0]
     Z1 * qr[0]
     Swap * (qr[0], qr[1])
-    iSwap(pi / 2) * (qr[0], qr[1])
+    iSwap * (qr[0], qr[1])
     SqrtX * qr[0]
 
     CX * (qr[0], qr[1])
@@ -71,7 +71,9 @@ def run_gates():
     Barrier * qr
 
     Power(2, H) * qr[0]
+
     my_gate * (qr[0], qr[1])
+    Barrier * qr
     Power(2, my_gate) * (qr[0], qr[1])
 
     # Measure all quantum qubits

@@ -7,6 +7,7 @@ from qutrunk.circuit import QuBit, Qureg
 from qutrunk.circuit.command import Command, CmdEx, Mat
 
 
+# need to improve.
 class All(BasicGate):
     """Meta operator, provides unified operation of multiple qubits.
 
@@ -64,7 +65,7 @@ class Power(BasicGate):
     def __or__(self, qubits: Union[QuBit, Qureg, tuple]):
         """Quantum logic gate operation."""
         if self.power < 0:
-            raise ValueError("power should >= 0")
+            raise ValueError("power should >= 0.")
 
         if not isinstance(qubits, (QuBit, Qureg, tuple)):
             raise TypeError("qubits should be type of QuBit, Qureg or tuple.")
@@ -77,7 +78,15 @@ class Power(BasicGate):
 
 
 class Matrix(BasicGate):
-    """Custom matrix gate."""
+    """Custom matrix gate.
+
+    Example:
+            .. code-block:: python
+
+                Matrix([[0.5, 0.5], [0.5, -0.5]]) * qr[0]  -- No controlled bit
+                Matrix([[0.5, 0.5], [0.5, -0.5]], 1) * (qr[0], qr[1])  -- qr[0] is controlled bit
+                Matrix([[0.5, 0.5], [0.5, -0.5]], 2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
+    """
 
     def __init__(self, matrix, ctrl_cnt=0):
         super().__init__()
@@ -93,25 +102,18 @@ class Matrix(BasicGate):
         Args:
             qubit: The quantum bit to apply X gate.
 
-        Example:
-            .. code-block:: python
-
-                Matrix([[0.5, 0.5], [0.5, -0.5]]) * qr[0]  -- No controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 1) * (qr[0], qr[1])  -- qr[0] is controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
-
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubits, QuBit) and not all(
             isinstance(qubit, QuBit) for qubit in qubits
         ):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if (isinstance(qubits, QuBit) and self.ctrl_cnt > 0) or (
             not isinstance(qubits, QuBit) and (len(qubits) <= self.ctrl_cnt)
         ):
-            raise AttributeError("The parameter miss controlled or target qubit(s).")
+            raise ValueError("The parameter miss controlled or target qubit(s).")
 
         controls = (
             None if self.ctrl_cnt <= 0 else [q.index for q in qubits[0 : self.ctrl_cnt]]
@@ -123,14 +125,14 @@ class Matrix(BasicGate):
         )
 
         if not self.check_matrix_format(len(targets)):
-            raise AttributeError(
+            raise ValueError(
                 "The matrix is not in the right format by specified target(s)."
             )
 
         e = np.matrix(self.matrix)
         if self.is_inverse:
             if not self.is_unitary(e):
-                raise AttributeError(
+                raise ValueError(
                     "Only unitary matrices support invertible operations"
                 )
             else:
@@ -150,7 +152,7 @@ class Matrix(BasicGate):
         self.__or__(qubit)
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Matrix(self.matrix, self.ctrl_cnt)
         gate.is_inverse = not self.is_inverse
         return gate
@@ -179,11 +181,14 @@ class Matrix(BasicGate):
         return True
 
     def is_unitary(self, mat):
-        """
-        Test a matrix is unitary or not
-        m = [[1, 0], [0, 1]]
-        m = np.matrix(m)
-        print(is_unitary(m))
+        """Test a matrix is unitary or not.
+
+         Example:
+            .. code-block:: python
+
+                m = [[1, 0], [0, 1]]
+                m = np.matrix(m)
+                print(is_unitary(m))
         """
         return np.allclose(np.eye(mat.shape[0]), mat.H * mat)
 
@@ -196,13 +201,13 @@ class Gate(BasicGate):
     Example:
         .. code-block:: python
 
-        @Gate
-        def my_gate(a, b, c, d):
-            return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
-                << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
-                << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
+            @Gate
+            def my_gate(a, b, c, d):
+                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
+                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
+                    << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
 
-        my_gate * (q[3], q[1], q[0], q[2])
+            my_gate * (q[3], q[1], q[0], q[2])
     """
 
     def __init__(self, func: Optional[callable] = None):
@@ -212,12 +217,12 @@ class Gate(BasicGate):
 
     def __lshift__(self, gate_define):
         if not isinstance(gate_define[0], BasicGate):
-            raise AttributeError("The first parameter is not a gate object.")
+            raise TypeError("The first parameter is not a gate object.")
 
         if not isinstance(gate_define[1], QuBit) and not all(
             isinstance(qubit, QuBit) for qubit in gate_define[1]
         ):
-            raise AttributeError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         self.gates.append({"gate": gate_define[0], "qubits": gate_define[1]})
 
@@ -228,7 +233,7 @@ class Gate(BasicGate):
         if not isinstance(qubits, QuBit) and not all(
             isinstance(qubit, QuBit) for qubit in qubits
         ):
-            raise AttributeError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if isinstance(qubits, QuBit):
             custom_gate = self.func(qubits)
@@ -240,22 +245,3 @@ class Gate(BasicGate):
 
     def __mul__(self, qubits: Union[QuBit, tuple]):
         self.__or__(qubits)
-
-
-# note: 该方法会导致部分门操作产生状态污染，比如通过对象实例调用的门操作
-# 只要设置过状态，那么后续所有该量子门操作都带了这个状态
-# def Inv(gate):
-#     """Inverse gate.
-
-#     Args:
-#         gate: The gate will apply inverse operator.
-
-#     Example:
-#         .. code-block:: python
-
-#             Inv(H) * q[0]
-#     """
-#     if isinstance(gate, BasicGate):
-#         gate.is_inverse = not gate.is_inverse
-
-#     return gate
