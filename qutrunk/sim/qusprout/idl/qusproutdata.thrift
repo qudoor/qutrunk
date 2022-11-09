@@ -6,6 +6,8 @@ include "ecode.thrift"
 enum ExecCmdType {
     ExecTypeDefault = 0,
     ExecTypeCpuSingle = 1,
+    ExecTypeCpuMpi = 2,
+    ExecTypeGpuSingle = 3
 }
 
 //振幅数据

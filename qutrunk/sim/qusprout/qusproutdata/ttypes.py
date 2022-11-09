@@ -20,15 +20,21 @@ all_structs = []
 class ExecCmdType(object):
     ExecTypeDefault = 0
     ExecTypeCpuSingle = 1
+    ExecTypeCpuMpi = 2
+    ExecTypeGpuSingle = 3
 
     _VALUES_TO_NAMES = {
         0: "ExecTypeDefault",
         1: "ExecTypeCpuSingle",
+        2: "ExecTypeCpuMpi",
+        3: "ExecTypeGpuSingle",
     }
 
     _NAMES_TO_VALUES = {
         "ExecTypeDefault": 0,
         "ExecTypeCpuSingle": 1,
+        "ExecTypeCpuMpi": 2,
+        "ExecTypeGpuSingle": 3,
     }
 
 
