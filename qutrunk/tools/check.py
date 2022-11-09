@@ -1,10 +1,8 @@
 """Run quantum circuits using local as the backend."""
-
+from qutrunk.circuit import QCircuit
+from qutrunk.circuit.gates import H, CNOT, Measure
 
 def run_check(backend=None):
-    from qutrunk.circuit import QCircuit
-    from qutrunk.circuit.gates import H, CNOT, Measure
-
     # allocate
     qc = QCircuit(backend=backend)
 
