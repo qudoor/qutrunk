@@ -1,34 +1,21 @@
-"""self decrement example."""
+"""Self-decrement operation example."""
 
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import CNOT, Measure, Toffoli, X, All, MCX
-from qutrunk.circuit.ops import QSP
+from qutrunk.circuit.gates import Measure, All
+from qutrunk.circuit.ops import Classical
+from qutrunk.circuit.ops import DEC
 
 
 def decrement(num_qubits, init_value):
-    # Create quantum circuit
     circuit = QCircuit()
-
-    # Allocate quantum qubits
     qr = circuit.allocate(num_qubits)
 
-    # Set inital amplitudes to classical state with init_value
-    QSP(init_value) * qr
+    Classical(init_value) * qr
 
-    # Apply quamtum gates
-    X * qr[0]
-    CNOT * (qr[0], qr[1])
-    Toffoli * (qr[0], qr[1], qr[2])
-    MCX(3) * (qr[0], qr[1], qr[2], qr[3])
+    DEC * qr
 
-    # Measure all quantum qubits
     All(Measure) * qr
-
-    # Run circuit in local simulator
     res = circuit.run()
-
-    # Print measure result like:
-    # 0b1111
     print(res.get_outcome())
 
     return circuit
@@ -36,7 +23,8 @@ def decrement(num_qubits, init_value):
 
 if __name__ == "__main__":
     # Run locally
-    circuit = decrement(4, 0)
+    circuit = decrement(4, 1)
 
     # Draw quantum circuit
     circuit.draw()
+

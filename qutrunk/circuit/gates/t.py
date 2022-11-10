@@ -1,3 +1,5 @@
+"""T gate."""
+
 import cmath
 
 import numpy as np
@@ -34,10 +36,10 @@ class TGate(BasicGate):
                 T * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)
@@ -51,7 +53,13 @@ class TGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.matrix([[1, 0], [0, cmath.exp(1j * cmath.pi / 4)]])
+        return np.array([[1, 0], [0, cmath.exp(1j * cmath.pi / 4)]])
+
+    def inv(self):
+        """Apply inverse gate(TdgGate)."""
+        gate = TGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
 
 
 T = TGate()

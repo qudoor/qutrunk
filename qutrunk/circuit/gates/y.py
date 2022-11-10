@@ -35,7 +35,7 @@ class YGate(BasicGate, Observable):
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)
@@ -51,8 +51,9 @@ class YGate(BasicGate, Observable):
         """Access to the matrix property of this gate."""
         return np.array([[0, -1j], [1j, 0]])
 
-    def obs(self, target):
-        """Get Observable data.
+    def __call__(self, target):
+        """
+        Get Observable data.
 
         Args:
             target: The observed qubit.
@@ -61,12 +62,28 @@ class YGate(BasicGate, Observable):
             The observed data list, each item contains op type and target qubit, \
                 e.g: [{"oper_type": 1, "target": 0}].
         """
-        puali_list = []
         pauli = {}
-        pauli["oper_type"] = PauliType.POT_PAULI_Y.value
+        pauli["oper_type"] = PauliType.PAULI_Y.value
         pauli["target"] = target.index
-        puali_list.append(pauli)
-        return puali_list
+        return pauli
+
+    def inv(self):
+        """Return inverted Y gate (itself)."""
+        gate = YGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("Y gate do not support multiple control bits.")
+        gate = CYGate()
+        gate.is_inverse = self.is_inverse
+        return gate
 
 
 PauliY = Y = YGate()
@@ -99,7 +116,7 @@ class CYGate(BasicGate):
                 CY * (qr[0], qr[1])
         """
         if len(qubits) != 2:
-            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
+            raise ValueError("Parameter error: One controlled and one target qubit are required.")
 
         self.qubits = qubits
         controls = [qubits[0].index]
@@ -115,6 +132,12 @@ class CYGate(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         return np.array([[0, 0, -1j, 0], [0, 1, 0, 0], [1j, 0, 0, 0], [0, 0, 0, 1]])
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CYGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
 
 
 CY = CYGate()

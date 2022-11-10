@@ -1,6 +1,7 @@
 import math
 from copy import deepcopy
 
+# TDOO: need to improve.
 import numpy as np
 from numpy import pi
 
@@ -9,6 +10,7 @@ from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
 
 
+# TODO: need to improve.
 class MeasureResult:
     def __init__(self, id=0, value=0):
         # TODO: id是关键字，不建议使用
@@ -78,12 +80,14 @@ class BackendLocalPython:
             "SqrtXdg": "sqrtxdg",
             "CSqrtX": "csqrtx",
             "CSwap": "cswap",
+            "AMP": "amp",
+            "Matrix": "matrix"
         }
         self.cmds = []
         self.result = Result()
 
     @timefn
-    def init(self, qubits, show):
+    def init(self, qubits):
         self.sim.create_qureg(qubits)
         self.sim.init_zero_state()
 
@@ -115,6 +119,7 @@ class BackendLocalPython:
         Returns:
             result: the Result object contain circuit running outcome.
         """
+        # TODO: need to improve.
         run_times = shots - 1
         while run_times > 0:
             self.result.measureSet = []
@@ -131,7 +136,7 @@ class BackendLocalPython:
         return self.result
 
     @timefn
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """
         Get the probability of a state-vector at an index in the full state vector.
 
@@ -141,41 +146,21 @@ class BackendLocalPython:
         Returns:
             the probability of target index
         """
-        return self.sim.get_prob_amp(index)
+        return self.sim.get_prob(index)
 
     @timefn
-    def get_prob_outcome(self, target, outcome):
-        """
-        Get the probability of a specified qubit being measured in the given outcome (0 or 1)
-
-        Args:
-            qubit: the specified qubit to be measured
-            outcome: the qubit measure result(0 or 1)
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            the probability of target qubit
+            An array contains all probabilities of circuit.
         """
-        return self.sim.get_prob_outcome(target, outcome)
+        return self.sim.get_probs(qubits)
 
     @timefn
-    def get_prob_all_outcome(self, qubits):
-        """
-        Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg
-
-        Args:
-            qubits: the sub-register contained in qureg
-
-        Returns:
-            An array contains probability of target qubits
-        """
-        return self.sim.get_prob_all_outcome(qubits)
-
-    @timefn
-    def get_all_state(self):
-        """
-        Get the current state vector of probability amplitudes for a set of qubits
-        """
-        return self.sim.get_all_state()
+    def get_statevector(self):
+        """Get state vector of circuit."""
+        return self.sim.get_statevector()
 
     @timefn
     def qft(self, qubits):
@@ -202,7 +187,7 @@ class BackendLocalPython:
         Returns:
             the expected value of a product of Pauli operators.
         """
-        self.sim.get_expec_pauli_prod(pauli_prod_list)
+        return self.sim.get_expec_pauli_prod(pauli_prod_list)
 
     @timefn
     def get_expec_pauli_sum(self, oper_type_list, term_coeff_list):
@@ -218,9 +203,10 @@ class BackendLocalPython:
         Returns:
             the expected value of a sum of products of Pauli operators. 
         """
-        self.sim.get_expec_pauli_sum(oper_type_list, term_coeff_list)
+        return self.sim.get_expec_pauli_sum(oper_type_list, term_coeff_list)
 
     def exec_cmd(self, cmd):
+        # TODO: need to improve.
         if str(cmd.gate) == "Measure":
             res = self.sim.measure(cmd.targets[0])
             mr = MeasureResult(cmd.targets[0], res)
@@ -274,6 +260,7 @@ class BackendLocalPython:
         # inverse is the same.
         """
         if len(cmd.targets) != 1 or len(cmd.controls) != 1:
+            # TODO: need to improve.
             return
 
         factor = 1 / math.sqrt(2)
@@ -554,11 +541,10 @@ class BackendLocalPython:
         self.sim.pauli_x(cmd.targets[0])
 
     def y(self, cmd):
-        """
-        The single-qubit Pauli-Y gate.
+        """The single-qubit Pauli-Y gate.
 
-            Args:
-                cmd: the Command object.
+        Args:
+            cmd: the Command object.
         """
         targets_len = len(cmd.targets)
         if targets_len != 1:
@@ -675,6 +661,7 @@ class BackendLocalPython:
     def cy(self, cmd):
         # inverse is the same
         if len(cmd.targets) != 1 or len(cmd.controls) != 1:
+            # TODO: need to improve.
             return
 
         self.sim.cy(cmd.controls[0], cmd.targets[0])
@@ -730,6 +717,7 @@ class BackendLocalPython:
         lam = cmd.rotation[1]
 
         if cmd.inverse:
+            # TODO: need to improve.
             phi1 = -lam - pi
             lam1 = -phi + pi
             phi = phi1
@@ -983,29 +971,45 @@ class BackendLocalPython:
         self.sim.cr(cmd.controls[0], cmd.targets[0], ureal, uimag)
 
     def iswap(self, cmd):
-        if len(cmd.rotation) != 1 or len(cmd.targets) != 2:
+        if len(cmd.targets) != 2:
             return
 
-        theta = cmd.rotation[0]
+        ureal = []
+        uimag = []
         if cmd.inverse:
-            theta = -theta
-
-        ureal = np.array(
-            [
-                [1, 0, 0, 0],
-                [0, math.cos(theta), 0, 0],
-                [0, 0, math.cos(theta), 0],
-                [0, 0, 0, 1],
-            ]
-        )
-        uimag = np.array(
-            [
-                [0, 0, 0, 0],
-                [0, 0, -math.sin(theta), 0],
-                [0, -math.sin(theta), 0, 0],
-                [0, 0, 0, 0],
-            ]
-        )
+            ureal = np.array(
+                [
+                    [1, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 1],
+                ]
+            )
+            uimag = np.array(
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, -1, 0],
+                    [0, -1, 0, 0],
+                    [0, 0, 0, 0],
+                ]
+            )
+        else:
+            ureal = np.array(
+                [
+                    [1, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 1],
+                ]
+            )
+            uimag = np.array(
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, 1, 0],
+                    [0, 1, 0, 0],
+                    [0, 0, 0, 0],
+                ]
+            )
 
         self.sim.iswap(cmd.targets[0], cmd.targets[1], ureal, uimag)
 
@@ -1069,3 +1073,21 @@ class BackendLocalPython:
     def id(self, cmd):
         # do nothing
         pass
+
+    def amp(self, cmd):
+        """the set amplitudes gate.
+
+        Args:
+           cmd: the Command object.
+        """
+
+        self.sim.amp(cmd.cmdex.amp.reals, cmd.cmdex.amp.imags, cmd.cmdex.amp.startind, cmd.cmdex.amp.numamps)
+
+    def matrix(self, cmd):
+        """Apply custom matrix gate.
+
+        Args:
+           cmd: the Command object.
+        """
+
+        self.sim.matrix(cmd.controls, cmd.targets, cmd.cmdex.mat.reals, cmd.cmdex.mat.imags)

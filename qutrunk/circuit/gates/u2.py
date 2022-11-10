@@ -1,4 +1,5 @@
 """U2 gate."""
+
 import numpy as np
 
 from .basicgate import BasicGate
@@ -19,16 +20,16 @@ class U2(BasicGate):
             U2(pi/2, pi/2) * qr[0]
     """
 
-    def __init__(self, theta, phi):
+    def __init__(self, phi, lam):
         """
         Args:
             theta: U2 gate parameter1.
             phi: U2 gate parameter2.
         """
-        if theta is None or phi is None:
-            raise NotImplementedError("The argument cannot be empty.")
+        if lam is None or phi is None:
+            raise ValueError("The argument cannot be empty.")
         super().__init__()
-        self.theta = theta
+        self.lam = lam
         self.phi = phi
 
     def __str__(self):
@@ -46,14 +47,14 @@ class U2(BasicGate):
                 U2(pi/2, pi/2) * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(
-            self, targets, rotation=[self.theta, self.phi], inverse=self.is_inverse
+            self, targets, rotation=[self.phi, self.lam], inverse=self.is_inverse
         )
         self.commit(qubit.circuit, cmd)
 
@@ -66,11 +67,17 @@ class U2(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         isqrt2 = 1 / np.sqrt(2)
-        phi = self.theta
-        lam = self.phi
-        return np.matrix(
+        phi = self.phi
+        lam = self.lam
+        return np.array(
             [
                 [isqrt2, -np.exp(1j * lam) * isqrt2],
                 [np.exp(1j * phi) * isqrt2, np.exp(1j * (phi + lam)) * isqrt2],
             ]
         )
+
+    def inv(self):
+        """Apply inverse gate."""
+        gate = U2(self.phi, self.lam)
+        gate.is_inverse = not self.is_inverse
+        return gate

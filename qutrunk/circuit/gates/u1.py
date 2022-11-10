@@ -2,10 +2,9 @@
 
 import numpy as np
 
-from .basicgate import BasicGate
-from .basicgate import BasicRotateGate
 from qutrunk.circuit import Command
 from qutrunk.circuit.qubit import QuBit
+from .basicgate import BasicGate, BasicRotateGate
 
 
 class U1(BasicGate):
@@ -45,11 +44,10 @@ class U1(BasicGate):
                 U1(pi/2) * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)
@@ -65,6 +63,24 @@ class U1(BasicGate):
         """Access to the matrix property of this gate."""
         lam = float(self.rotation)
         return np.array([[1, 0], [0, np.exp(1j * lam)]])
+
+    def inv(self):
+        """Apply inverse gate."""
+        gate = U1(self.rotation)
+        gate.is_inverse = not self.is_inverse
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("U1 gate do not support multiple control bits.")
+        gate = CU1(self.rotation)
+        gate.is_inverse = self.is_inverse
+        return gate
 
 
 class CU1(BasicRotateGate):
@@ -85,7 +101,7 @@ class CU1(BasicRotateGate):
             alpha: Rotation angle.
         """
         if alpha is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise TypeError("The argument cannot be empty.")
         super().__init__()
         self.rotation = alpha
 
@@ -104,16 +120,14 @@ class CU1(BasicRotateGate):
                 CU1(pi/2) * (qr[0], qr[1])
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
             AttributeError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO: need to improve.
-            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
+            raise ValueError("Parameter error: One controlled and one target qubit are required.")
 
         controls = [qubits[0].index]
         targets = [qubits[1].index]
@@ -132,5 +146,11 @@ class CU1(BasicRotateGate):
         # TODO: definition have problem.
         half_alpha = float(self.rotation)
         return np.matrix(
-            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, np.exp(1j * half_alpha)]]
+            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, np.exp(1j * half_alpha)]]
         )
+
+    def inv(self):
+        """Apply inverse gate."""
+        gate = CU1(self.rotation)
+        gate.is_inverse = not self.is_inverse
+        return gate

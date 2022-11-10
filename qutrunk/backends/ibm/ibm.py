@@ -38,9 +38,10 @@ class BackendIBM(Backend):
 
             # run circuit
             res = qc.run(shots=100)
+            print(res)
     """
 
-    def __init__(self, token=None, device=None):
+    def __init__(self, token, device=None):
         super().__init__()
         self.circuit = None
         self._token = token
@@ -65,34 +66,16 @@ class BackendIBM(Backend):
         """
         self._allocated_qubits.add(len(circuit.qreg))
 
-        for ct in circuit:
-            self.circuit_to_json(ct)
+        for ct in circuit.cmds:
+            self._circuit_to_json(ct)
 
         for measured_id in self._measured_ids:
             self._json.append(
                 {"qubits": [measured_id], "name": "measure", "memory": [measured_id]}
             )
-        print("result==", self._json)
+        # print("send circuit:", self._json)
 
-        info = {}
-        info["json"] = self._json
-
-        info["nq"] = len(circuit.qreg)
-        info["shots"] = 1024
-        info["maxCredits"] = 10
-        info["backend"] = {"name": self.device}
-
-        result = send(
-            info,
-            device=self.device,
-            token=self._token,
-            num_retries=1024,
-            verbose=True,
-        )
-        print("result=", result)
-        return result
-
-    def circuit_to_json(self, cmd):
+    def _circuit_to_json(self, cmd):
         """Translates the command and in a local variable.
 
         Args:
@@ -130,7 +113,32 @@ class BackendIBM(Backend):
             )
 
     def run(self, shots=1):
-        pass  # nothing to run
+        """Run quantum circuit.
 
-    def backend_type(self):
+        Args:
+            shots: Circuit run times, for sampling, default: 1.
+
+        Returns:
+            JSON: The Result object contain circuit running outcome.
+        """
+        info = {}
+        info["json"] = self._json
+
+        info["nq"] = sum(self._allocated_qubits)
+        info["shots"] = shots
+        info["maxCredits"] = 10
+        info["backend"] = {"name": self.device}
+
+        result = send(
+            info,
+            device=self.device,
+            token=self._token,
+            num_retries=shots,
+            verbose=True,
+        )
+        return result
+
+    @property
+    def name(self):
+        """The name of Backend."""
         return "BackendIBM"

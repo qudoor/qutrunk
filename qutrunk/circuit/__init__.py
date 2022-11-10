@@ -6,3 +6,4 @@ from .counter import Counter
 from .qubit import QuBit
 from .qureg import Qureg
 from .circuit import QCircuit
+from .parameter import Parameter

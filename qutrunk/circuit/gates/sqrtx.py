@@ -35,8 +35,7 @@ class SqrtXGate(BasicGate):
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            # TODO: need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, inverse=self.is_inverse)
@@ -51,6 +50,24 @@ class SqrtXGate(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         return 0.5 * np.array([[1 + 1j, 1 - 1j], [1 - 1j, 1 + 1j]])
+
+    def inv(self):
+        """Apply inverse gate."""
+        gate = SqrtXGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("SqrtX gate do not support multiple control bits.")
+        gate = CSqrtXGate()
+        gate.is_inverse = self.is_inverse
+        return gate
 
 
 SqrtX = SqrtXGate()
@@ -83,15 +100,14 @@ class CSqrtXGate(BasicGate):
                 CSqrtX * (qr[0], qr[1])
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
             AttributeError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO:need to improve.
-            raise AttributeError(
+            raise ValueError(
                 "Parameter error: One controlled and one target qubit are required."
             )
 
@@ -114,6 +130,12 @@ class CSqrtXGate(BasicGate):
             [(1 - 1j) / 2, 0, (1 + 1j) / 2, 0],
             [0, 0, 0, 1],
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CSqrtXGate()
+        gate.is_inverse = not self.is_inverse
+        return gate
 
 
 CSqrtX = CSqrtXGate()

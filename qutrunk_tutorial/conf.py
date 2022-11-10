@@ -13,12 +13,15 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import os
 import sys
-
-sys.path.append(os.path.relpath("..\qutrunk"))
+from pathlib import Path
+qutrunk_path = Path.cwd().parent / "qutrunk"
+print("qutrunk_path=", qutrunk_path)
+sys.path.insert(0, qutrunk_path)
+# TODO:have some problem.
+# sys.path.append(os.path.relpath("..\qutrunk"))
 # mac need abs path
-sys.path.append(os.path.abspath("../qutrunk"))
+# sys.path.append(os.path.abspath("../qutrunk"))
 
 
 # -- Project information -----------------------------------------------------

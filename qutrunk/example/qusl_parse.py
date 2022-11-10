@@ -1,4 +1,5 @@
 """Deserialize QuSL file object."""
+
 import os
 from pathlib import Path
 

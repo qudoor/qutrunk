@@ -1,24 +1,23 @@
-"""self increment example."""
+"""Self-increment operation  example."""
+
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import CNOT, Measure, Toffoli, X, All, MCX
-from qutrunk.circuit.ops import QSP
+from qutrunk.circuit.gates import Measure, All
+from qutrunk.circuit.ops import Classical
+from qutrunk.circuit.ops import INC
 
 
 def increment(num_qubits, init_value):
-    # Create quantum circuit 
+    # Create quantum circuit
     circuit = QCircuit()
 
     # Allocate quantum qubits
     qr = circuit.allocate(num_qubits)
 
     # Set initial amplitudes to classical state with init_value
-    QSP(init_value) * qr
+    Classical(init_value) * qr
 
-    # Apply quantam gates
-    MCX(3) * (qr[0], qr[1], qr[2], qr[3])
-    Toffoli * (qr[0], qr[1], qr[2])
-    CNOT * (qr[0], qr[1])
-    X * qr[0]
+    # Apply quantum gates
+    INC * qr
 
     # Measure all quantum qubits
     All(Measure) * qr

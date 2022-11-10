@@ -51,8 +51,7 @@ class Simulator:
         self.total_num_amps = 0  # numAmpsPerChunk
 
     def create_qureg(self, num_qubits):
-        """
-        Allocate resource
+        """Allocate resource.
 
         Args:
             num_qubits: number of qubits
@@ -60,6 +59,7 @@ class Simulator:
         self.qubits = num_qubits
         num_amps = 2**num_qubits
         self.total_num_amps = num_amps
+        # TODO: need to improve.
         self.real = [0] * num_amps
         self.imag = [0] * num_amps
 
@@ -72,6 +72,7 @@ class Simulator:
     def init_zero_state(self):
         """Init zero state"""
         self.init_blank_state()
+        # TODO:??
         self.real[0] = 1.0
 
     def init_plus_state(self):
@@ -95,6 +96,67 @@ class Simulator:
         # give the specified classical state prob 1
         self.real[0] = 1.0
         self.imag[0] = 0.0
+
+    def amp(self, reals, imags, startindex, numamps):
+        """Init amplitudes state"""
+        
+        for index in range(numamps):
+            self.real[startindex] = reals[index]
+            self.imag[startindex] = imags[index]
+            startindex += 1
+
+    def matrix(self, controls, targets, reals, imags):
+        """Apply custom matrix"""
+        ctrlMask = self.get_qubit_bit_mask(controls, len(controls))
+
+        numTargs = len(targets)
+        numTasks = self.total_num_amps >> numTargs
+        numTargAmps = 1 << numTargs
+
+        ampInds = [0]*numTargAmps
+        reAmps = [0]*numTargAmps
+        imAmps = [0]*numTargAmps
+
+        sortedTargs = [0]*numTargs
+        for t in range(numTargs):
+            sortedTargs[t] = targets[t]
+        sortedTargs.sort()
+
+        for thisTask in range(numTasks):
+            # find this task's start index (where all targs are 0)
+            thisInd00 = thisTask
+            for t in range(numTargs):
+                thisInd00 = self.insert_zero_bit(thisInd00, sortedTargs[t])
+                
+            # this task only modifies amplitudes if control qubits are 1 for this state
+            thisGlobalInd00 = thisInd00
+            if (ctrlMask and ((ctrlMask & thisGlobalInd00) != ctrlMask)):
+                continue
+                
+            # determine the indices and record values of this tasks's target amps
+            for i in range(numTargAmps):
+                # get statevec index of current target qubit assignment
+                ind = thisInd00
+                for t in range(numTargs):
+                    if (self.extract_bit(t, i)):
+                        ind = self.flip_bit(ind, targets[t])
+                
+                # update this tasks's private arrays
+                ampInds[i] = ind
+                reAmps [i] = self.real[ind]
+                imAmps [i] = self.imag[ind]
+            
+            # modify this tasks's target amplitudes
+            for r in range(numTargAmps):
+                ind = ampInds[r]
+                self.imag[ind] = 0
+                self.imag[ind] = 0
+                
+                for c in range(numTargAmps):
+                    reElem = reals[r][c]
+                    imElem = imags[r][c]
+                    self.real[ind] += reAmps[c]*reElem - imAmps[c]*imElem
+                    self.imag[ind] += reAmps[c]*imElem + imAmps[c]*reElem
 
     # TODO:need to improve.
     def hadamard(self, target):
@@ -943,7 +1005,7 @@ class Simulator:
 
         return total_prob
 
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """
         Get the probability of a state-vector at an index in the full state vector.
 
@@ -958,33 +1020,15 @@ class Simulator:
 
         real = self.real[index]
         imag = self.imag[index]
+        # TODO:doing
+        # print("in pysim=", real * real + imag * imag)
         return real * real + imag * imag
 
-    def get_prob_outcome(self, qubit, outcome):
-        """
-        Get the probability of a specified qubit being measured in the given outcome (0 or 1)
-
-        Args:
-            qubit: the specified qubit to be measured
-            outcome: the qubit measure result(0 or 1)
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            the probability of target qubit
-        """
-        outcome_prob = self.find_prob_of_zero(qubit)
-        if outcome == 1:
-            outcome_prob = 1.0 - outcome_prob
-        return outcome_prob
-
-    def get_prob_all_outcome(self, qubits):
-        """
-        Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg
-
-        Args:
-            qubits: the sub-register contained in qureg
-
-        Returns:
-            An array contains probability of target qubits
+            An array contains all probabilities of circuit.
         """
         num_outcome_probs = len(qubits)
         outcome_probs = [0] * (2**num_outcome_probs)
@@ -1000,7 +1044,8 @@ class Simulator:
 
         return outcome_probs
 
-    def get_all_state(self):
+    # TODO: to matrix
+    def get_statevector(self):
         """
         Get the current state vector of probability amplitudes for a set of qubits
         """
@@ -1009,6 +1054,7 @@ class Simulator:
         for i in range(self.total_num_amps):
             real = self.real[i]
             imag = self.imag[i]
+            # TODO: need to improve.
             if self.real[i] > -1e-15 and self.real[i] < 1e-15:
                 real = 0
             if self.imag[i] > -1e-15 and self.imag[i] < 1e-15:
@@ -1348,11 +1394,11 @@ class Simulator:
             work_imag[i] = self.imag[i]
         for pauli_op in pauli_prod_list:
             op_type = pauli_op["oper_type"]
-            if op_type == PauliOpType.PAULI_X:
+            if op_type == PauliOpType.PAULI_X.value:
                 self.paulix_local(work_real, work_imag, pauli_op["target"])
-            elif op_type == PauliOpType.PAULI_Y:
-                self.pauliy_local(work_real, work_imag, pauli_op["target"])
-            elif op_type == PauliOpType.PAULI_Z:
+            elif op_type == PauliOpType.PAULI_Y.value:
+                self.pauliy_local(work_real, work_imag, pauli_op["target"], 1)
+            elif op_type == PauliOpType.PAULI_Z.value:
                 self.pauliz_local(work_real, work_imag, pauli_op["target"])
 
         real, imag = self.calc_inner_product_local(
@@ -1376,16 +1422,18 @@ class Simulator:
         """Computes the expected value of a sum of products of Pauli operators."""
         num_qb = self.qubits
         targs = []
-        for q in range(targs):
-            targs[q] = q
+        for q in range(num_qb):
+            targs.append(q)
 
         value = 0
+        idx = 0
         num_sum_terms = len(term_coeff_list)
         for t in range(num_sum_terms):
             pauli_prod_list = []
             for i in range(num_qb):
                 temp = {}
-                temp["oper_type"] = oper_type_list[t * i]
+                temp["oper_type"] = oper_type_list[idx]
+                idx += 1
                 temp["target"] = targs[i]
                 pauli_prod_list.append(temp)
             value += term_coeff_list[t] * self.get_expec_pauli_prod(pauli_prod_list)

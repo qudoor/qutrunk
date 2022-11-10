@@ -19,7 +19,7 @@ class Rx(BasicRotateGate):
 
     def __init__(self, alpha):
         if alpha is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
 
         super().__init__()
         self.rotation = alpha
@@ -42,8 +42,7 @@ class Rx(BasicRotateGate):
             NotImplementedError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
         cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)
@@ -66,6 +65,24 @@ class Rx(BasicRotateGate):
             ]
         )
 
+    def inv(self):
+        """Apply inverse gate."""
+        gate = Rx(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate
+
+    def ctrl(self, ctrl_cnt=1):
+        """Apply controlled gate.
+        
+        Args:
+            ctrl_cnt: The number of control qubits, default: 1.
+        """
+        if ctrl_cnt > 1:
+            raise ValueError("Rx gate do not support multiple control bits.")
+        gate = CRx(self.rotation)
+        gate.is_inverse = self.is_inverse
+        return gate
+
 
 class CRx(BasicRotateGate):
     """Control Rx Gate.
@@ -82,7 +99,7 @@ class CRx(BasicRotateGate):
 
     def __init__(self, angle):
         if angle is None:
-            raise NotImplementedError("The argument cannot be empty.")
+            raise ValueError("The argument cannot be empty.")
 
         super().__init__()
         self.rotation = angle
@@ -106,12 +123,10 @@ class CRx(BasicRotateGate):
             AttributeError: If the qubits should not be two.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO:need to improve.
-            raise AttributeError(
+            raise ValueError(
                 "Parameter error: One controlled and one target qubit are required."
             )
 
@@ -137,3 +152,9 @@ class CRx(BasicRotateGate):
         return np.array(
             [[cos, 0, -isin, 0], [0, 1, 0, 0], [-isin, 0, cos, 0], [0, 0, 0, 1]]
         )
+
+    def inv(self):
+        """Apply inverse gate"""
+        gate = CRx(self.rotation)
+        gate.is_inverse = not self.is_inverse 
+        return gate

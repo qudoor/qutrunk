@@ -65,8 +65,8 @@ def qusl_to_circuit(file):
         circuit = g.generate_circuit()
         # delete the temp file
         os.remove(f"{filename}.py")
-
-        return circuit
     except Exception as e:
         raise QuTrunkError(e)
+    else:
+        return circuit
 

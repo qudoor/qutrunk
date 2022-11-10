@@ -99,7 +99,7 @@ class Qureg:
         return self.qubits.index(qubit)
 
     def to_cl(self):
-        """Get measure result of Qureg"""
+        """Get measure result of Qureg."""
         res = []
         for i in range(len(self.qubits)):
             res.append(self.circuit.creg[i].value)
@@ -115,11 +115,11 @@ class Qureg:
         Returns:
             The tuple contains all subqureg.
         """
-        # TODO: need to improve.
-        if type(sections) != list:
-            raise TypeError("sections parameter should be a list")
+        if not isinstance(sections, list):
+            raise TypeError("sections parameter should be a list.")
+
         if sum(sections) != len(self.qubits):
-            raise ValueError("the sum of sections should be equal to len(qubits)")
+            raise ValueError("The sum of sections should be equal to len(qubits).")
 
         res = []
         start_index = 0

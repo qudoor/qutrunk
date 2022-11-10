@@ -18,7 +18,7 @@ class QuSproutApiServer:
         port: port, default: 9090.
     """
 
-    def __init__(self, ip='localhost', port=9090):
+    def __init__(self, ip="localhost", port=9090):
         socket = TSocket.TSocket(ip, port)
         self._transport = TTransport.TBufferedTransport(socket)
         protocol = TBinaryProtocol.TBinaryProtocol(self._transport)
@@ -77,7 +77,7 @@ class QuSproutApiServer:
         return res.result
 
     @timefn
-    def get_prob_amp(self, index):
+    def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
@@ -91,36 +91,18 @@ class QuSproutApiServer:
         return res.amp
 
     @timefn
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1)
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
 
         Returns:
-            The probability of target qubit
-        """
-        req = qusproutdata.GetProbOfOutcomeReq(self._taskid, qubit, outcome)
-        res = self._client.getProbOfOutcome(req)
-        return res.pro_outcome
-
-    @timefn
-    def get_prob_all_outcome(self, qubits):
-        """Get outcomeProbs with the probabilities of every outcome of the sub-register contained in qureg.
-
-        Args:
-            qubits: The sub-register contained in qureg.
-
-        Returns:
-            An array contains probability of target qubits.
+            An array contains all probabilities of circuit.
         """
         req = qusproutdata.GetProbOfAllOutcomReq(self._taskid, qubits)
         res = self._client.getProbOfAllOutcome(req)
         return res.pro_outcomes
 
     @timefn
-    def get_all_state(self):
+    def get_statevector(self):
         """Get the current state vector of probability amplitudes for a set of qubits.
 
         Returns:
@@ -135,20 +117,6 @@ class QuSproutApiServer:
         """Cancel current job."""
         req = qusproutdata.CancelCmdReq(self._taskid)
         return self._client.cancelCmd(req)
-
-    @timefn
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        if qubits:
-            req = qusproutdata.ApplyQFTReq(self._taskid, qubits)
-            self._client.applyQFT(req)
-        else:
-            req = qusproutdata.ApplyFullQFTReq(self._taskid)
-            self._client.applyFullQFT(req)
 
     @timefn
     def get_expec_pauli_prod(self, pauli_prod_list):
