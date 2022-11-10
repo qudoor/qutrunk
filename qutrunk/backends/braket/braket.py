@@ -19,7 +19,7 @@ CLIENT_VERSION = "0.0.1"
 
 
 class BackendBraket(Backend, ABC):
-    """BraketBackend."""
+    """BackendBraket."""
 
     def __init__(
             self,
@@ -48,9 +48,24 @@ class BackendBraket(Backend, ABC):
         self._circuit = None
 
     def send_circuit(self, circuit, final=False):
+        """Send the quantum circuit to Braket backend.
+
+        Args:
+            circuit: Quantum circuit to send.
+            final: True if quantum circuit finish, default False, \
+            when final==True The backend program will release the computing resources.
+        """
         self._circuit = circuit
 
     def run(self, shots=1024):
+        """Run quantum circuit.
+
+        Args:
+            shots: Circuit run times, for sampling, default: 1024.
+
+        Returns:
+            The Result object contain circuit running outcome.
+        """
         circuit: Circuit = convert_qutrunk_to_braket_circuit(self._circuit)
         try:
             task: LocalQuantumTask = self._device.run(
@@ -73,10 +88,10 @@ class BackendBraket(Backend, ABC):
 
 
 class BackendAWSLocal(BackendBraket):
-    """BraketLocalBackend."""
+    """BackendAWSLocal."""
 
     def __init__(self, name: str = "default"):
-        """AWSBraketLocalBackend for local execution of circuits.
+        """BackendAWSLocal for local execution of circuits.
 
         Example:
             .. code-block:: python
@@ -95,17 +110,17 @@ class BackendAWSLocal(BackendBraket):
 
 
 class BackendAWSDevice(BackendBraket):
-    """ AWSBraketBackend.
-        following below steps to use AWS braket device.
-        referring to https://docs.aws.amazon.com/braket/index.html for detail
-        1. sign in AWS console, visit https://console.aws.amazon.com/braket/home.
-            follow guide to create execution roles, including service-link role and job execute role
-        2. set up AWS credentials and default region,
-            referring to https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html
+    """ BackendAWSDevice. Following below steps to use AWS braket device. \
+        Referring to https://docs.aws.amazon.com/braket/index.html for detail
+
+        1. sign in AWS console, https://console.aws.amazon.com/braket/home. \
+            Follow guidance to create roles, including service-link role and job execution role
+        2. set up AWS credentials and default region, \
+            Referring to https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html
     """
 
     def __init__(self, name: str = None):
-        """AWSBraketBackend for execution circuits against AWS Braket devices.
+        """BackendAWSDevice for execution circuits against AWS Braket devices.
 
         Args:
             name: name of backend, such as SV1, TN1, DM1, etc. refer to Amazon Braket service for detail
@@ -122,33 +137,32 @@ class BackendAWSDevice(BackendBraket):
 
 
 def supported_aws_device(name):
-    """
+    """Get supported AWS device by name
 
     Args:
         name: device name, such as
-         [Aspen-10],
-         [Aspen-11],
-         [Aspen-8],
-         [Aspen-9],
-         [Aspen-M-1],
-         [IonQ Device],
-         [Lucy],
-         [SV1],
-         [TN1],
-         [dm1]]
-
+            [Aspen-10],
+            [Aspen-11],
+            [Aspen-8],
+            [Aspen-9],
+            [Aspen-M-1],
+            [IonQ Device],
+            [Lucy],
+            [SV1],
+            [TN1],
+            [dm1]
     Returns:
         supported device, such as
-         [BraketBackend[Aspen-10],
-         BraketBackend[Aspen-11],
-         BraketBackend[Aspen-8],
-         BraketBackend[Aspen-9],
-         BraketBackend[Aspen-M-1],
-         BraketBackend[IonQ Device],
-         BraketBackend[Lucy],
-         BraketBackend[SV1],
-         BraketBackend[TN1],
-         BraketBackend[dm1]]
+        BraketBackend[Aspen-10],
+        BraketBackend[Aspen-11],
+        BraketBackend[Aspen-8],
+        BraketBackend[Aspen-9],
+        BraketBackend[Aspen-M-1],
+        BraketBackend[IonQ Device],
+        BraketBackend[Lucy],
+        BraketBackend[SV1],
+        BraketBackend[TN1],
+        BraketBackend[dm1]
 
     """
     names = [name] if name else None

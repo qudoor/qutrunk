@@ -10,6 +10,16 @@ from .exception import QuTrunkBraketException
 
 
 def u3(theta, phi, lam):
+    """U3Gate decomposition
+
+    Args:
+        theta: theta
+        phi: phi
+        lam: lam
+
+    Returns:
+        list of gates representing u3 gate
+    """
     return [
         gates.Rz(lam),
         gates.Rx(pi / 2),
