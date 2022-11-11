@@ -1,9 +1,11 @@
 """Run the quantum circuit using QuSprout as the backend."""
 from typing import Optional
 
+import qutrunk
 from qutrunk.circuit import QCircuit
 from qutrunk.backends import BackendQuSprout
 from qutrunk.circuit.gates import H, CNOT, Measure
+
 
 def run_check_sprout(ip: Optional[str] = None, port: Optional[int] = None):
     # allocate
@@ -25,7 +27,8 @@ def run_check_sprout(ip: Optional[str] = None, port: Optional[int] = None):
     print(res.get_counts())
     print("===========circuit running info==========")
     print(res.excute_info())
-    print("QuTrunk is installed successfully! You can use QuTrunk now.")
+
+    print(f"qutrunk {qutrunk.__version__} is installed successfully! You can use QuTrunk now.")
 
 
 if __name__ == "__main__":

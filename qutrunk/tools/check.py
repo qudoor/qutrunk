@@ -1,6 +1,8 @@
 """Run quantum circuits using local as the backend."""
+import qutrunk
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, CNOT, Measure
+
 
 def run_check(backend=None):
     # allocate
@@ -23,7 +25,8 @@ def run_check(backend=None):
     print(res.get_counts())
     print("===========circuit running info==========")
     print(res.excute_info())
-    print("QuTrunk is installed successfully! You can use QuTrunk now.")
+
+    print(f"qutrunk {qutrunk.__version__} is installed successfully! You can use QuTrunk now.")
 
 
 if __name__ == "__main__":

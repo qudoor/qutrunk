@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   qutrunk.backends.braket
    qutrunk.backends.ibm
    qutrunk.backends.qusprout
 

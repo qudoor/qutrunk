@@ -6,13 +6,13 @@
 QuTrunk
 =============
    
-
-.. toctree::
-   :maxdepth: 1
+..
+ .. toctree::
+    :maxdepth: 1
    :caption: 量子门
 
-   Gate/gate1  
-   Gate/gate2  
+   Gate/gate1
+   Gate/gate2
 
 .. toctree::
    :maxdepth: 1
