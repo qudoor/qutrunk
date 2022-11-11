@@ -27,7 +27,7 @@ class BackendBraket(Backend):
         description: str = None,
         online_date: datetime.datetime = None,
     ):
-        """Initialize a based backend
+        """Initialize a based backend.
 
         Args:
             device: device: Braket device class
@@ -37,7 +37,8 @@ class BackendBraket(Backend):
 
         Raises:
             AttributeError: If a field is specified that's outside the backend's
-                options
+                options.
+
         """
         self._device = device
         self._name = name
