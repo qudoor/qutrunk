@@ -1,4 +1,5 @@
 """Util function for backend."""
+
 from typing import Dict, Callable
 
 import numpy as np
@@ -10,6 +11,17 @@ from .exception import QuTrunkBraketException
 
 
 def u3(theta, phi, lam):
+    """U3Gate decomposition
+
+    Args:
+        theta: theta
+        phi: phi
+        lam: lam
+
+    Returns:
+        list of gates representing u3 gate.
+
+    """
     return [
         gates.Rz(lam),
         gates.Rx(pi / 2),
@@ -50,7 +62,6 @@ qutrunk_gate_names_to_braket_gates: Dict[str, Callable] = {
     "rxx": lambda angle: [gates.XX(angle)],
     "ryy": lambda angle: [gates.YY(angle)],
     "ecr": lambda: [gates.ECR()],
-
     "x1": lambda: [gates.Rx(pi / 2)],
     "y1": lambda: [gates.Ry(pi / 2)],
     "z1": lambda: [gates.Rz(pi / 2)],
@@ -60,9 +71,13 @@ qutrunk_gate_names_to_braket_gates: Dict[str, Callable] = {
     "crx": lambda theta: [gates.Unitary(np.array(i_gates.CRx(theta).matrix), "CRx")],
     "cry": lambda theta: [gates.Unitary(np.array(i_gates.CRy(theta).matrix), "CRy")],
     "crz": lambda theta: [gates.Unitary(np.array(i_gates.CRz(theta).matrix), "CRz")],
-    "cu": lambda theta, phi, lam, gamma: [gates.Unitary(np.array(i_gates.CU(theta, phi, lam, gamma).matrix), "CU")],
+    "cu": lambda theta, phi, lam, gamma: [
+        gates.Unitary(np.array(i_gates.CU(theta, phi, lam, gamma).matrix), "CU")
+    ],
     "cu1": lambda theta: [gates.Unitary(np.array(i_gates.CU1(theta).matrix), "CU1")],
-    "cu3": lambda theta, phi, lam: [gates.Unitary(np.array(i_gates.CU3(theta, phi, lam).matrix), "CU3")],
+    "cu3": lambda theta, phi, lam: [
+        gates.Unitary(np.array(i_gates.CU3(theta, phi, lam).matrix), "CU3")
+    ],
     "ch": lambda: [gates.Unitary(np.array(i_gates.CH.matrix), "CH")],
     "csqrtx": lambda: [gates.CV()],
     "sqrtxdg": lambda: [gates.Vi()],
@@ -75,7 +90,8 @@ def convert_qutrunk_to_braket_circuit(circuit) -> Circuit:
             circuit (QCircuit): QuTrunk Quantum Cricuit
 
     Returns:
-        Circuit: Braket circuit
+        Circuit: Braket circuit.
+
     """
     quantum_circuit = Circuit()
     for qutrunk_cmd in circuit.cmds:
@@ -84,10 +100,7 @@ def convert_qutrunk_to_braket_circuit(circuit) -> Circuit:
             # TODO: change Probability result type for Sample for proper functioning # pylint:disable=fixme
             quantum_circuit.add_result_type(
                 result_types.Probability(
-                    target=[
-                        qutrunk_cmd.targets[0],
-                        qutrunk_cmd.targets[0]
-                    ]
+                    target=[qutrunk_cmd.targets[0], qutrunk_cmd.targets[0]]
                 )
             )
         elif name == "barrier":
@@ -105,13 +118,15 @@ def convert_qutrunk_to_braket_circuit(circuit) -> Circuit:
                     gate_list = [gates.CCNot()]
                 else:
                     raise QuTrunkBraketException(
-                        f"{name}({ctr_cnt}):mcx with more than 2 control bit isn't supported by BRAKET")
+                        f"{name}({ctr_cnt}):mcx with more than 2 control bit isn't supported by BRAKET"
+                    )
             elif name == "mcz":
                 if ctr_cnt == 1:
                     gate_list = [gates.CZ()]
                 else:
                     raise QuTrunkBraketException(
-                        f"{name}({ctr_cnt}):mcz with more than 1 control bit isn't supported by BRAKET")
+                        f"{name}({ctr_cnt}):mcz with more than 1 control bit isn't supported by BRAKET"
+                    )
             else:
                 gate_list = qutrunk_gate_names_to_braket_gates[name](*params)
 
