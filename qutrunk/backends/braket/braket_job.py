@@ -30,11 +30,11 @@ class AWSBraketJob:
     """AWSBraketJob."""
 
     def __init__(
-            self,
-            job_id: str,
-            backend: Backend,
-            task: Union[LocalQuantumTask, AwsQuantumTask],
-            **metadata: Optional[dict]
+        self,
+        job_id: str,
+        backend: Backend,
+        task: Union[LocalQuantumTask, AwsQuantumTask],
+        **metadata: Optional[dict]
     ):
         """AWSBraketJob for local execution of circuits.
 
@@ -55,16 +55,15 @@ class AWSBraketJob:
 
         Returns:
             shots: int with the number of shots.
+
         """
-        return (
-            self._metadata["shots"] if "shots" in self._metadata else 0
-        )
+        return self._metadata["shots"] if "shots" in self._metadata else 0
 
     def result(self) -> _Result:
         """Convert braket result to qutrunk measurement result
 
         Returns:
-            qutrunk measurement result
+            qutrunk measurement result.
 
         """
         # todo bit str big end?
@@ -75,9 +74,9 @@ class AWSBraketJob:
         return res
 
     def cancel(self):
-        """Cancel AWS Braket task"""
+        """Cancel AWS Braket task."""
         self._task.cancel()
 
     def status(self):
-        """Task status"""
+        """Task status."""
         return self._task.state()

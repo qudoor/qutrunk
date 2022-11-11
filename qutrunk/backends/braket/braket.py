@@ -1,7 +1,6 @@
 """AWS Braket backends."""
 
 import datetime
-from abc import ABC
 
 from braket.aws import AwsDevice
 from braket.circuits import Circuit
@@ -18,15 +17,15 @@ from .. import Backend
 CLIENT_VERSION = "0.0.1"
 
 
-class BackendBraket(Backend, ABC):
+class BackendBraket(Backend):
     """BackendBraket."""
 
     def __init__(
-            self,
-            device,
-            name: str = None,
-            description: str = None,
-            online_date: datetime.datetime = None,
+        self,
+        device,
+        name: str = None,
+        description: str = None,
+        online_date: datetime.datetime = None,
     ):
         """Initialize a based backend
 
@@ -84,6 +83,7 @@ class BackendBraket(Backend, ABC):
 
     @property
     def name(self):
+        """The name of Backend."""
         return f"BackendAWSBraket[{self._name}]"
 
 
@@ -103,7 +103,8 @@ class BackendAWSLocal(BackendBraket):
                 device = LocalSimulator(name="braket_dm")      #Local Density Matrix Simulator
 
         Args:
-            name: name of backend
+            name: name of backend。
+
         """
         device = LocalSimulator(backend=name)
         super().__init__(device, name="sv_simulator")
@@ -137,7 +138,7 @@ class BackendAWSDevice(BackendBraket):
 
 
 def supported_aws_device(name):
-    """Get supported AWS device by name
+    """Get supported AWS device by name.
 
     Args:
         name: device name, such as
@@ -151,6 +152,7 @@ def supported_aws_device(name):
             [SV1],
             [TN1],
             [dm1]
+
     Returns:
         supported device, such as
         BraketBackend[Aspen-10],
