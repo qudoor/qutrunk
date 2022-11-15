@@ -240,7 +240,10 @@ class QCircuit:
         print(circuit_drawer(circuit=self, output=output, line_length=line_length))
 
     def __str__(self) -> str:
-        return str(self.draw(output="text"))
+        return f"QCircuit({self.num_qubits})"
+
+    def __repr__(self) -> str:
+        return f"QCircuit({self.num_qubits})"
 
     @property
     def qubits(self) -> List[QuBit]:
