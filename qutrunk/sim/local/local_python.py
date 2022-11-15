@@ -163,19 +163,6 @@ class BackendLocalPython:
         return self.sim.get_statevector()
 
     @timefn
-    def qft(self, qubits):
-        """
-        Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg
-
-        Args:
-            qubits: a list of the qubits to operate the QFT upon
-        """
-        if qubits:
-            self.sim.apply_qft(qubits, len(qubits))
-        else:
-            self.sim.apply_full_qft()
-
-    @timefn
     def get_expec_pauli_prod(self, pauli_prod_list):
         """
         Computes the expected value of a product of Pauli operators.
