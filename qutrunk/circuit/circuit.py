@@ -84,6 +84,8 @@ class QCircuit:
 
         if resource:
             self.counter = Counter(self)
+        # circuit init state
+        self._init_state = 0
     
     def allocate(self, qubits: Union[int, list]):
         """Allocate qubit in quantum circuit.
@@ -621,6 +623,7 @@ class QCircuit:
         """Show resource of the circuit use."""
         if self.counter:
             self.counter.show_verbose()
+
 
 
 class Result:
