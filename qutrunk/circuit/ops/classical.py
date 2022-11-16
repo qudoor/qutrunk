@@ -23,7 +23,7 @@ class Classical(Operator):
 
             circuit = QCircuit()
             qureg = circuit.allocate(3)
-            Classical("0100") * qureg 
+            Classical("0100") * qureg
             # Classical(4) * qureg
             print(circuit.get_statevector())
     """
@@ -37,7 +37,9 @@ class Classical(Operator):
 
     def __mul__(self, qureg: Qureg):
         if qureg.circuit.num_gates > 0:
-            raise QuTrunkError("Classical operator should be applied at the beginning of circuit.")
+            raise QuTrunkError(
+                "Classical operator should be applied at the beginning of circuit."
+            )
 
         if not isinstance(qureg, Qureg):
             raise TypeError("the operand must be Qureg.")
@@ -46,6 +48,8 @@ class Classical(Operator):
             raise ValueError(f"Invalid state: {self.state}")
 
         self._process_state(qureg)
+        # record init state
+        qureg.circuit._init_state = self._state()
 
     def _check_state(self, qureg: Qureg):
         if isinstance(self.state, str):
@@ -76,3 +80,9 @@ class Classical(Operator):
         for i, _ in enumerate(qureg):
             if bit_strs[i] == "1":
                 X * qureg[i]
+
+    def _state(self):
+        if isinstance(self.state, str):
+            return int(self.state, base=2)
+        if isinstance(self.state, int):
+            return self.state

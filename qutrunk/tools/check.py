@@ -26,7 +26,9 @@ def run_check(backend=None):
     print("===========circuit running info==========")
     print(res.excute_info())
 
-    print(f"qutrunk {qutrunk.__version__} is installed successfully! You can use QuTrunk now.")
+    print(
+        f"qutrunk {qutrunk.__version__} is installed successfully! You can use QuTrunk now."
+    )
 
 
 if __name__ == "__main__":

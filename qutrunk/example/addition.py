@@ -22,5 +22,5 @@ def run_addition(num_qubits, init_value, number=0):
 
 
 if __name__ == "__main__":
-    circuit = run_addition(4, 3, 3)
+    circuit = run_addition(4, 3, 12)
 
