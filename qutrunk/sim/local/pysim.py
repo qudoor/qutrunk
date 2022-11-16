@@ -1253,55 +1253,6 @@ class Simulator:
             self.imag[ind01] = im10
             self.imag[ind10] = im01
 
-    def apply_qft(self, qubits, num_qubits):
-        """
-        Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg
-
-        Args:
-            qubits: a list of the qubits to operate the QFT upon
-            num_qubits: number of qubits
-        """
-        for q in range(num_qubits - 1, -1, -1):
-            self.hadamard(qubits[q])
-
-            if q == 0:
-                break
-
-            num_regs = 2
-            num_qubits_per_reg = [q, 1]
-            regs = [0] * 100
-            for i in range(q + 1):
-                regs[i] = qubits[i]
-
-            params = [math.pi / (2**q)]
-
-            self.apply_param_named_phase(
-                regs,
-                num_qubits_per_reg,
-                num_regs,
-                BitEncoding.UNSIGNED,
-                PhaseFunc.SCALED_PRODUCT,
-                params,
-                None,
-                None,
-                0,
-                0,
-            )
-
-        for i in range(num_qubits // 2):
-            qb1 = qubits[i]
-            qb2 = qubits[num_qubits - i - 1]
-            self.swap_qubit_amps(qb1, qb2)
-
-    def apply_full_qft(self):
-        """
-        Applies the quantum Fourier transform (QFT) to the entirety of qureg
-        """
-        qubits = [0] * 100
-        for i in range(self.qubits):
-            qubits[i] = i
-        self.apply_qft(qubits, self.qubits)
-
     # TODO:need to improve.
     def paulix_local(self, work_real, work_imag, target_qubit):
         """pauli-X"""

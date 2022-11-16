@@ -1399,162 +1399,6 @@ class GetProbAmpResp(object):
         return not (self == other)
 
 
-class GetProbOfOutcomeReq(object):
-    """
-    Attributes:
-     - id
-     - qubit
-     - outcom
-
-    """
-
-
-    def __init__(self, id=None, qubit=None, outcom=None,):
-        self.id = id
-        self.qubit = qubit
-        self.outcom = outcom
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.id = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.I32:
-                    self.qubit = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 3:
-                if ftype == TType.I32:
-                    self.outcom = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('GetProbOfOutcomeReq')
-        if self.id is not None:
-            oprot.writeFieldBegin('id', TType.STRING, 1)
-            oprot.writeString(self.id.encode('utf-8') if sys.version_info[0] == 2 else self.id)
-            oprot.writeFieldEnd()
-        if self.qubit is not None:
-            oprot.writeFieldBegin('qubit', TType.I32, 2)
-            oprot.writeI32(self.qubit)
-            oprot.writeFieldEnd()
-        if self.outcom is not None:
-            oprot.writeFieldBegin('outcom', TType.I32, 3)
-            oprot.writeI32(self.outcom)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.id is None:
-            raise TProtocolException(message='Required field id is unset!')
-        if self.qubit is None:
-            raise TProtocolException(message='Required field qubit is unset!')
-        if self.outcom is None:
-            raise TProtocolException(message='Required field outcom is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class GetProbOfOutcomeResp(object):
-    """
-    Attributes:
-     - base
-     - pro_outcome
-
-    """
-
-
-    def __init__(self, base=None, pro_outcome=None,):
-        self.base = base
-        self.pro_outcome = pro_outcome
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.base = qutrunk.sim.qusprout.code.ttypes.BaseCode()
-                    self.base.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.DOUBLE:
-                    self.pro_outcome = iprot.readDouble()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('GetProbOfOutcomeResp')
-        if self.base is not None:
-            oprot.writeFieldBegin('base', TType.STRUCT, 1)
-            self.base.write(oprot)
-            oprot.writeFieldEnd()
-        if self.pro_outcome is not None:
-            oprot.writeFieldBegin('pro_outcome', TType.DOUBLE, 2)
-            oprot.writeDouble(self.pro_outcome)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.base is None:
-            raise TProtocolException(message='Required field base is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
 class GetProbOfAllOutcomReq(object):
     """
     Attributes:
@@ -1852,265 +1696,6 @@ class GetAllStateResp(object):
         return not (self == other)
 
 
-class ApplyQFTReq(object):
-    """
-    Attributes:
-     - id
-     - targets
-
-    """
-
-
-    def __init__(self, id=None, targets=None,):
-        self.id = id
-        self.targets = targets
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.id = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.LIST:
-                    self.targets = []
-                    (_etype115, _size112) = iprot.readListBegin()
-                    for _i116 in range(_size112):
-                        _elem117 = iprot.readI32()
-                        self.targets.append(_elem117)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('ApplyQFTReq')
-        if self.id is not None:
-            oprot.writeFieldBegin('id', TType.STRING, 1)
-            oprot.writeString(self.id.encode('utf-8') if sys.version_info[0] == 2 else self.id)
-            oprot.writeFieldEnd()
-        if self.targets is not None:
-            oprot.writeFieldBegin('targets', TType.LIST, 2)
-            oprot.writeListBegin(TType.I32, len(self.targets))
-            for iter118 in self.targets:
-                oprot.writeI32(iter118)
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.id is None:
-            raise TProtocolException(message='Required field id is unset!')
-        if self.targets is None:
-            raise TProtocolException(message='Required field targets is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class ApplyQFTResp(object):
-    """
-    Attributes:
-     - base
-
-    """
-
-
-    def __init__(self, base=None,):
-        self.base = base
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.base = qutrunk.sim.qusprout.code.ttypes.BaseCode()
-                    self.base.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('ApplyQFTResp')
-        if self.base is not None:
-            oprot.writeFieldBegin('base', TType.STRUCT, 1)
-            self.base.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.base is None:
-            raise TProtocolException(message='Required field base is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class ApplyFullQFTReq(object):
-    """
-    Attributes:
-     - id
-
-    """
-
-
-    def __init__(self, id=None,):
-        self.id = id
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.id = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('ApplyFullQFTReq')
-        if self.id is not None:
-            oprot.writeFieldBegin('id', TType.STRING, 1)
-            oprot.writeString(self.id.encode('utf-8') if sys.version_info[0] == 2 else self.id)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.id is None:
-            raise TProtocolException(message='Required field id is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class ApplyFullQFTResp(object):
-    """
-    Attributes:
-     - base
-
-    """
-
-
-    def __init__(self, base=None,):
-        self.base = base
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.base = qutrunk.sim.qusprout.code.ttypes.BaseCode()
-                    self.base.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('ApplyFullQFTResp')
-        if self.base is not None:
-            oprot.writeFieldBegin('base', TType.STRUCT, 1)
-            self.base.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.base is None:
-            raise TProtocolException(message='Required field base is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
 class RunCircuitReq(object):
     """
     Attributes:
@@ -2285,11 +1870,11 @@ class GetExpecPauliProdReq(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.pauli_prod = []
-                    (_etype122, _size119) = iprot.readListBegin()
-                    for _i123 in range(_size119):
-                        _elem124 = PauliProdInfo()
-                        _elem124.read(iprot)
-                        self.pauli_prod.append(_elem124)
+                    (_etype115, _size112) = iprot.readListBegin()
+                    for _i116 in range(_size112):
+                        _elem117 = PauliProdInfo()
+                        _elem117.read(iprot)
+                        self.pauli_prod.append(_elem117)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -2310,8 +1895,8 @@ class GetExpecPauliProdReq(object):
         if self.pauli_prod is not None:
             oprot.writeFieldBegin('pauli_prod', TType.LIST, 2)
             oprot.writeListBegin(TType.STRUCT, len(self.pauli_prod))
-            for iter125 in self.pauli_prod:
-                iter125.write(oprot)
+            for iter118 in self.pauli_prod:
+                iter118.write(oprot)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2511,20 +2096,20 @@ class GetExpecPauliSumReq(object):
             elif fid == 2:
                 if ftype == TType.LIST:
                     self.oper_type_list = []
-                    (_etype129, _size126) = iprot.readListBegin()
-                    for _i130 in range(_size126):
-                        _elem131 = iprot.readI32()
-                        self.oper_type_list.append(_elem131)
+                    (_etype122, _size119) = iprot.readListBegin()
+                    for _i123 in range(_size119):
+                        _elem124 = iprot.readI32()
+                        self.oper_type_list.append(_elem124)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
                 if ftype == TType.LIST:
                     self.term_coeff_list = []
-                    (_etype135, _size132) = iprot.readListBegin()
-                    for _i136 in range(_size132):
-                        _elem137 = iprot.readDouble()
-                        self.term_coeff_list.append(_elem137)
+                    (_etype128, _size125) = iprot.readListBegin()
+                    for _i129 in range(_size125):
+                        _elem130 = iprot.readDouble()
+                        self.term_coeff_list.append(_elem130)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -2545,15 +2130,15 @@ class GetExpecPauliSumReq(object):
         if self.oper_type_list is not None:
             oprot.writeFieldBegin('oper_type_list', TType.LIST, 2)
             oprot.writeListBegin(TType.I32, len(self.oper_type_list))
-            for iter138 in self.oper_type_list:
-                oprot.writeI32(iter138)
+            for iter131 in self.oper_type_list:
+                oprot.writeI32(iter131)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.term_coeff_list is not None:
             oprot.writeFieldBegin('term_coeff_list', TType.LIST, 3)
             oprot.writeListBegin(TType.DOUBLE, len(self.term_coeff_list))
-            for iter139 in self.term_coeff_list:
-                oprot.writeDouble(iter139)
+            for iter132 in self.term_coeff_list:
+                oprot.writeDouble(iter132)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2750,19 +2335,6 @@ GetProbAmpResp.thrift_spec = (
     (1, TType.STRUCT, 'base', [qutrunk.sim.qusprout.code.ttypes.BaseCode, None], None, ),  # 1
     (2, TType.DOUBLE, 'amp', None, None, ),  # 2
 )
-all_structs.append(GetProbOfOutcomeReq)
-GetProbOfOutcomeReq.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'id', 'UTF8', None, ),  # 1
-    (2, TType.I32, 'qubit', None, None, ),  # 2
-    (3, TType.I32, 'outcom', None, None, ),  # 3
-)
-all_structs.append(GetProbOfOutcomeResp)
-GetProbOfOutcomeResp.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'base', [qutrunk.sim.qusprout.code.ttypes.BaseCode, None], None, ),  # 1
-    (2, TType.DOUBLE, 'pro_outcome', None, None, ),  # 2
-)
 all_structs.append(GetProbOfAllOutcomReq)
 GetProbOfAllOutcomReq.thrift_spec = (
     None,  # 0
@@ -2785,27 +2357,6 @@ GetAllStateResp.thrift_spec = (
     None,  # 0
     (1, TType.STRUCT, 'base', [qutrunk.sim.qusprout.code.ttypes.BaseCode, None], None, ),  # 1
     (2, TType.LIST, 'all_state', (TType.STRING, 'UTF8', False), None, ),  # 2
-)
-all_structs.append(ApplyQFTReq)
-ApplyQFTReq.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'id', 'UTF8', None, ),  # 1
-    (2, TType.LIST, 'targets', (TType.I32, None, False), None, ),  # 2
-)
-all_structs.append(ApplyQFTResp)
-ApplyQFTResp.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'base', [qutrunk.sim.qusprout.code.ttypes.BaseCode, None], None, ),  # 1
-)
-all_structs.append(ApplyFullQFTReq)
-ApplyFullQFTReq.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'id', 'UTF8', None, ),  # 1
-)
-all_structs.append(ApplyFullQFTResp)
-ApplyFullQFTResp.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'base', [qutrunk.sim.qusprout.code.ttypes.BaseCode, None], None, ),  # 1
 )
 all_structs.append(RunCircuitReq)
 RunCircuitReq.thrift_spec = (
