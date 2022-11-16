@@ -15,3 +15,6 @@ def get_qubox_setting():
     with open(yaml_file) as f:
         yaml_content = yaml.load(f, Loader=yaml.FullLoader)
         return f"{yaml_content['ip']}:{yaml_content['port']}"
+
+
+print(get_qubox_setting())

@@ -86,7 +86,7 @@ class QCircuit:
             self.counter = Counter(self)
         # circuit init state
         self._init_state = 0
-    
+
     def allocate(self, qubits: Union[int, list]):
         """Allocate qubit in quantum circuit.
 
@@ -106,8 +106,8 @@ class QCircuit:
         if qubit_size <= 0:
             raise TypeError("Number of qubits should be larger than 0.")
 
-        if qubit_size > 20:
-            raise ValueError("Number of qubits should be less than 20.")
+        if qubit_size > 25:
+            raise ValueError("Number of qubits should be less than 25.")
 
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)
@@ -149,7 +149,9 @@ class QCircuit:
             circuit: The target circuit append to current circuit.
         """
         if circuit.num_qubits != self.num_qubits:
-            raise QuTrunkError("The target circuit must have the same qubits as current circuit.")
+            raise QuTrunkError(
+                "The target circuit must have the same qubits as current circuit."
+            )
         for cmd in circuit.cmds:
             self.append_cmd(cmd)
 
@@ -284,7 +286,7 @@ class QCircuit:
         qubits = [i for i in range(self.num_qubits)]
         self.backend.send_circuit(self)
         probs = self.backend.get_probs(qubits)
-        
+
         out_probs = []
         for i in range(len(probs)):
             prob = {}
@@ -341,7 +343,7 @@ class QCircuit:
         self.param_dict[name] = p
         return p
 
-    def create_parameters(self, names: list)->tuple:
+    def create_parameters(self, names: list) -> tuple:
         """
         Allocate a batch of parameters.
 
@@ -349,8 +351,8 @@ class QCircuit:
             names(list): A list of parameter's name.
 
         Returns:
-            tuple: a batch of parameters. 
-        """ 
+            tuple: a batch of parameters.
+        """
         params = []
         for name in names:
             params.append(self.create_parameter(name))
@@ -395,7 +397,6 @@ class QCircuit:
         for k, v in params.items():
             param = self.param_dict[k]
             param.update(v)
-            
 
         # note: 绑定参数后意味着线路已经改变，需要重新构建线路
         new_circuit = QCircuit(backend=self.backend, name=self.name)
@@ -469,7 +470,7 @@ class QCircuit:
         if not isinstance(paulis, list):
             pauli_list.append(paulis)
         else:
-            pauli_list = paulis 
+            pauli_list = paulis
         self.backend.send_circuit(self)
         expect = self.backend.get_expec_pauli_prod(pauli_list)
         return expect
@@ -497,7 +498,9 @@ class QCircuit:
         coeffs = []
         for term in pauli_coeffs:
             if len(term.paulis) > self.num_qubits:
-                raise ValueError("The length of paulis in each term should be equal to self.num_qubits")
+                raise ValueError(
+                    "The length of paulis in each term should be equal to self.num_qubits"
+                )
             if len(term.paulis) < self.num_qubits:
                 term.padding(self.num_qubits - len(term.paulis))
             coeffs.append(term.coeff)
@@ -626,7 +629,6 @@ class QCircuit:
         """Show resource of the circuit use."""
         if self.counter:
             self.counter.show_verbose()
-
 
 
 class Result:
