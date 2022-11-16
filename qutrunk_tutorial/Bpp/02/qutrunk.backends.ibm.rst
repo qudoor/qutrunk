@@ -12,6 +12,14 @@ qutrunk.backends.ibm.ibm module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.backends.ibm.ibm\_client module
+---------------------------------------
+
+.. automodule:: qutrunk.backends.ibm.ibm_client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

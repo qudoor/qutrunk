@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qutrunk"
-version = "0.1.13"
+version = "0.1.14"
 description = "qutrunk is an open source library for quantum computing."
 authors = ["qudoorzh2022 <qudoorzh2022@163.com>"]
 license = "Apache-2.0"
