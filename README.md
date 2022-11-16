@@ -29,7 +29,7 @@ QuTrunk内部模块划分及层次结构如下：
 * command: 对量子线路中所有门级操作做参数化处理，对接目标后端模块，用于运行整个量子线路。
 * qasm: 兼容OpenQASM 2.0标准，实现量子线路到OpenQASM指令的序列化和反序列化。
 * qusl: QuTrunk量子汇编标准，实现与qasm类似功能。
-* backend: 量子计算后端模块，用于执行量子线路，支持Python本地后端，qusprout和qusaas两种远程后端以及第三方后端(目前支持IBM)。
+* backend: 量子计算后端模块，用于执行量子线路，支持Python本地后端，qusprout和qusaas两种远程后端以及第三方后端(目前支持IBM和AWS Braket)。
 * qusprout: 对接启科研制的qubox设备，使用经典计算资源并针对量子计算特点做优化，提供高性能量子模拟计算服务。
 * qusaas: 对接启科量子计算云平台，接入多种量子计算资源，包括经典计算资源，离子阱量子计算机（研发中）。
 
