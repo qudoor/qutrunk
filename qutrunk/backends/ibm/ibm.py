@@ -4,6 +4,7 @@ import math
 
 from qutrunk.backends import Backend
 from qutrunk.circuit.gates import CNOT, H, Measure, Rx, Ry, Rz
+from qutrunk.backends.result import Result, MeasureCount, MeasureQubits, MeasureQubit
 from .ibm_client import send
 
 
@@ -137,6 +138,17 @@ class BackendIBM(Backend):
             verbose=True,
         )
         return result
+
+    def _to_result(self, res):
+        pass
+        result = Result()
+        # exception
+        # counts = res.get["data"]["counts"]
+        counts = res["data"]["counts"]
+
+        for bit_str, count in counts:
+            result.measure_counts.append(MeasureCount(bit_str, count))
+        return res
 
     @property
     def name(self):

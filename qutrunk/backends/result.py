@@ -22,4 +22,5 @@ class Result:
     def __init__(self):
         # store the object of MeasureQubits.
         self.measures = []
+        # store the object of MeasureCount.
         self.measure_counts = []
