@@ -51,8 +51,11 @@ QuTrunk内部模块划分及层次结构如下：
 QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
 注意在正式使用 QuTurnk 之前，您需要先安装 Python（版本 3.8+）。
 
-  ```python
+  ```shell
   pip install qutrunk
+  
+  # AWS Braket后端以可选包的方式提供，需单独安装
+  pip install qutrunk[braket]
   ```
 
 验证QuTrunk是否安装成功，打开终端进入python交互模式，执行如下语句：
