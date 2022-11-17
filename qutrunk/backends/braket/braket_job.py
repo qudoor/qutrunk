@@ -5,26 +5,7 @@ from braket.aws import AwsQuantumTask
 from braket.tasks.local_quantum_task import LocalQuantumTask
 
 from qutrunk.backends import Backend
-
-
-class _MeasureResult:
-    def __init__(self, id=0, value=0):
-        # TODO: id是关键字，不建议使用
-        self.id = id
-        self.value = value
-
-
-class _OutcomeResult:
-    def __init__(self, bit_str="", count=0):
-        self.bitstr = bit_str
-        self.count = count
-
-
-class _Result:
-    def __init__(self):
-        self.measureSet = []
-        self.outcomeSet = []
-
+from qutrunk.backends.result import MeasureCount, MeasureResult
 
 class AWSBraketJob:
     """AWSBraketJob."""
@@ -59,7 +40,7 @@ class AWSBraketJob:
         """
         return self._metadata["shots"] if "shots" in self._metadata else 0
 
-    def result(self) -> _Result:
+    def result(self) -> MeasureResult:
         """Convert braket result to qutrunk measurement result
 
         Returns:
@@ -68,9 +49,9 @@ class AWSBraketJob:
         """
         # todo bit str big end?
         counter = self._task.result().measurement_counts
-        res = _Result()
+        res = MeasureResult()
         for bs, cnt in dict(counter).items():
-            res.outcomeSet.append(_OutcomeResult(bs, cnt))
+            res.measure_counts.append(MeasureCount(bs, cnt))
         return res
 
     def cancel(self):

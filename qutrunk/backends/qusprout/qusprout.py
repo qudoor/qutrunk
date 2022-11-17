@@ -6,6 +6,7 @@ from qutrunk.backends.backend import Backend
 from qutrunk.tools.read_qubox import get_qubox_setting
 from .rpcclient import QuSproutApiServer
 from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
+from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
 
 
 class ExecType(Enum):
@@ -184,13 +185,20 @@ class BackendQuSprout(Backend):
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
 
+        result = MeasureResult()
+        for meas in res.measures:
+            meas_temp = MeasureQubits()
+            for mea in meas.measure:
+                mea_temp = MeasureQubit(mea.idx, mea.value)
+                meas_temp.measure.append(mea_temp)
+            result.measures.append(meas_temp)
         """
         1 必须释放连接，不然其它连接无法连上服务端
         2 不能放在__del__中，因为对象释放不代表析构函数会及时调用
         """
         self._api_server.close()
 
-        return res
+        return result
 
     def get_expec_pauli_prod(self, pauli_prod_list):
         """Computes the expected value of a product of Pauli operators.

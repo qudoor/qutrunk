@@ -214,9 +214,9 @@ class QCircuit:
             # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
             return result
         # TODO: measureSet
-        if result and result.measureSet:
-            for m in result.measureSet:
-                self.set_measure(m.id, m.value)
+        if result and len(result.measures) > 0:
+            for mea in result.measures[0]:
+                self.set_measure(mea.idx, mea.value)
 
         res = Result(self.num_qubits, result, self.backend, arguments={"shots": shots})
 
@@ -663,72 +663,32 @@ class Result:
     def __init__(
         self, num_qubits, res, backend, arguments, task_id=None, status="success"
     ):
-        self.states = []
-        self.values = []
         self.backend = backend
         self.task_id = task_id
         self.status = status
         self.arguments = arguments
-        # Modified quantum gate annotation.
-        self.measure_result = [-1] * num_qubits
-
-        if res and res.measureSet:
-            for m in res.measureSet:
-                self.set_measure(m.id, m.value)
-
-        # Count the number of occurrences of the bit-bit string composed of all qubits.
-        if res and res.outcomeSet:
-            self.outcome = res.outcomeSet
-            for out in self.outcome:
-                # 二进制字符串转换成十进制
-                if out.bitstr:
-                    self.states.append(int(out.bitstr, base=2))
-                    self.values.append(out.count)
-        else:
-            self.outcome = None
-
-    def set_measure(self, qubit, value):
-        """Update qubit measure value.
-
-        Args:
-            qubit: The index of qubit in qureg.
-            value: The qubit measure value(0 or 1).
-        """
-        if qubit >= len(self.measure_result) or qubit < 0:
-            raise IndexError("qubit index out of range.")
-        self.measure_result[qubit] = value
+        self.num_qubits = num_qubits
+        self.measure_result = res
 
     def get_measure(self):
         """Get the measure result."""
-        return self.measure_result
+        return self.measure_result.measures
 
     def get_outcome(self):
         """Get the measure result in binary format."""
-        out = self.measure_result[::-1]
-        # TODO:improve
-        bit_str = "0b"
-        for o in out:
-            bit_str += str(o)
-        return bit_str
+        return self.measure_result.get_outcome(self.num_qubits)
 
     def get_counts(self):
         """Get the number of times the measurement results appear."""
         # TODO:improve
-        if self.outcome is None:
+        if self.measure_result is None:
             return None
 
         res = []
-        for out in self.outcome:
+        measure_counts = self.measure_result.get_measure_counts()
+        for out in measure_counts:
             res.append({out.bitstr: out.count})
         return json.dumps(res)
-
-    def get_states(self):
-        """Get all states"""
-        return self.states
-
-    def get_values(self):
-        """Get all values"""
-        return self.values
 
     def excute_info(self):
         """The resourece of run."""
