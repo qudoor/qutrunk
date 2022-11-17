@@ -44,7 +44,7 @@ def run_grover(qubits=10, backend=None):
     res = circuit.run()
 
     # Get measure result and print as int
-    out = res.get_outcome()
+    out = res.get_bitstrs()[0]
     print("measure result: " + str(int(out, base=2)))
 
     # Print quantum circuit resource information

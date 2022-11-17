@@ -28,7 +28,7 @@ def run_phase_kickback(backend=None):
     res = qc.run(shots=100)
 
     # print result
-    print(res.get_measure())
+    print(res.get_measures())
 
     return qc
 

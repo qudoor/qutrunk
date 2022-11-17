@@ -9,6 +9,17 @@ class MeasureQubits:
     def __init__(self):
         self.measure = []
 
+    def __getitem__(self, index):
+        return self.measure[index]
+
+    def simplify(self):
+        return [{"idx": m.idx, "val": m.value} for m in self.measure]
+
+    def bit_str(self):
+        bitstr = "0b"
+        for m in self.measure[::-1]:
+            bitstr += str(m.value)
+        return bitstr
 
 class MeasureCount:
     def __init__(self, bit_str="", count=0):
@@ -45,20 +56,9 @@ class MeasureResult:
             
         return self.measure_counts
     
-    def get_outcome(self, num_qubits):
+    def get_bitstrs(self, num_qubits):
         bit_strs = []
-        for meas in self.measures:
-            measure_result = [-1] * num_qubits
-            mealen = len(meas.measure)
-            for mea in meas.measure:
-                if  mea.idx < 0 or mea.idx >= mealen:
-                    raise IndexError("qubit index out of range.")
-                measure_result[mea.idx] = mea.value
-                
-            out = measure_result[::-1]
-            bit_str = "0b"
-            for o in out:
-                bit_str += str(o)
-            bit_strs.append(bit_str)
+        for m in self.measures:
+            bit_strs.append(m.bit_str())
             
         return bit_strs

@@ -27,8 +27,10 @@ def run_bell_pair(backend=None):
     # Print result like:
     #[1, 1]
     #[{"00": 50}, {"11": 50}]
-    print(res.get_measure())
+    # print(res.get_measures())
+    print(res.get_measures()[0])
     print(res.get_counts())
+    print(res.get_bitstrs())
 
     # Print quantum circuit exection information
     print(res.excute_info())

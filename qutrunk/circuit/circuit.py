@@ -213,10 +213,6 @@ class QCircuit:
         if self.backend.name == "BackendIBM":
             # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
             return result
-        # TODO: measureSet
-        if result and len(result.measures) > 0:
-            for mea in result.measures[0]:
-                self.set_measure(mea.idx, mea.value)
 
         res = Result(self.num_qubits, result, self.backend, arguments={"shots": shots})
 
@@ -657,7 +653,7 @@ class Result:
             # get running result
             res = qc.run()
             # get measurement from result
-            print(res.get_measure())
+            print(res.get_measures())
     """
 
     def __init__(
@@ -670,13 +666,16 @@ class Result:
         self.num_qubits = num_qubits
         self.measure_result = res
 
-    def get_measure(self):
+    def get_measures(self):
         """Get the measure result."""
-        return self.measure_result.measures
+        measures = []
+        for ms in self.measure_result.measures:
+            measures.append(ms.simplify()) 
+        return np.array(measures).reshape(-1, self.num_qubits)
 
-    def get_outcome(self):
+    def get_bitstrs(self):
         """Get the measure result in binary format."""
-        return self.measure_result.get_outcome(self.num_qubits)
+        return self.measure_result.get_bitstrs(self.num_qubits)
 
     def get_counts(self):
         """Get the number of times the measurement results appear."""

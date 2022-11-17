@@ -25,7 +25,7 @@ class ADD(Operator):
             ADD(3) * qr
             All(Measure) * qr
             res = circuit.run()
-            print(res.get_outcome())
+            print(res.get_bitstrs())
     """
 
     def __init__(self, number: int):
