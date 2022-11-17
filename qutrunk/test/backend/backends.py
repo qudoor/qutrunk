@@ -2,7 +2,8 @@ from enum import IntEnum
 
 import pytest
 
-from qutrunk.backends import BackendLocal, BackendQuSprout, BackendIBM, BackendAWSLocal, BackendAWSDevice
+from qutrunk.backends import BackendLocal, BackendQuSprout, BackendIBM
+from qutrunk.backends.braket import BackendAWSLocal, BackendAWSDevice
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import H, CNOT, All, Measure
 
