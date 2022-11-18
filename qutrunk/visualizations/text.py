@@ -11,7 +11,6 @@ from qutrunk.circuit.gates import (
     MCZ,
     MCX,
     P,
-    U3,
     ZGate,
     R,
     Rx,
@@ -298,8 +297,6 @@ class TextDrawing:
             add_connected_gate(node, gates, layer, current_cons)
         elif isinstance(op.gate, P):
             layer.set_qubit(node.qargs[0], BoxOnQuWire("P", conditional=conditional))
-        elif isinstance(op.gate, U3):
-            layer.set_qubit(node.qargs[0], BoxOnQuWire("U3", conditional=conditional))
         elif isinstance(op.gate, ZGate):
             layer.set_qubit(node.qargs[0], BoxOnQuWire("Z", conditional=conditional))
         elif isinstance(op.gate, R):
