@@ -4,7 +4,7 @@ from qutrunk.circuit.gates import X, CSwap
 from qutrunk.circuit import QCircuit
 
 
-def test_csqrtx_gate():
+def test_cswap_gate():
     """Test CSwap gate."""
     # local backend
     circuit = QCircuit()
