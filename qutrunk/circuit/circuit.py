@@ -665,8 +665,8 @@ class Result:
         self.arguments = arguments
         self.num_qubits = num_qubits
         self.measure_result = res
-        
-    def get_measures(self, creg: Union[Qureg, SubQureg]=None):
+
+    def get_measures(self, creg: Union[Qureg, SubQureg] = None):
         """Get the measure result."""
         if not self.measure_result.measures or len(self.measure_result.measures) == 0:
             return []
@@ -678,17 +678,24 @@ class Result:
             indexs = creg.get_indexs()
             array_step = len(indexs)
         for ms in self.measure_result.measures:
-            measures.append(ms.simplify(indexs)) 
+            measures.append(ms.simplify(indexs))
         return np.array(measures).reshape(-1, array_step)
 
-    def get_bitstrs(self, creg: Union[Qureg, SubQureg]=None):
+    def get_bitstrs(self, creg: Union[Qureg, SubQureg] = None):
         """Get the measure result in binary format."""
         indexs = None
         if creg is not None:
             indexs = creg.get_indexs()
         return self.measure_result.get_bitstrs(indexs)
 
-    def get_counts(self, creg: Union[Qureg, SubQureg]=None):
+    def get_bitints(self, creg: Union[Qureg, SubQureg] = None):
+        """Get the measure result in int format."""
+        indexs = None
+        if creg is not None:
+            indexs = creg.get_indexs()
+        return self.measure_result.get_bitints(indexs)
+
+    def get_counts(self, creg: Union[Qureg, SubQureg] = None):
         """Get the number of times the measurement results appear."""
         # TODO:improve
         if self.measure_result is None:
