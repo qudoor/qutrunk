@@ -15,7 +15,7 @@ def test_t_gate():
     result_backend = np.array(result).reshape(-1, 1)
 
     # math
-    result_math = np.dot(Tdg.matrix, ZERO_STATE)
+    result_math = np.dot(T.matrix, ZERO_STATE)
 
     assert np.allclose(result_backend, result_math)
 

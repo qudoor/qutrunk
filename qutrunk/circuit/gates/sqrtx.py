@@ -46,6 +46,7 @@ class SqrtXGate(BasicGate):
             reuse __or__ operator implement."""
         self.__or__(qubit)
 
+    # TODO: have problems.
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
