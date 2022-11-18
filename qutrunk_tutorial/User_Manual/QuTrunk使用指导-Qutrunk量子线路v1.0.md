@@ -53,7 +53,7 @@ qc.draw()
 
 量子电路图打印输出结果如下图：
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221103165323970.png" alt="image-20221103165323970" style="zoom:80%;" />
+<img src="image\image-20221103165323970.png" alt="image-20221103165323970" style="zoom:80%;" />
 
 该电路图中，量子比特是从上到下排列，q[0]第一个量子比特在最上方，q[2]第三个量子比特在最下方，门的排列顺序是从左到右，即最早操作的门在最左边，最后操作的门在最右边。
 
