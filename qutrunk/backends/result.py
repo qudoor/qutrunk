@@ -49,7 +49,8 @@ class MeasureResult:
                 measure_counts[bitstr] += 1
             else:
                 measure_counts[bitstr] = 1
-        
+            
+        measure_counts = dict(sorted(measure_counts.items(), key=lambda x : x[0]))
         for bitstr, count in measure_counts.items():
             mc = MeasureCount(bitstr, count)
             self.measure_counts.append(mc)
