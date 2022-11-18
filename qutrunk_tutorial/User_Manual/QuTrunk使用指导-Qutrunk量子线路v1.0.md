@@ -111,7 +111,7 @@ All(Measure) * qr
 
 添加测量后输出电路打印如下，此线路中增加了3个经典寄存器c[0]~c[3]，用于将量子比特测量结果映射到经典位。
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221103165240268.png" alt="image-20221103165240268" style="zoom:80%;" />
+<img src="image\image-20221103165240268.png" alt="image-20221103165240268" style="zoom:80%;" />
 
 ## 6、 运行量子电路并获取结果
 
@@ -146,7 +146,7 @@ qc.draw()
 
 运行后打印结果如下：
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221103165200409.png" alt="image-20221103165200409" style="zoom:80%;" />
+<img src="image\image-20221103165200409.png" alt="image-20221103165200409" style="zoom:80%;" />
 
 从结果可以看到000状态的次数是537次，获得111状态的次数为487次，每个状态的次数各占大约50%。
 
@@ -177,7 +177,7 @@ qc.draw()
 
 执行后终端显示的结果如下，总共7个状态，其中状态是000和111的概率各占约50%
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221103165120012.png" alt="image-20221103165120012" style="zoom:80%;" />
+<img src="image\image-20221103165120012.png" alt="image-20221103165120012" style="zoom:80%;" />
 
 ## 8、获取状态向量
 
@@ -208,7 +208,7 @@ print(qc.get_statevector())
 
 运行后输出如下结果如下：
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221103165026039.png" alt="image-20221103165026039" style="zoom:80%;" />
+<img src="image\image-20221103165026039.png" alt="image-20221103165026039" style="zoom:80%;" />
 
 ## 9、导出量子电路
 
@@ -240,7 +240,7 @@ with open(file="bell_pair.qasm") as f:
 
 输出结果如下，可以看到在示例程序的目录下生成了bell_pair.qasm文件，打印输出的内容与原始量子电路一致。
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221104115440864.png" alt="image-20221104115440864" style="zoom:80%;" />
+<img src="image\image-20221104115440864.png" alt="image-20221104115440864" style="zoom:80%;" />
 
 ## 10、反序列化OpenQASM或者QuSL文件对象，并运行量子电路
 
@@ -262,7 +262,7 @@ print(res.get_counts())
 
 输出结果如下：
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221104113954558.png" alt="image-20221104113954558" style="zoom:80%;" />
+<img src="image\image-20221104113954558.png" alt="image-20221104113954558" style="zoom:80%;" />
 
 ## 11、申请多个量子寄存器
 
@@ -300,7 +300,7 @@ print(res.get_counts())
 
 运行后结果如下：
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221103164752232.png" alt="image-20221103164752232" style="zoom:80%;" />
+<img src="image\image-20221103164752232.png" alt="image-20221103164752232" style="zoom:80%;" />
 
 ## 12、量子电路追加
 
@@ -331,7 +331,7 @@ res = circuit.run(shots=100)
 
 运行结果如下：
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221104114525168.png" alt="image-20221104114525168" style="zoom:80%;" />
+<img src="image\image-20221104114525168.png" alt="image-20221104114525168" style="zoom:80%;" />
 
 ## 13、参数化量子电路
 
@@ -369,7 +369,7 @@ print(c2.get_statevector())
 
 输出的结果如下：
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221115175923733.png" alt="image-20221115175923733" style="zoom:67%;" />
+<img src="image\image-20221115175923733.png" alt="image-20221115175923733" style="zoom:67%;" />
 
 ## 14、量子电路的深度和宽度
 
@@ -402,7 +402,7 @@ qc.draw()
 
 获取的电路如下：
 
-<img src="C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221116095358139.png" alt="image-20221116095358139" style="zoom:67%;" />
+<img src="image\image-20221116095358139.png" alt="image-20221116095358139" style="zoom:67%;" />
 
 从图上我们可以直观的看到总共12个qubits和12个cbits，也可以方便数出$H,CX,X,SWAP$这些门的数量，但是从程序中如何获取?QuTrunk中提供了这些属性的获取方法。
 
@@ -426,7 +426,7 @@ print(qc.num_gates)
 
 获取的数量分别是width=24，num_qubits=12，num_gates=19执行结果如下：
 
-![image-20221116104639303](C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221116104639303.png)
+![image-20221116104639303](image\image-20221116104639303.png)
 
 量子电路还有一个重要的特性称为电路深度（depth）。量子电路的深度是衡量并行执行的量子门有多少“层”，完成电路定义的计算所需的时间。因为量子门实现需要时间，所以电路的深度大致对应于量子计算机执行电路所需的时间。因此，电路的深度是衡量量子电路能否在器件上运行的一个重要量。
 
@@ -437,7 +437,7 @@ cir_dep=qc.depth()
 print(f'the circuit depth is {cir_dep}')
 ```
 
-![image-20221116140217940](C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221116140217940.png)
+![image-20221116140217940](image\image-20221116140217940.png)
 
 ## 15、计算量子电路期望值
 

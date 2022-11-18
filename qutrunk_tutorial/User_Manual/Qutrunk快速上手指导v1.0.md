@@ -16,7 +16,7 @@ QuBranch是由启科量子基于vscode开发的量子编程集成开发环境，
 
  QuTrunk内部模块划分及层次结构如下：
 
-![image-20221108114813102](C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221108114813102.png)
+![image-20221108114813102](image\image-20221108114813102.png)
 
 #### **1.2.1 QuTrunk核心模块**
 
@@ -73,10 +73,10 @@ QuBranch支持Windows，MacOS和Linux操作系统，各系统上的安装方法�
 
 3. 打开vscode，右侧导航栏选择扩展，然后点击三点打开菜单，选择从VSIX文件安装，从下载目录选择qun-graph的安装包，点击安装  
 
-   <img src="./img/quan-graph安装.jpg" width="60%">    
+   <img src="image\quan-graph安装.jpg" width="60%">    
 
 ​      安装会自动安装相关依赖包，完成后效果如图：  
-​      <img src="./img/quan-graph安装后效果.jpg" width="60%">   
+​      <img src="image\quan-graph安装后效果.jpg" width="60%">   
 
 ## **3 QuTrunk下载及安装**   
 
@@ -141,18 +141,18 @@ QuTrunk部署完成后，可以开始我们的第一个hello world程序运行�
 #### 4.1.1 Python解释器切换  
 
 windows及Linux下执行ctrl+shift+p，macOS下执行command+shift+p，打开命令行，输入quan搜索，选择**quan：python解释器切换**。python解释器切换可切换全工作区或为单一项目切换python环境。  
-<img src="./img/python解释器切换.jpg" width="100%">  
+<img src="image\python解释器切换.jpg" width="100%">  
 
-<img src="./img/python解释器切换工作区.jpg " width="100%">
+<img src="image\python解释器切换工作区.jpg " width="100%">
 
 打开选择界面后，可以通过加号自己输入，也可以选择recommend，还有安装了python版本的路径。本示例中选择recommend本地安装了python3.10.5的64bit版本  
-<img src="./img/python解释器切换选择.jpg" width="100%">  
+<img src="image\python解释器切换选择.jpg" width="100%">  
 选择完成后，windows上可以查询左下角解释器版本是否一致。
 
 #### 4.1.2 新建工作区  
 
 在需要保存的目录下新建一个目录，示例中Qun-Demo，在IDE开始界面，选择打开文件夹，然后选中新建的文件夹打开,显示如下：  
-  <img src="./img/新建工作区.jpg" width="60%">
+  <img src="image\新建工作区.jpg" width="60%">
 
 #### 4.1.3 量子计算Demo程序编写及运行
 
@@ -178,7 +178,7 @@ qc.draw() #print quantum circuit
 ```
 
 上面程序运行结果如下：  
-![image-20221107110935584](C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221107110935584.png)
+![image-20221107110935584](image\image-20221107110935584.png)
 
 程序结果说明如下：
 
@@ -190,17 +190,17 @@ qc.draw() #print quantum circuit
 #### 4.2.1 初始化量子编程工作区  
 
 ​          打开IDE，先初始化量子编程工作区：windows上按ctrl+shift+p，macOS上command+shift+p打开命令行，输入quan搜索，选择quan：初始化量子编程工作区，执行初始化。启动初始化可视化编程工作区功能，将为用户建立一个虚拟工作区用于可视化编程。  
-<img src="./img/初始化量子编程工作区.jpg" width="80%">  
+<img src="image\初始化量子编程工作区.jpg" width="80%">  
 
 #### 4.2.2 启动可视化量子编程  
 
 ​         再次按ctrl+shift+p/comand+shift+p，输入quan搜索，可以看到量子可视化编程已经出现，选择“quan:量子可视化编程“启动量子编程可视化功能。该功能允许用户生成多个可视化编程的qdoor文件，并且切换不同的qdoor文件生成不同的量子电路图，亦允许您使用编程的方式或者使用可视化拖拽的方式编辑电路图，将量子门图入电路图中生成电路图，将量子门从电路图中拖出可删除量子门。目前支持H、NOT、Sdg、Toffoli、Tdg、X、Y、Z、P、Rx、Ry、Rz、R、SqrtX、T、Measure，其中X、Y、Z、P、Rx、Ry、Rz允许添加一个控制位，Rx、Ry、Rz允许变更旋转角。并提供了关键字高亮，代码提示，代码自动完成等功能。借助Qutrunk的能力您可以查看当前量子电路图的量子态统计。  
-  <img src="./img/启动量子编程可视化.jpg" width="80%">  
+  <img src="image\启动量子编程可视化.jpg" width="80%">  
 
 #### 4.2.3 开始进行可视化编程示例
 
 在可视化编程页面，用户可以通过托拉拽的方式选择各图形化编程元素加入或者删除完成编程，删除只需将元素脱出窗外松开即可，可视化编程示例如下：  
-<img src="./img/可视化编程示例.jpg" width="60%"> 
+<img src="image\可视化编程示例.jpg" width="60%"> 
 
 ### 4.3 配置后端量子计算资源
 
@@ -216,19 +216,19 @@ qc.draw() #print quantum circuit
 
 目前内部测试qusprout的地址可以临时用（192.168.170.214:9091）来验证
 
-<img src="./img/QuSprout配置选择.jpg" width="100%">
+<img src="image\QuSprout配置选择.jpg" width="100%">
 
-<img src="./img/QuSprout服务器及端口配置.jpg" width="100%">
+<img src="image\QuSprout服务器及端口配置.jpg" width="100%">
 
 **2）通过修改qubox的配置文件**
 
 首先命令行上执行pip3 show qutrunk 可以找到qutrunk安装的地址Location，如下图所示
 
-![image-20221109154314045](C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221109154314045.png)
+![image-20221109154314045](image\image-20221109154314045.png)
 
 然后进入到此地址下的:Location路径\qutrunk\config\ 目录下，修改qubox.xml地址，如下：
 
-![image-20221109154710887](C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221109154710887.png)
+![image-20221109154710887](image\image-20221109154710887.png)
 
 #### 4.3.2 代码中指定QuSprout为计算后端
 
@@ -260,7 +260,7 @@ qc.draw()
 
 程序运行结果如下图，可以看到运行结果与上面使用本地资源计算结果一致
 
-![image-20221107111410736](C:\Users\huang\AppData\Roaming\Typora\typora-user-images\image-20221107111410736.png)
+![image-20221107111410736](image\image-20221107111410736.png)
 
 ## 5  QuTrunk参考资料
 
