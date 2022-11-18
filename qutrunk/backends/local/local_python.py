@@ -5,9 +5,9 @@ from copy import deepcopy
 import numpy as np
 from numpy import pi
 
-from qutrunk.sim.local.pysim import Simulator
 from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
+from .pysim import Simulator
 
 
 # TODO: need to improve.
