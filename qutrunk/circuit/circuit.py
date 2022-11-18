@@ -1,12 +1,12 @@
 """Circuit Module."""
 import json
-import random
 from typing import List, Optional, Union, Callable
 import numpy as np
+import uuid
 
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
-from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable, PauliCoeffs
+from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 from qutrunk.exceptions import QuTrunkError
@@ -259,7 +259,8 @@ class QCircuit:
 
     def _generate_circuit_name(self):
         """Generate circuit name."""
-        return f"{self.prefix}-{str(random.getrandbits(15))}"
+        name = uuid.uuid4()
+        return f"{self.prefix}-{name}"
 
     def __len__(self) -> int:
         """Return the number of operations in circuit."""
