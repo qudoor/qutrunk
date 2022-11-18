@@ -14,7 +14,7 @@ PaddlePaddle是百度发布的一款AI框架（下面简称Paddle），QuTrunk�
 
 变分量子算法（variational quantum algorithm, VQA）其实就是用一个经典优化器（classical optimizer）来训练一个含参量子线路（quantum circuit），即VQA使用参数化的量子电路在量子计算机上进行计算，然后把参数的优化训练丢给经典优化器来处理，从而充分利用了经典优化的工具箱。与其他为容错时代开发的量子算法相比，VQA具有保持量子电路深度较浅从而降低噪声的额外优势，因而VQA也成为NISQ上设备取得量子优势的主要策略，在大量的应用中被使用，基本上涵盖了研究人员为量子计算机设想的所有应用，如下图所示：
 
-<img src="image\image-20221031112914732.png" alt="image-20221031112914732" style="zoom: 33%;" />
+<img src="image/image-20221031112914732.png" alt="image-20221031112914732" style="zoom: 33%;" />
 
 
 
@@ -317,7 +317,7 @@ circuit.draw()
 
 结果如下：
 
-![image-20221103112620851](image\image-20221103112620851.png)
+![image-20221103112620851](image/image-20221103112620851.png)
 
 为了更形象的展示迭代优化效果，我们也可以通过绘制其曲线来详细展示，程序如下
 
@@ -336,7 +336,7 @@ plt.show()
 
 最后运行输出的效果如下图所示：
 
-<img src="image\image-20221103112649216.png" alt="image-20221103112649216" style="zoom:80%;" />
+<img src="image/image-20221103112649216.png" alt="image-20221103112649216" style="zoom:80%;" />
 
 ## 4、总结
 

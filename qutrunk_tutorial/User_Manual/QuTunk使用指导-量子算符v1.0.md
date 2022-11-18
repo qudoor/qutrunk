@@ -32,7 +32,7 @@ print(circuit.get_statevector())
 
 程序运行结果如下：
 
-![image-20221114170356983](image\image-20221114170356983.png)
+![image-20221114170356983](image/image-20221114170356983.png)
 
 执行操作前，向量值是$\begin{pmatrix}
 1&0&0&0
@@ -59,7 +59,7 @@ print(circuit.get_statevector())
 
 输出的结果如下：
 
-<img src="image\image-20221115101047479.png" alt="image-20221115101047479" style="zoom:67%;" />
+<img src="image/image-20221115101047479.png" alt="image-20221115101047479" style="zoom:67%;" />
 
 可以看到分配的4个量子比特均被执行了H门操作。PLUS算符通常用于除初始化线路时的批量H门操作
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
 本示例中，定义了一个自减函数，这个函数的参数有2个：num_qubits即量子比特数和执行自减的初始化值，执行后，输出的结果如下，打印的结果是二进制
 
-<img src="image\image-20221114180250750.png" alt="image-20221114180250750" style="zoom:67%;" />
+<img src="image/image-20221114180250750.png" alt="image-20221114180250750" style="zoom:67%;" />
 
 如果需要执行较大的值，可以增加量子比特数，例如如果初始化值为100，可以指定量子比特为8
 
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 circuit = increment(8, 100)
 ```
 
-<img src="image\image-20221114180438733.png" alt="image-20221114180438733" style="zoom:67%;" />
+<img src="image/image-20221114180438733.png" alt="image-20221114180438733" style="zoom:67%;" />
 
 
 
@@ -212,11 +212,11 @@ if __name__ == "__main__":
 
 计算结果如下：
 
-<img src="image\image-20221115102316455.png" alt="image-20221115102316455" style="zoom:67%;" />
+<img src="image/image-20221115102316455.png" alt="image-20221115102316455" style="zoom:67%;" />
 
 如果需要计算超过100的，比特数跟着调整，例如设置比特数为8，初始值为100，计算结果如下：
 
-<img src="image\image-20221115102543906.png" alt="image-20221115102543906" style="zoom: 50%;" />
+<img src="image/image-20221115102543906.png" alt="image-20221115102543906" style="zoom: 50%;" />
 
 ## 6、AMP算符
 
@@ -236,7 +236,7 @@ print(circuit.get_statevector())
 
 经过AMP算符后，输出的结果如下
 
-<img src="image\image-20221115110903230.png" alt="image-20221115110903230" style="zoom:67%;" />
+<img src="image/image-20221115110903230.png" alt="image-20221115110903230" style="zoom:67%;" />
 
 ## 6、QAA算符
 
@@ -315,7 +315,7 @@ if __name__ == "__main__":
 
 输出结果如下：
 
-![image-20221115114056030](image\image-20221115114056030.png)
+![image-20221115114056030](image/image-20221115114056030.png)
 
 ## 8、QPE算符
 
@@ -369,7 +369,7 @@ if __name__ == "__main__":
 
 输出的结果如下：
 
-![image-20221115142733292](image\image-20221115142733292.png)
+![image-20221115142733292](image/image-20221115142733292.png)
 
 
 

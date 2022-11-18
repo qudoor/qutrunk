@@ -35,7 +35,7 @@ qc.draw()
 
 程序运行结果如下：
 
-![image-20221115161759872](image\image-20221115161759872.png)
+![image-20221115161759872](image/image-20221115161759872.png)
 
 ## 2、远程后端
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
 执行结果如下：
 
-![image-20221115153145224](image\image-20221115153145224.png)
+![image-20221115153145224](image/image-20221115153145224.png)
 
 ### 2.1 QuSaaS后端
 
@@ -104,13 +104,13 @@ QuSaaS是启科量子开发的一个开发者社区平台，提供启科各软�
 
 使用IBM的后端，需要用户先到IBM的网站上注册IBM的账号IBMid，访问地址：[IBM Quantum](https://quantum-computing.ibm.com/)
 
-<img src="image\image-20221115153750950.png" alt="image-20221115153750950" style="zoom:67%;" />
+<img src="image/image-20221115153750950.png" alt="image-20221115153750950" style="zoom:67%;" />
 
 注册完IBM账号后，登录到IBM quamtum主页，然后在账号详情下生成token，https://quantum-computing.ibm.com/account
 
 打开页面后在API token下面点击生成token即可生成一个token，
 
-<img src="image\image-20221115154531007.png" alt="image-20221115154531007" style="zoom:67%;" />
+<img src="image/image-20221115154531007.png" alt="image-20221115154531007" style="zoom:67%;" />
 
 点击token旁边的复制按钮复制下token备用
 
@@ -154,7 +154,7 @@ circuit.draw()
 
 输出结果如下：
 
-![image-20221115174150003](image\image-20221115174150003.png)
+![image-20221115174150003](image/image-20221115174150003.png)
 
 返回的结果为json格式，统计结果为00为517次，11为507次`{'counts': {'0x0': 517, '0x3': 507}`
 
@@ -162,15 +162,15 @@ circuit.draw()
 
 通过上面示例程序终端打印的信息可以看到，我们调用IBMQ后端计算资源成功，并生成了Job ID: 63735eaa754e4624994cf410.通过这个ID我们可以到IBMQ平台页面查询job执行情况。我们登录IBMQ平台，点击左上角的导航按钮展开导航，然后选Jobs
 
-<img src="image\image-20221115160458822.png" alt="image-20221115160458822" style="zoom:67%;" />
+<img src="image/image-20221115160458822.png" alt="image-20221115160458822" style="zoom:67%;" />
 
 打开Jobs页面，可以看到jobs列表，找到我们刚执行的jobid并点击打开，列表中第一个即为我们刚才执行的示例程序的job
 
-![image-20221115174403571](image\image-20221115174403571.png)
+![image-20221115174403571](image/image-20221115174403571.png)
 
 打开job页面后展示信息如下：
 
-![image-20221115174427153](image\image-20221115174427153.png)
+![image-20221115174427153](image/image-20221115174427153.png)
 
 Details可以查询到job创建时间，执行时间，Provider和runmode信息，以及状态时间线等信息。
 
@@ -180,15 +180,15 @@ ciruit部分为打印的线路图，提供3种线路格式：图形化，QASM格
 
 图形格式：
 
-<img src="image\image-20221115161515110.png" alt="image-20221115161515110" style="zoom:67%;" />
+<img src="image/image-20221115161515110.png" alt="image-20221115161515110" style="zoom:67%;" />
 
 QASM格式：
 
-<img src="image\image-20221115161534072.png" alt="image-20221115161534072" style="zoom: 67%;" />
+<img src="image/image-20221115161534072.png" alt="image-20221115161534072" style="zoom: 67%;" />
 
 Qiskit格式：
 
-<img src="image\image-20221115161553181.png" alt="image-20221115161553181" style="zoom:50%;" />
+<img src="image/image-20221115161553181.png" alt="image-20221115161553181" style="zoom:50%;" />
 
 从IBM的页面的运行结果看，与我们在第一节本地local计算的结果基本一致。
 
