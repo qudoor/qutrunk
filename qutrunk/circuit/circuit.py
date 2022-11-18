@@ -5,7 +5,7 @@ from typing import List, Optional, Union, Callable
 import numpy as np
 
 from qutrunk.backends import Backend, BackendLocal
-from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
+from qutrunk.circuit import CBit, CReg, Counter, QuBit, SubQureg, Qureg
 from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable, PauliCoeffs
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
@@ -665,29 +665,40 @@ class Result:
         self.arguments = arguments
         self.num_qubits = num_qubits
         self.measure_result = res
-
-    def get_measures(self):
+        
+    def get_measures(self, creg: Union[Qureg, SubQureg]=None):
         """Get the measure result."""
         if not self.measure_result.measures or len(self.measure_result.measures) == 0:
             return []
 
         measures = []
+        indexs = None
+        array_step = self.num_qubits
+        if creg is not None:
+            indexs = creg.get_indexs()
+            array_step = len(indexs)
         for ms in self.measure_result.measures:
-            measures.append(ms.simplify()) 
-        return np.array(measures).reshape(-1, self.num_qubits)
+            measures.append(ms.simplify(indexs)) 
+        return np.array(measures).reshape(-1, array_step)
 
-    def get_bitstrs(self):
+    def get_bitstrs(self, creg: Union[Qureg, SubQureg]=None):
         """Get the measure result in binary format."""
-        return self.measure_result.get_bitstrs(self.num_qubits)
+        indexs = None
+        if creg is not None:
+            indexs = creg.get_indexs()
+        return self.measure_result.get_bitstrs(indexs)
 
-    def get_counts(self):
+    def get_counts(self, creg: Union[Qureg, SubQureg]=None):
         """Get the number of times the measurement results appear."""
         # TODO:improve
         if self.measure_result is None:
             return None
 
         res = []
-        measure_counts = self.measure_result.get_measure_counts()
+        indexs = None
+        if creg is not None:
+            indexs = creg.get_indexs()
+        measure_counts = self.measure_result.get_measure_counts(indexs)
         for out in measure_counts:
             res.append({out.bitstr: out.count})
         return json.dumps(res)

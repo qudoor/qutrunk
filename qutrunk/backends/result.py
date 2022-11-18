@@ -12,13 +12,18 @@ class MeasureQubits:
     def __getitem__(self, index):
         return self.measure[index]
 
-    def simplify(self):
-        return [{"idx": m.idx, "val": m.value} for m in self.measure]
+    def simplify(self, indexs: set=None):
+        meas = []
+        for m in self.measure:
+            if indexs is None or m.idx in indexs:
+                meas.append({"idx": m.idx, "val": m.value})
+        return meas
 
-    def bit_str(self):
+    def bit_str(self, indexs: set=None):
         bitstr = "0b"
         for m in self.measure[::-1]:
-            bitstr += str(m.value)
+            if indexs is None or m.idx in indexs:
+                bitstr += str(m.value)
         return bitstr
 
 class MeasureCount:
@@ -35,7 +40,7 @@ class MeasureResult:
     def add_measures(self, measure_qubits):
         self.measures.append(measure_qubits)
         
-    def get_measure_counts(self) -> MeasureCount:
+    def get_measure_counts(self, indexs: set=None) -> MeasureCount:
         if len(self.measure_counts) > 0:
             return self.measure_counts
         
@@ -43,7 +48,8 @@ class MeasureResult:
         for meas in self.measures:
             bitstr = ""
             for mea in meas.measure:
-                bitstr += str(mea.value)
+                if indexs is None or mea.idx in indexs:
+                    bitstr += str(mea.value)
                 
             if bitstr in measure_counts:
                 measure_counts[bitstr] += 1
@@ -57,9 +63,9 @@ class MeasureResult:
             
         return self.measure_counts
     
-    def get_bitstrs(self, num_qubits):
+    def get_bitstrs(self, indexs: set=None):
         bit_strs = []
         for m in self.measures:
-            bit_strs.append(m.bit_str())
+            bit_strs.append(m.bit_str(indexs))
             
         return bit_strs
