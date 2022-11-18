@@ -668,6 +668,9 @@ class Result:
 
     def get_measures(self):
         """Get the measure result."""
+        if not self.measure_result.measures or len(self.measure_result.measures) == 0:
+            return []
+
         measures = []
         for ms in self.measure_result.measures:
             measures.append(ms.simplify()) 

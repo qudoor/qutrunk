@@ -28,7 +28,7 @@ def run_bell_pair(backend=None):
     #[1, 1]
     #[{"00": 50}, {"11": 50}]
     # print(res.get_measures())
-    print(res.get_measures()[0])
+    print(res.get_measures())
     print(res.get_counts())
     print(res.get_bitstrs())
 
