@@ -690,12 +690,12 @@ class Result:
             idxs = qreg.get_indexs()
         return self.measure_result.get_bitstrs(idxs)
 
-    def get_bitints(self, qreg: Union[Qureg, SubQureg] = None):
-        """Get the measure result in int format."""
+    def get_values(self, qreg: Union[Qureg, SubQureg] = None):
+        """Get the measure result of int."""
         idxs = None
         if qreg is not None:
             idxs = qreg.get_indexs()
-        return self.measure_result.get_bitints(idxs)
+        return self.measure_result.get_values(idxs)
 
     def get_counts(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the number of times the measurement results appear."""

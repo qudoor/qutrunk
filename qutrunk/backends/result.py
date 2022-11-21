@@ -124,8 +124,8 @@ class MeasureResult:
 
         return bit_strs
     
-    def get_bitints(self, idxs: set = None):
-        """Get the measure result in int format."""
+    def get_values(self, idxs: set = None):
+        """Get the measure result of int."""
         bit_strs = []
         for m in self.measures:
             bit_strs.append(int(m.bit_str(idxs)))
