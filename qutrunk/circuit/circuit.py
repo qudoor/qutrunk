@@ -735,7 +735,7 @@ class Result:
         """The resourece of run."""
         result = {
             "backend": self.backend.name,
-            "task_id": self.task_id,
+            # "task_id": self.task_id,
             "status": self.status,
             "arguments": self.arguments,
         }
