@@ -332,4 +332,4 @@ class QuSaasApiServer:
         saas_conf = configuration['QuSaas']
         url = f"{saas_conf['schema']}://{saas_conf['host']}:{saas_conf['port']}{saas_conf['api']['token']}"
         response = self._client.post(url, data=data).json()
-        return response['data']['access_token']
+        return response['access_token']
