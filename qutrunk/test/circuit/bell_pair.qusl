@@ -1,1 +1,1 @@
-{"target": "QuSL", "version": "1.0", "meta": {"circuit_name": "circuit-28290", "qubits": "2"}, "code": ["H * q[0]\n", "MCX(1) * (q[0], q[1])\n", "Measure * q[0]\n", "Measure * q[1]\n"]}
+{"target": "QuSL", "version": "1.0", "meta": {"circuit_name": "circuit-16848", "qubits": "2"}, "code": ["H * q[0]\n", "MCX(1) * (q[0], q[1])\n", "Measure * q[0]\n", "Measure * q[1]\n"]}

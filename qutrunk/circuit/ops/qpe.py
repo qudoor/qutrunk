@@ -48,10 +48,7 @@ class QPE(Operator):
             print(out)
 
             # calculate the value of theta
-            value = []
-            for m in out:
-                value.append(m['val'])
-            f = _bin_int(value)
+            f = result.get_bitints(q1)[0]
             theta = f / 2 ** len(q1)
             print("θ=", theta)
 

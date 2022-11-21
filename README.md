@@ -55,7 +55,7 @@ QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
   pip install qutrunk
   
   # AWS Braket后端以可选包的方式提供，需单独安装
-  pip install qutrunk[braket]
+  pip install 'qutrunk[braket]'
   ```
 
 验证QuTrunk是否安装成功，打开终端进入python交互模式，执行如下语句：
