@@ -1,47 +1,99 @@
 # TODO: need to improve.
 class MeasureQubit:
+    """Measure Result Single Qubit.
+
+    Save the result of single measure qubit.
+
+    Args:
+        idx: The index of qubits.
+        value: The index of qubits result.
+    """
+    
     def __init__(self, idx=0, value=0):
         self.idx = idx
         self.value = value
 
 
 class MeasureQubits:
+    """Measure Result of all qubits.
+
+    Save the all qubits result of measure circuit running.
+
+    Args:
+        measure: The measure result of MeasureQubit.
+    """
+    
     def __init__(self):
         self.measure = []
 
-    def __getitem__(self, index):
-        return self.measure[index]
+    def __getitem__(self, idx):
+        """Return a MeasureQubit instance.
 
-    def simplify(self, indexs: set = None):
+        Arg:
+            idx: The index of MeasureQubit.
+
+        Returns:
+            MeasureQubit instance.
+
+        Raises:
+          ValueError: expected integer index into measure.
+        """
+        if not isinstance(idx, int):
+            raise ValueError("expected integer index into measure")
+        return self.measure[idx]
+
+    def simplify(self, idxs: set = None):
+        """Get the measure result in dict format."""
         meas = []
         for m in self.measure:
-            if indexs is None or m.idx in indexs:
+            if idxs is None or m.idx in idxs:
                 meas.append({"idx": m.idx, "val": m.value})
         return meas
 
-    def bit_str(self, indexs: set = None):
+    def bit_str(self, idxs: set = None):
+        """Get the measure result in str format."""
         bitstr = ""
         for m in self.measure[::-1]:
-            if indexs is None or m.idx in indexs:
+            if idxs is None or m.idx in idxs:
                 bitstr += str(m.value)
         return bitstr
 
 
 class MeasureCount:
+    """Counts Measure Result data.
+
+    Save the Counts result of measure circuit running.
+
+    Args:
+        bitstr: The str of all qubits.
+        count: The counts of measure result.
+    """
+    
     def __init__(self, bit_str="", count=0):
         self.bitstr = bit_str
         self.count = count
 
 
 class MeasureResult:
+    """Multi Measure Result data.
+
+    Save the result of multi measure circuit running.
+
+    Args:
+        measures: The measure result of MeasureQubits.
+        measure_counts: The counts measure result of measures.
+    """
+    
     def __init__(self):
         self.measures = []
         self.measure_counts = []
 
-    def add_measures(self, measure_qubits):
+    def add_measures(self, measure_qubits: MeasureQubits):
+        """add measurement results."""
         self.measures.append(measure_qubits)
 
-    def get_measure_counts(self, indexs: set = None) -> MeasureCount:
+    def get_measure_counts(self, idxs: set = None) -> MeasureCount:
+        """Get the number of times the measurement results appear."""
         if len(self.measure_counts) > 0:
             return self.measure_counts
 
@@ -49,7 +101,7 @@ class MeasureResult:
         for meas in self.measures:
             bitstr = ""
             for mea in meas.measure:
-                if indexs is None or mea.idx in indexs:
+                if idxs is None or mea.idx in idxs:
                     bitstr += str(mea.value)
 
             if bitstr in measure_counts:
@@ -64,16 +116,18 @@ class MeasureResult:
 
         return self.measure_counts
 
-    def get_bitstrs(self, indexs: set = None):
+    def get_bitstrs(self, idxs: set = None):
+        """Get the measure result in binary format."""
         bit_strs = []
         for m in self.measures:
-            bit_strs.append("0b"+m.bit_str(indexs))
+            bit_strs.append("0b"+m.bit_str(idxs))
 
         return bit_strs
     
-    def get_bitints(self, indexs: set = None):
+    def get_bitints(self, idxs: set = None):
+        """Get the measure result in int format."""
         bit_strs = []
         for m in self.measures:
-            bit_strs.append(int(m.bit_str(indexs)))
+            bit_strs.append(int(m.bit_str(idxs)))
 
         return bit_strs

@@ -638,6 +638,7 @@ class Result:
         backend: The backend that supports the operation of quantum circuits.
         task_id: Task id will automatic generate when submit a quantum computing job.
         status: The operating state of a quantum circuit.
+        measure_result: The measure result of MeasureResult.
 
     Example:
         .. code-block:: python
@@ -666,46 +667,46 @@ class Result:
         self.num_qubits = num_qubits
         self.measure_result = res
 
-    def get_measures(self, creg: Union[Qureg, SubQureg] = None):
+    def get_measures(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result."""
         if not self.measure_result.measures or len(self.measure_result.measures) == 0:
             return []
 
         measures = []
-        indexs = None
+        idxs = None
         array_step = self.num_qubits
-        if creg is not None:
-            indexs = creg.get_indexs()
-            array_step = len(indexs)
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+            array_step = len(idxs)
         for ms in self.measure_result.measures:
-            measures.append(ms.simplify(indexs))
+            measures.append(ms.simplify(idxs))
         return np.array(measures).reshape(-1, array_step)
 
-    def get_bitstrs(self, creg: Union[Qureg, SubQureg] = None):
+    def get_bitstrs(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result in binary format."""
-        indexs = None
-        if creg is not None:
-            indexs = creg.get_indexs()
-        return self.measure_result.get_bitstrs(indexs)
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        return self.measure_result.get_bitstrs(idxs)
 
-    def get_bitints(self, creg: Union[Qureg, SubQureg] = None):
+    def get_bitints(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result in int format."""
-        indexs = None
-        if creg is not None:
-            indexs = creg.get_indexs()
-        return self.measure_result.get_bitints(indexs)
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        return self.measure_result.get_bitints(idxs)
 
-    def get_counts(self, creg: Union[Qureg, SubQureg] = None):
+    def get_counts(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the number of times the measurement results appear."""
         # TODO:improve
         if self.measure_result is None:
             return None
 
         res = []
-        indexs = None
-        if creg is not None:
-            indexs = creg.get_indexs()
-        measure_counts = self.measure_result.get_measure_counts(indexs)
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        measure_counts = self.measure_result.get_measure_counts(idxs)
         for out in measure_counts:
             res.append({out.bitstr: out.count})
         return json.dumps(res)
