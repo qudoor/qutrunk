@@ -27,7 +27,7 @@ def increment(num_qubits, init_value):
 
     # Print measure result like:
     # 0b0001
-    print(res.get_outcome())
+    print(res.get_bitstrs())
 
     return circuit
 

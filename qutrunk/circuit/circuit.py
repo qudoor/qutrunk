@@ -5,7 +5,7 @@ import numpy as np
 import uuid
 
 from qutrunk.backends import Backend, BackendLocal
-from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
+from qutrunk.circuit import CBit, CReg, Counter, QuBit, SubQureg, Qureg
 from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
@@ -213,10 +213,6 @@ class QCircuit:
         if self.backend.name == "BackendIBM":
             # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
             return result
-        # TODO: measureSet
-        if result and result.measureSet:
-            for m in result.measureSet:
-                self.set_measure(m.id, m.value)
 
         res = Result(self.num_qubits, result, self.backend, arguments={"shots": shots})
 
@@ -643,6 +639,7 @@ class Result:
         backend: The backend that supports the operation of quantum circuits.
         task_id: Task id will automatic generate when submit a quantum computing job.
         status: The operating state of a quantum circuit.
+        measure_result: The measure result of MeasureResult.
 
     Example:
         .. code-block:: python
@@ -658,84 +655,68 @@ class Result:
             # get running result
             res = qc.run()
             # get measurement from result
-            print(res.get_measure())
+            print(res.get_measures())
     """
 
     def __init__(
         self, num_qubits, res, backend, arguments, task_id=None, status="success"
     ):
-        self.states = []
-        self.values = []
         self.backend = backend
         self.task_id = task_id
         self.status = status
         self.arguments = arguments
-        # Modified quantum gate annotation.
-        self.measure_result = [-1] * num_qubits
+        self.num_qubits = num_qubits
+        self.measure_result = res
 
-        if res and res.measureSet:
-            for m in res.measureSet:
-                self.set_measure(m.id, m.value)
-
-        # Count the number of occurrences of the bit-bit string composed of all qubits.
-        if res and res.outcomeSet:
-            self.outcome = res.outcomeSet
-            for out in self.outcome:
-                # 二进制字符串转换成十进制
-                if out.bitstr:
-                    self.states.append(int(out.bitstr, base=2))
-                    self.values.append(out.count)
-        else:
-            self.outcome = None
-
-    def set_measure(self, qubit, value):
-        """Update qubit measure value.
-
-        Args:
-            qubit: The index of qubit in qureg.
-            value: The qubit measure value(0 or 1).
-        """
-        if qubit >= len(self.measure_result) or qubit < 0:
-            raise IndexError("qubit index out of range.")
-        self.measure_result[qubit] = value
-
-    def get_measure(self):
+    def get_measures(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result."""
-        return self.measure_result
+        if not self.measure_result.measures or len(self.measure_result.measures) == 0:
+            return []
 
-    def get_outcome(self):
+        measures = []
+        idxs = None
+        array_step = self.num_qubits
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+            array_step = len(idxs)
+        for ms in self.measure_result.measures:
+            measures.append(ms.simplify(idxs))
+        return np.array(measures).reshape(-1, array_step)
+
+    def get_bitstrs(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result in binary format."""
-        out = self.measure_result[::-1]
-        # TODO:improve
-        bit_str = "0b"
-        for o in out:
-            bit_str += str(o)
-        return bit_str
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        return self.measure_result.get_bitstrs(idxs)
 
-    def get_counts(self):
+    def get_values(self, qreg: Union[Qureg, SubQureg] = None):
+        """Get the measure result of int."""
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        return self.measure_result.get_values(idxs)
+
+    def get_counts(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the number of times the measurement results appear."""
         # TODO:improve
-        if self.outcome is None:
+        if self.measure_result is None:
             return None
 
         res = []
-        for out in self.outcome:
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        measure_counts = self.measure_result.get_measure_counts(idxs)
+        for out in measure_counts:
             res.append({out.bitstr: out.count})
         return json.dumps(res)
-
-    def get_states(self):
-        """Get all states"""
-        return self.states
-
-    def get_values(self):
-        """Get all values"""
-        return self.values
 
     def excute_info(self):
         """The resourece of run."""
         result = {
             "backend": self.backend.name,
-            # "task_id": self.task_id,
+            "task_id": self.task_id,
             "status": self.status,
             "arguments": self.arguments,
         }

@@ -5,29 +5,10 @@ from copy import deepcopy
 import numpy as np
 from numpy import pi
 
+from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
 from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
 from .pysim import Simulator
-
-
-# TODO: need to improve.
-class MeasureResult:
-    def __init__(self, id=0, value=0):
-        # TODO: id是关键字，不建议使用
-        self.id = id
-        self.value = value
-
-
-class OutcomeResult:
-    def __init__(self, bit_str="", count=0):
-        self.bitstr = bit_str
-        self.count = count
-
-
-class Result:
-    def __init__(self):
-        self.measureSet = []
-        self.outcomeSet = []
 
 
 class BackendLocalPython:
@@ -84,7 +65,8 @@ class BackendLocalPython:
             "Matrix": "matrix"
         }
         self.cmds = []
-        self.result = Result()
+        self.result = MeasureResult()
+        self.run_times = 0
 
     @timefn
     def init(self, qubits):
@@ -120,19 +102,17 @@ class BackendLocalPython:
             result: the Result object contain circuit running outcome.
         """
         # TODO: need to improve.
-        run_times = shots - 1
-        while run_times > 0:
-            self.result.measureSet = []
-
+        self.run_times = 1
+        while self.run_times < shots:
             # reset state
             self.sim.init_zero_state()
 
             for cmd in self.cmds:
                 self.exec_cmd(cmd)
             self.pack_result()
-            run_times -= 1
+            self.run_times += 1
 
-        self.result.outcomeSet.sort(key=lambda a: a.bitstr)
+        self.run_times = 0
         return self.result
 
     @timefn
@@ -196,33 +176,21 @@ class BackendLocalPython:
         # TODO: need to improve.
         if str(cmd.gate) == "Measure":
             res = self.sim.measure(cmd.targets[0])
-            mr = MeasureResult(cmd.targets[0], res)
-            self.result.measureSet.append(mr)
+            mr = MeasureQubit(cmd.targets[0], res)
+            index = self.run_times
+            meassize = len(self.result.measures)
+            if index >= meassize:
+                mrs = MeasureQubits()
+                self.result.measures.append(mrs)
+            self.result.measures[index].measure.append(mr)
             return
 
         return getattr(self, self.gate_map[str(cmd.gate)])(cmd)
 
     def pack_result(self):
-        self.result.measureSet.sort(key=lambda a: a.id)
-        bit_str = ""
-        measureSet = self.result.measureSet
-        for i in range(len(measureSet)):
-            m = measureSet[i]
-            bit_str += str(m.value)
-
-        index = -1
-        outcomeSet = self.result.outcomeSet
-        for i in range(len(outcomeSet)):
-            out = outcomeSet[i]
-            if out.bitstr == bit_str:
-                index = i
-                break
-
-        if index >= 0:
-            self.result.outcomeSet[index].count += 1
-        else:
-            out = OutcomeResult(bit_str, 1)
-            self.result.outcomeSet.append(out)
+        index = self.run_times
+        if index < len(self.result.measures):
+            self.result.measures[index].measure.sort(key=lambda a: a.idx)
 
     def h(self, cmd):
         """the single-qubit Hadamard gate.
