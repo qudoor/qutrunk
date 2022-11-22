@@ -35,13 +35,18 @@ def run_qpe(backend=None):
     result = qc.run(shots=100)
 
     # print result
-    out = result.get_measures(q1)[0]
-    print(out)
+    meas = result.get_measures(q1)
+    reslen = len(meas)
+    if reslen > 0:
+        print(meas[reslen-1])
 
     # calculate the value of theta
-    f = result.get_values(q1)[0]
-    theta = f / 2 ** len(q1)
-    print("θ=", theta)
+    val = result.get_values(q1)
+    reslen = len(val)
+    if reslen > 0:
+        f = val[reslen-1]
+        theta = f / 2 ** len(q1)
+        print("θ=", theta)
 
     return qc
 

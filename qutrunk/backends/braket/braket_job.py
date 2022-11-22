@@ -7,6 +7,7 @@ from braket.tasks.local_quantum_task import LocalQuantumTask
 from qutrunk.backends import Backend
 from qutrunk.backends.result import MeasureCount, MeasureResult
 
+
 class AWSBraketJob:
     """AWSBraketJob."""
 

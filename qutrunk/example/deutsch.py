@@ -25,7 +25,7 @@ def deutsch(backend=None):
 
     # Run quantum circuit and print result
     result = qc.run()
-    print("The result of Deutsch: ", result.get_measures()[0])
+    print("The result of Deutsch: ", result.get_measures())
 
     return qc
 

@@ -141,7 +141,7 @@ class BackendIBM(Backend):
 
     def _to_result(self, res):
         pass
-        result = Result()
+        result = MeasureResult()
         # exception
         # counts = res.get["data"]["counts"]
         counts = res["data"]["counts"]

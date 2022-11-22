@@ -25,7 +25,10 @@ def run_random_byte(backend=None):
 
     # Print measure result like:
     # [0, 1, 0, 0, 0, 0, 1, 0]
-    print(res.get_measures())
+    meas = res.get_measures()
+    reslen = len(meas)
+    if reslen > 0:
+        print(meas[reslen-1])
 
     return qc
 
