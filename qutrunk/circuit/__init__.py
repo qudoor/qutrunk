@@ -4,6 +4,6 @@ from .classical_reg import CReg
 from .command import Command
 from .counter import Counter
 from .qubit import QuBit
-from .qureg import Qureg
+from .qureg import SubQureg, Qureg
 from .circuit import QCircuit
 from .parameter import Parameter

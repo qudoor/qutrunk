@@ -16,7 +16,7 @@ def run_addition(num_qubits, init_value, number=0):
 
     All(Measure) * qr
     res = circuit.run()
-    print(res.get_outcome())
+    print(res.get_bitstrs())
 
     return circuit
 
