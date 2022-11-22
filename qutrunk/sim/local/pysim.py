@@ -149,6 +149,7 @@ class Simulator:
             # modify this tasks's target amplitudes
             for r in range(numTargAmps):
                 ind = ampInds[r]
+                self.real[ind] = 0
                 self.imag[ind] = 0
                 
                 for c in range(numTargAmps):
