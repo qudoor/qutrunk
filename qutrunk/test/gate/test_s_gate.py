@@ -1,5 +1,4 @@
 import numpy as np
-from enum import IntEnum
 import pytest
 from qiskit import QuantumCircuit, assemble, Aer
 
@@ -7,8 +6,8 @@ from qutrunk.circuit.gates import S
 from qutrunk.circuit import QCircuit
 from qutrunk.test.global_parameters import ZERO_STATE
 from qutrunk.circuit.gates import Matrix
-from qutrunk.backends import BackendQuSprout, BackendLocal
 from qutrunk.test.gate.backend_fixture import backend, backend_type
+
 
 class TestSgate:
     @pytest.fixture
