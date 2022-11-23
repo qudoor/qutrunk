@@ -5,7 +5,7 @@ from typing import Optional
 from qutrunk.backends.backend import Backend
 from qutrunk.tools.read_qubox import get_qubox_setting
 from .rpcclient import QuSproutApiServer
-from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
+from qutrunk.thrift.qusproutdata import ttypes as qusproutdata
 from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
 
 

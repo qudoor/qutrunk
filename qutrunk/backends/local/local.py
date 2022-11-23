@@ -2,7 +2,7 @@
 
 from qutrunk.backends.backend import Backend
 # TODO:need to improve.
-from qutrunk.sim.local.local_python import BackendLocalPython as BackendLocalImpl
+from .local_python import BackendLocalPython as BackendLocalImpl
 
 
 class BackendLocal(Backend):

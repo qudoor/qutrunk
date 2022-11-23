@@ -5,10 +5,10 @@ from copy import deepcopy
 import numpy as np
 from numpy import pi
 
-from qutrunk.sim.local.pysim import Simulator
+from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
 from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
-from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
+from .pysim import Simulator
 
 
 class BackendLocalPython:
