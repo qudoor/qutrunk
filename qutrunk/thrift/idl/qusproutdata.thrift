@@ -75,31 +75,25 @@ struct Circuit {
     1: required list<Cmd> cmds
 }
 
-//测量结果
-struct MeasureResult {
+//单个比特测量结果
+struct MeasureQubit {
     //量子比特
-    1: required i32 id
+    1: required i32 idx
 
     //测量结果
     2: required i32 value
 }
 
-//运行结果
-struct Outcome {
-    //比特位组成的字符串
-    1: required string bitstr
-
-    //出现次数
-    2: required i32 count
+//所有比特测量结果
+struct MeasureQubits {
+    //测量结果
+    1: required list<MeasureQubit> measure
 }
 
 //指令结果集
-struct Result {
-    //测量结果
-    1: required list<MeasureResult> measureSet
-
-    //结果集
-    2: required list<Outcome> outcomeSet
+struct MeasureResult {
+    //多次采样测量结果
+    1: required list<MeasureQubits> measures
 }
 
 //任务初始化信息
@@ -215,7 +209,7 @@ struct RunCircuitResp {
     1: required ecode.BaseCode base 
 
     //返回结果
-    2: optional Result result
+    2: optional MeasureResult result
 }
 
 //泡利算子操作类型

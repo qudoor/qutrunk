@@ -6,24 +6,7 @@ import requests
 
 from qutrunk.config import configuration
 from qutrunk.tools.function_time import timefn
-
-
-class Measure:
-    def __init__(self, id=0, value=0):
-        self.id = id
-        self.value = value
-
-
-class Outcome:
-    def __init__(self, bit_str="", count=0):
-        self.bitstr = bit_str
-        self.count = count
-
-
-class MeasureResult:
-    def __init__(self):
-        self.measureSet = []
-        self.outcomeSet = []
+from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
 
 
 class QuSaasApiServer:
@@ -120,7 +103,7 @@ class QuSaasApiServer:
             shots: Circuit run times, for sampling, default: 1.
 
         Returns:
-            result: The Result object contain circuit running outcome.
+            result: The Result object contain circuit running measure.
         """
         req = json.dumps({
             "flowid": "3",
@@ -134,12 +117,12 @@ class QuSaasApiServer:
         resp = resp.json()
 
         result = MeasureResult()
-        for measure in resp['data']['measures']:
-            temp = Measure(measure['target'], measure['value'])
-            result.measureSet.append(temp)
-        for outcome in resp['data']['outcomes']:
-            temp = Outcome(outcome['bitstr'], outcome['count'])
-            result.outcomeSet.append(temp)
+        for meas in resp["data"]["measures"]:
+            meas_temp = MeasureQubits()
+            for mea in meas["measure"]:
+                mea_temp = MeasureQubit(mea["target"], mea["value"])
+                meas_temp.measure.append(mea_temp)
+            result.measures.append(meas_temp)
         return result
 
     @timefn
@@ -162,29 +145,6 @@ class QuSaasApiServer:
         })
         res = self._client.post(self.base_url, req)
         return res.json()["data"]["amps"][0]
-
-    @timefn
-    def get_prob_outcome(self, qubit, outcome):
-        """Get the probability of a specified qubit being measured in the given outcome (0 or 1)
-
-        Args:
-            qubit: The specified qubit to be measured.
-            outcome: The qubit measure result(0 or 1).
-
-        Returns:
-            The probability of target qubit
-        """
-        req = json.dumps({
-            "flowid": "5",
-            "taskid": self._taskid,
-            "cmd": "getprob",
-            "params": {
-                "targets": [qubit],
-            },
-        })
-        res = self._client.post(self.base_url, req)
-        out_one = res.json()['data']['outcomes'][0]
-        return 1 - out_one if outcome else out_one
 
     @timefn
     def get_probs(self, qubits):
@@ -229,24 +189,6 @@ class QuSaasApiServer:
             "flowid": "7",
             "taskid": self._taskid,
             "cmd": "releaseenv",
-        })
-        res = self._client.post(self.base_url, req)
-        return res.json()['code']
-
-    @timefn
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        req = json.dumps({
-            "flowid": "8",
-            "taskid": self._taskid,
-            "cmd": "applyqft",
-            "params": {
-                "targets": qubits
-            }
         })
         res = self._client.post(self.base_url, req)
         return res.json()['code']
@@ -332,4 +274,4 @@ class QuSaasApiServer:
         saas_conf = configuration['QuSaas']
         url = f"{saas_conf['schema']}://{saas_conf['host']}:{saas_conf['port']}{saas_conf['api']['token']}"
         response = self._client.post(url, data=data).json()
-        return response['data']['access_token']
+        return response['access_token']

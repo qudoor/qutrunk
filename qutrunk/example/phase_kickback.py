@@ -28,7 +28,10 @@ def run_phase_kickback(backend=None):
     res = qc.run(shots=100)
 
     # print result
-    print(res.get_measure())
+    meas = res.get_measures()
+    reslen = len(meas)
+    if reslen > 0:
+        print(meas[reslen-1])
 
     return qc
 
