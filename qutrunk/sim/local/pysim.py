@@ -150,8 +150,7 @@ class Simulator:
             for r in range(numTargAmps):
                 ind = ampInds[r]
                 self.imag[ind] = 0
-                self.real[ind] = 0
-
+                
                 for c in range(numTargAmps):
                     reElem = reals[r][c]
                     imElem = imags[r][c]
