@@ -5,6 +5,7 @@ from qutrunk.backends import BackendQuSprout, BackendLocal
 
 class BackendType(IntEnum):
     LOCAL = 1
+    # NOTE: 如果访问不到QuSprout服务，请将QU_SPROUT后端类型注释掉，只测本地计算
     QU_SPROUT = 2
 
 @pytest.fixture(params=[int(bt) for bt in list(BackendType)])
