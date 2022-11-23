@@ -84,14 +84,14 @@ class Matrix(BasicGate):
             .. code-block:: python
 
                 Matrix([[0.5, 0.5], [0.5, -0.5]]) * qr[0]  -- No controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 1) * (qr[0], qr[1])  -- qr[0] is controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
+                Matrix([[0.5, 0.5], [0.5, -0.5]]).ctrl(1) * (qr[0], qr[1])  -- qr[0] is controlled bit
+                Matrix([[0.5, 0.5], [0.5, -0.5]]).ctrl(2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
     """
 
-    def __init__(self, matrix, ctrl_cnt=0):
+    def __init__(self, matrix):
         super().__init__()
         self.matrix = matrix
-        self.ctrl_cnt = ctrl_cnt
+        self.ctrl_cnt = 0
 
     def __str__(self):
         return "Matrix"
@@ -153,7 +153,8 @@ class Matrix(BasicGate):
 
     def inv(self):
         """Apply inverse gate."""
-        gate = Matrix(self.matrix, self.ctrl_cnt)
+        gate = Matrix(self.matrix)
+        gate.ctrl_cnt = self.ctrl_cnt
         gate.is_inverse = not self.is_inverse
         return gate
 
@@ -163,7 +164,8 @@ class Matrix(BasicGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
-        gate = Matrix(self.matrix, ctrl_cnt)
+        gate = Matrix(self.matrix)
+        gate.ctrl_cnt = ctrl_cnt
         gate.is_inverse = self.is_inverse
         return gate
 
@@ -203,8 +205,8 @@ class Gate(BasicGate):
 
             @Gate
             def my_gate(a, b, c, d):
-                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
-                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
+                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]]).ctrl(2).inv(), (a, b, c)) \
+                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl(1).inv(), (a, c)) \
                     << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
 
             my_gate * (q[3], q[1], q[0], q[2])
