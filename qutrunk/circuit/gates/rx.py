@@ -150,7 +150,7 @@ class CRx(BasicRotateGate):
         cos = np.cos(half_theta)
         isin = 1j * np.sin(half_theta)
         return np.array(
-            [[cos, 0, -isin, 0], [0, 1, 0, 0], [-isin, 0, cos, 0], [0, 0, 0, 1]]
+            [[1, 0, 0, 0], [0, cos, 0, -isin], [0, 0, 1, 0], [0, -isin, 0, cos]]
         )
 
     def inv(self):

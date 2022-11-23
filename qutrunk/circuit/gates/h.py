@@ -133,10 +133,10 @@ class CHGate(BasicGate):
         _sqrt2o2 = 1 / cmath.sqrt(2)
         return np.array(
             [
-                [_sqrt2o2, 0, _sqrt2o2, 0],
-                [0, 1, 0, 0],
-                [_sqrt2o2, 0, -_sqrt2o2, 0],
-                [0, 0, 0, 1],
+                [1, 0, 0, 0],
+                [0, _sqrt2o2, 0, _sqrt2o2],
+                [0, 0, 1, 0],
+                [0, _sqrt2o2, 0, -_sqrt2o2],
             ]
         )
 
