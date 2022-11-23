@@ -4,11 +4,11 @@ from qiskit import QuantumCircuit, assemble, Aer
 
 from qutrunk.circuit import QCircuit
 from qutrunk.test.global_parameters import ZERO_STATE
-from qutrunk.circuit.gates import Matrix, Sdg
+from qutrunk.circuit.gates import Matrix, Sdg, H
 from qutrunk.test.gate.backend_fixture import backend, backend_type
 
 
-class TestSgate:
+class TestSdg:
     @pytest.fixture
     def result_qutrunk(self, backend):
         # local backend

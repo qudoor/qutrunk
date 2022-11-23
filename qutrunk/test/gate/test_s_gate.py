@@ -9,7 +9,7 @@ from qutrunk.circuit.gates import Matrix
 from qutrunk.test.gate.backend_fixture import backend, backend_type
 
 
-class TestSgate:
+class TestS:
     @pytest.fixture
     def result_qutrunk(self, backend):
         # local backend
