@@ -20,7 +20,7 @@ class TestSdg:
         return result_q
 
     def test_matrix(self, result_qutrunk):
-        """Test S gate with Matrix."""
+        """Test Sdg gate with Matrix."""
         circuit = QCircuit()
         qr = circuit.allocate(1)
         Matrix(H.matrix.tolist()) * qr[0]
@@ -31,7 +31,7 @@ class TestSdg:
         assert np.allclose(result_qutrunk, result_m)
 
     def test_qiskit(self, result_qutrunk):
-        """Test S gate with qiskit."""
+        """Test Sdg gate with qiskit."""
         qc = QuantumCircuit(1)
         initial_state = [1, 0]
         qc.initialize(initial_state, 0)
@@ -48,7 +48,7 @@ class TestSdg:
         assert np.allclose(result_qutrunk, result_qiskit)
 
     def test_gate_inverse(self):
-        """Test the inverse of S gate."""
+        """Test the inverse of Sdg gate."""
         # local backend
         circuit = QCircuit()
         qr = circuit.allocate(1)
@@ -64,7 +64,7 @@ class TestSdg:
         assert np.allclose(result_init, result_expect)
 
     def test_matrix_inverse(self):
-        """Test the inverse of S gate with Matrix."""
+        """Test the inverse of Sdg gate with Matrix."""
         circuit = QCircuit()
         qr = circuit.allocate(1)
 
