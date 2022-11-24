@@ -4,8 +4,8 @@ import uuid
 from thrift.protocol import TBinaryProtocol, TMultiplexedProtocol
 from thrift.transport import TSocket, TTransport
 
-from qutrunk.thrift.qusprout import QuSproutServer
-from qutrunk.thrift.qusproutdata import ttypes as qusproutdata
+from qutrunk.sim.qusprout.qusprout import QuSproutServer
+from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
 from qutrunk.tools.function_time import timefn
 
 
