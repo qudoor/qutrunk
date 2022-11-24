@@ -269,7 +269,7 @@ class Simulator:
     def t_gate(self, target):
         """The single-qubit T gate."""
         real = 1 / math.sqrt(2)
-        imag = -1 / math.sqrt(2)
+        imag = 1 / math.sqrt(2)
         self.phase_shift_by_term(self.real, self.imag, target, real, imag)
 
     def control_not(self, ctrl, target):
