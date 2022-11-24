@@ -72,7 +72,7 @@ class BackendLocal(Backend):
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
-        return res
+        return res, None
 
     def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.

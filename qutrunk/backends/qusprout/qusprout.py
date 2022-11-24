@@ -186,7 +186,7 @@ class BackendQuSprout(Backend):
             self.circuit.counter.finish()
 
         result = MeasureResult()
-        for meas in res.measures:
+        for meas in res.result.measures:
             meas_temp = MeasureQubits()
             for mea in meas.measure:
                 mea_temp = MeasureQubit(mea.idx, mea.value)
@@ -198,7 +198,7 @@ class BackendQuSprout(Backend):
         """
         self._api_server.close()
 
-        return result
+        return result, [self._api_server._taskid, res.base.msg]
 
     def get_expec_pauli_prod(self, pauli_prod_list):
         """Computes the expected value of a product of Pauli operators.

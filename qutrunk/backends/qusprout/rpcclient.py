@@ -74,7 +74,7 @@ class QuSproutApiServer:
         """
         req = qusproutdata.RunCircuitReq(self._taskid, shots)
         res = self._client.run(req)
-        return res.result
+        return res
 
     @timefn
     def get_prob(self, index):
