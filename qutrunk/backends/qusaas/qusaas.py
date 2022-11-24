@@ -140,14 +140,6 @@ class BackendQuSaas(Backend):
             self.circuit.counter.acc_run_time(elapsed)
         return res
 
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        self._api_server.apply_QFT(qubits)
-
     def get_expec_pauli_prod(self, pauli_prod_list):
         """Computes the expected value of a product of Pauli operators.
 
