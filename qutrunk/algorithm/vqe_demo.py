@@ -1,50 +1,11 @@
 import numpy as np
-from scipy.linalg import block_diag
+from numpy import pi
 from scipy.optimize import minimize
 
+from qutrunk.circuit import QCircuit
+from qutrunk.circuit.gates import Ry, Rx, CNOT, Rz, X, Z, Y, All
+
 np.set_printoptions(precision=4, suppress=True)
-
-# Pauli matrices
-I = np.array([[1, 0],
-              [0, 1]])
-Sx = np.array([[0, 1],
-               [1, 0]])
-Sy = np.array([[0, -1j],
-               [1j, 0]])
-Sz = np.array([[1, 0],
-               [0, -1]])
-
-# Hadamard matrix
-H = (1 / np.sqrt(2)) * np.array([[1, 1],
-                                 [1, -1]])
-
-# Phase matrix
-S = np.array([[1, 0],
-              [0, 1j]])
-
-# single qubit basis states |0> and |1>
-q0 = np.array([[1],
-               [0]])
-q1 = np.array([[0],
-               [1]])
-
-# Projection matrices |0><0| and |1><1|
-P0 = np.dot(q0, q0.conj().T)
-P1 = np.dot(q1, q1.conj().T)
-
-# Rotation matrices as a function of theta, e.g. Rx(theta), etc.
-Rx = lambda theta: np.array([[np.cos(theta / 2), -1j * np.sin(theta / 2)],
-                             [-1j * np.sin(theta / 2), np.cos(theta / 2)]])
-Ry = lambda theta: np.array([[np.cos(theta / 2), -np.sin(theta / 2)],
-                             [np.sin(theta / 2), np.cos(theta / 2)]])
-Rz = lambda theta: np.array([[np.exp(-1j * theta / 2), 0.0],
-                             [0.0, np.exp(1j * theta / 2)]])
-
-# CNOTij, where i is control qubit and j is target qubit
-CNOT10 = np.kron(P0, I) + np.kron(P1, Sx)  # control -> q1, target -> q0
-CNOT01 = np.kron(I, P0) + np.kron(Sx, P1)  # control -> q0, target -> q1
-
-SWAP = block_diag(1, Sx, 1)
 
 # See DOI: 10.1103/PhysRevX.6.031007
 # Here, we use parameters given for H2 at R=0.75A
@@ -57,92 +18,74 @@ g5 = +0.0910
 
 nuclear_repulsion = 0.7055696146
 
-Hmol = (g0 * np.kron(I, I) +  # g0 * I
-        g1 * np.kron(I, Sz) +  # g1 * Z0
-        g2 * np.kron(Sz, I) +  # g2 * Z1
-        g3 * np.kron(Sz, Sz) +  # g3 * Z0Z1
-        g4 * np.kron(Sy, Sy) +  # g4 * Y0Y1
-        g5 * np.kron(Sx, Sx))  # g5 * X0X1
 
-electronic_energy = np.linalg.eigvalsh(Hmol)[0]  # take the lowest value
-print("Classical diagonalization: {:+2.8} Eh".format(electronic_energy + nuclear_repulsion))
-print("Exact (from G16):          {:+2.8} Eh".format(-1.1457416808))
+def ansatz(theta, qreg):
+    Ry(pi / 2) * qreg[1]
+    Rx(pi / 2) * qreg[0]  # todo minus required
 
-# initial basis, put in |01> state with Sx operator on q0
-psi0 = np.zeros((4, 1))
-psi0[0] = 1
-psi0 = np.dot(np.kron(I, Sx), psi0)
+    CNOT * (qreg[1], qreg[0])
 
-# read right-to-left (bottom-to-top?)
-ansatz = lambda theta: \
-    (
-        np.dot(
-            np.dot(
-                np.kron(-Ry(np.pi / 2), Rx(np.pi / 2)),
-                np.dot(
-                    CNOT10,
-                    np.dot(
-                        np.kron(I, Rz(theta)),
-                        CNOT10)
-                )
-            ),
-            np.kron(Ry(np.pi / 2), -Rx(np.pi / 2))
-        )
-    )
+    Rz(theta) * qreg[0]
+
+    CNOT * (qreg[1], qreg[0])
+
+    Ry(pi / 2) * qreg[1]  # todo minus required
+    Rx(pi / 2) * qreg[0]
 
 
-def projective_expected(theta, ansatz, psi0):
-    print("theta:" + str(theta))
-    # print(psi0)
-    # this will depend on the hard-coded Hamiltonian + coefficients
-    circuit = ansatz(theta[0])
-    psi = np.dot(circuit, psi0)
+def projective_expected(a_theta, a_ansatz):
+    energy = g0
 
-    # for 2 qubits, assume we can only take Pauli Sz measurements (Sz \otimes I)
-    # we just apply the right unitary for the desired Pauli measurement
-    measureZ = lambda U: np.dot(np.conj(U).T, np.dot(np.kron(Sz, I), U))
+    circuit, qreg = prepare(a_theta, a_ansatz)
+    in_state = circuit.get_statevector()
 
-    energy = 0.0
+    Z * qreg[0]
+    out_state = circuit.get_statevector()
+    energy += g1 * state_inner(in_state, out_state)
+    Z * qreg[0]  # cancel op
 
-    # although the paper indexes the hamiltonian left-to-right (0-to-1)
-    # qubit-1 is always the top qubit for us, so the tensor pdt changes
-    # e.g. compare with the "exact Hamiltonian" we explicitly diagonalized
+    Z * qreg[1]
+    out_state = circuit.get_statevector()
+    energy += g2 * state_inner(in_state, out_state)
+    Z * qreg[1]
 
-    # <I1 I0>
-    energy += g0  # it is a constant
-    print(energy)
+    All(Z) * qreg
+    out_state = circuit.get_statevector()
+    energy += g3 * state_inner(in_state, out_state)
+    All(Z) * qreg
 
-    # <I1 Sz0>
-    U = SWAP
-    energy += g1 * np.dot(psi.conj().T, np.dot(measureZ(U), psi))
-    print(np.real(energy)[0, 0])
+    All(X) * qreg
+    out_state = circuit.get_statevector()
+    energy += g4 * state_inner(in_state, out_state)
+    All(X) * qreg
 
-    # <Sz1 I0>
-    U = np.kron(I, I)
-    energy += g2 * np.dot(psi.conj().T, np.dot(measureZ(U), psi))
-    print(np.real(energy)[0, 0])
+    All(Y) * qreg
+    out_state = circuit.get_statevector()
+    energy += g5 * state_inner(in_state, out_state)
+    All(Y) * qreg
 
-    # <Sz1 Sz0>
-    U = CNOT01
-    energy += g3 * np.dot(psi.conj().T, np.dot(measureZ(U), psi))
-    print(np.real(energy)[0, 0])
+    # op_list = [3, 0, 0, 3, 3, 3, 1, 1, 2, 2]
+    # coff_list = [g1, g2, g3, g4, g5]
+    # res += circuit.expval_sum([op_list, coff_list], 2)
+    return energy
 
-    # <Sx1 Sx0>
-    U = np.dot(CNOT01, np.kron(H, H))
-    energy += g4 * np.dot(psi.conj().T, np.dot(measureZ(U), psi))
-    print(np.real(energy)[0, 0])
 
-    # <Sy1 Sy0>
-    U = np.dot(CNOT01, np.kron(np.dot(H, S.conj().T), np.dot(H, S.conj().T)))
-    energy += g5 * np.dot(psi.conj().T, np.dot(measureZ(U), psi))
+def prepare(a_theta, a_ansatz):
+    circuit = QCircuit()
+    qreg = circuit.allocate(2)
+    X * qreg[0]
 
-    print("res:" + str(np.real(energy)[0, 0]))
+    a_ansatz(a_theta[0], qreg)
+    return circuit, qreg
 
-    return np.real(energy)[0, 0]
+
+def state_inner(i_state, o_state):
+    res = i_state @ o_state.conj().T
+    return res.real
 
 
 theta = [0.0]
-result = minimize(projective_expected, theta, args=(ansatz, psi0))
+result = minimize(projective_expected, theta, args=ansatz)
 theta = result.x[0]
 val = result.fun
 
