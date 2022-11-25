@@ -1,7 +1,7 @@
 import math
 from copy import deepcopy
 
-# TDOO: need to improve.
+# TODO: need to improve.
 import numpy as np
 from numpy import pi
 
