@@ -147,7 +147,7 @@ class MCZ(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         if self.ctrl_cnt == 1:
-            return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+            return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]])
 
     def inv(self):
         """Apply inverse gate."""
