@@ -1,45 +1,32 @@
 from enum import IntEnum
-
 import pytest
 
-from qutrunk.backends import BackendLocal, BackendQuSprout, BackendIBM
-from qutrunk.backends.braket import BackendAWSLocal, BackendAWSDevice
-from qutrunk.circuit import QCircuit
+from qutrunk.backends import BackendQuSprout, BackendLocal
 
 
 class BackendType(IntEnum):
     LOCAL = 1
+    # NOTE: 如果访问不到QuSprout服务，请将QU_SPROUT后端类型注释掉，只测本地计算
     QU_SPROUT = 2
-    QU_SAAS = 3
-    IBM = 4
-    AWS_LOCAL = 5
-    AWS_DEVICE = 6
 
 
-# all backend type
+# TODO: have some problem.
 @pytest.fixture(params=[int(bt) for bt in list(BackendType)])
 def backend_type(request):
     return request.param
 
 
 @pytest.fixture
-def circuit(backend_type):
-    cir = QCircuit(backend=create_backend(backend_type))
-    return cir
+def backend(backend_type):
+    return create_backend(backend_type)
 
 
 def create_backend(backend_type):
     if backend_type == BackendType.LOCAL:
-        backend = BackendLocal()
+        be = BackendLocal()
     elif backend_type == BackendType.QU_SPROUT:
-        backend = BackendQuSprout()
-    elif backend_type == BackendType.IBM:
-        backend = BackendIBM()
-    elif backend_type == BackendType.AWS_LOCAL:
-        backend = BackendAWSLocal()
-    elif backend_type == BackendType.AWS_DEVICE:
-        backend = BackendAWSDevice()
+        be = BackendQuSprout(ip="192.168.170.195", port=9091)
     else:
         raise ValueError(f"unsupported backend type:{backend_type}")
 
-    return backend
+    return be
