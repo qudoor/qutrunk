@@ -43,7 +43,7 @@ class BackendQuSprout(Backend):
             print(res.get_counts())
     """
 
-    def __init__(self, ip: Optional[str] = None, port: Optional[int] = None, run_mode: str = "cpu"):
+    def __init__(self, run_mode: str = "cpu", ip: Optional[str] = None, port: Optional[int] = None):
         super().__init__()
         self.circuit = None
         self.run_mode = run_mode
@@ -184,12 +184,13 @@ class BackendQuSprout(Backend):
             self.circuit.counter.finish()
 
         result = MeasureResult()
-        for meas in res.measures:
-            meas_temp = MeasureQubits()
-            for mea in meas.measure:
-                mea_temp = MeasureQubit(mea.idx, mea.value)
-                meas_temp.measure.append(mea_temp)
-            result.measures.append(meas_temp)
+        if res is not None and res.measures is not None:
+            for meas in res.measures:
+                meas_temp = MeasureQubits()
+                for mea in meas.measure:
+                    mea_temp = MeasureQubit(mea.idx, mea.value)
+                    meas_temp.measure.append(mea_temp)
+                result.measures.append(meas_temp)
         """
         1 必须释放连接，不然其它连接无法连上服务端
         2 不能放在__del__中，因为对象释放不代表析构函数会及时调用
