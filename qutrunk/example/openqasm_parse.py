@@ -15,7 +15,10 @@ def run_openqasm_parse():
     res = circuit.run(shots=100)
 
     # print result
-    print(res.get_measure())
+    meas = res.get_measures()
+    reslen = len(meas)
+    if reslen > 0:
+        print(meas[reslen-1])
     print(res.get_counts())
 
     return circuit
