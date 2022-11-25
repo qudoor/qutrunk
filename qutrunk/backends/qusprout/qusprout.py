@@ -178,7 +178,9 @@ class BackendQuSprout(Backend):
             shots: Circuit run times, for sampling, default: 1.
 
         Returns:
-            The Result object contain circuit running outcome.
+            result: The Result object contain circuit running outcome.
+            taskid: The id of this task
+            errinfo: Error information of this task
         """
         res, elapsed = self._api_server.run(shots)
         if self.circuit.counter:
@@ -198,7 +200,7 @@ class BackendQuSprout(Backend):
         """
         self._api_server.close()
 
-        return result, [self._api_server._taskid, res.base.msg]
+        return [result, self._api_server._taskid, res.base.msg]
 
     def get_expec_pauli_prod(self, pauli_prod_list):
         """Computes the expected value of a product of Pauli operators.

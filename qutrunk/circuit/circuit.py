@@ -208,13 +208,13 @@ class QCircuit:
             The Result object contain circuit running outcome.
         """
         self.backend.send_circuit(self, True)
-        result, runinfo = self.backend.run(shots)
+        result = self.backend.run(shots)
 
         if self.backend.name == "BackendIBM":
             # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
             return result
 
-        res = Result(self.num_qubits, result, runinfo, self.backend, arguments={"shots": shots})
+        res = Result(self.num_qubits, self.backend, result[0], result[1], result[2], arguments={"shots": shots})
 
         return res
 
@@ -659,11 +659,11 @@ class Result:
     """
 
     def __init__(
-        self, num_qubits, res, runinfor, backend, arguments
+        self, num_qubits, backend, res, task_id=None, status='successabc', arguments = '{"shots": 1}'
     ):
         self.backend = backend
-        self.task_id = runinfor[0] if runinfor else None
-        self.status = runinfor[0] if runinfor else "success"
+        self.task_id = task_id
+        self.status = status
         self.arguments = arguments
         self.num_qubits = num_qubits
         self.measure_result = res

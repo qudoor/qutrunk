@@ -1,4 +1,5 @@
 """Python implementation of a quantum computer simulator."""
+import uuid
 
 from qutrunk.backends.backend import Backend
 # TODO:need to improve.
@@ -33,6 +34,7 @@ class BackendLocal(Backend):
         super().__init__()
         self.circuit = None
         self._local_impl = BackendLocalImpl()
+        self._taskid = uuid.uuid4().hex
 
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to local backend.
@@ -65,14 +67,17 @@ class BackendLocal(Backend):
             shots: Circuit run times, for sampling, default: 1.
 
         Returns:
-            list: The Result object contain circuit running outcome.
+            res: The Result object contain circuit running outcome.
+            taskid: The id of this task
+            errinfo: Error information of this task
         """
         res, elapsed = self._local_impl.run(shots)
+
         # TODO: circuit is None?
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
-        return res, None
+        return [res, self._taskid, 'success']
 
     def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
