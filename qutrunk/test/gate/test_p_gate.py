@@ -9,7 +9,7 @@ from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Matrix
 from qutrunk.test.gate.backend_fixture import backend, backend_type
 
-class Test_P_Gate:
+class TestPGate:
     @pytest.fixture
     def result_gate(self, backend):
         circuit = QCircuit(backend=backend)
@@ -55,7 +55,3 @@ class Test_P_Gate:
         Matrix(P(pi / 2).matrix.tolist()).inv() * qr[0]
         result_des = np.array(circuit.get_statevector()).reshape(-1, 1)
         assert np.allclose(result_src, result_des)
-
-
-if __name__ == '__main__':
-    pytest.main(['-s', 'qutrunk\\test\\gate\\test_p_gate.py'])
