@@ -1,37 +1,57 @@
+import pytest
 import numpy as np
+from numpy import pi
 
-from qutrunk.circuit.gates import P
+from qiskit import QuantumCircuit, BasicAer, transpile
+
+from qutrunk.circuit.gates import P, All, H
 from qutrunk.circuit import QCircuit
-from qutrunk.test.global_parameters import ZERO_STATE
+from qutrunk.circuit.gates import Matrix
+from qutrunk.test.gate.backend_fixture import backend, backend_type
 
+class TestPGate:
+    @pytest.fixture
+    def result_gate(self, backend):
+        circuit = QCircuit(backend=backend)
+        qr = circuit.allocate(1)
+        All(H) * qr
+        P(pi / 2) * qr[0]
+        result_gate = np.array(circuit.get_statevector()).reshape(-1, 1)
+        return result_gate
 
-def test_p_gate():
-    """Test P gate."""
-    # local backend
-    circuit = QCircuit()
-    qr = circuit.allocate(1)
-    P(np.pi / 2) * qr[0]
-    result = circuit.get_statevector()
-    result_backend = np.array(result).reshape(-1, 1)
+    def test_result_matrix(self, result_gate):
+        circuit = QCircuit()
+        qr = circuit.allocate(1)
+        Matrix(H.matrix.tolist()) * qr[0]
+        Matrix(P(pi / 2).matrix.tolist()) * qr[0]
+        result_matrix = np.array(circuit.get_statevector()).reshape(-1, 1)
+        assert np.allclose(result_gate, result_matrix)
 
-    # math
-    p = P(np.pi / 2)
-    result_math = np.dot(p.matrix, ZERO_STATE)
+    def test_result_qiskit(self, result_gate):
+        qc = QuantumCircuit(1, 1)
+        backend = BasicAer.get_backend('statevector_simulator')
+        qc.h(0)
+        qc.p(pi / 2, 0)
+        job = backend.run(transpile(qc, backend))
+        result_qiskit = np.array(job.result().get_statevector(qc)).reshape(-1, 1)
+        assert np.allclose(result_gate, result_qiskit)
 
-    assert np.allclose(result_backend, result_math)
+    def test_gate_inverse(self, backend):
+        circuit = QCircuit(backend=backend)
+        qr = circuit.allocate(1)
+        All(H) * qr
+        result_src = np.array(circuit.get_statevector()).reshape(-1, 1)
+        P(pi / 2) * qr[0]
+        P(pi / 2).inv() * qr[0]
+        result_des = np.array(circuit.get_statevector()).reshape(-1, 1)
+        assert np.allclose(result_src, result_des)
 
-
-def test_p_inverse_gate():
-    """Test the inverse of P gate."""
-    # local backend
-    circuit = QCircuit()
-    qr = circuit.allocate(1)
-    P(np.pi / 2).inv() * qr[0]
-    result = circuit.get_statevector()
-    result_backend = np.array(result).reshape(-1, 1)
-
-    # math
-    p = P(-np.pi / 2)
-    result_math = np.dot(p.matrix, ZERO_STATE)
-
-    assert np.allclose(result_backend, result_math)
+    def test_matrix_inverse(self, backend):
+        circuit = QCircuit(backend=backend)
+        qr = circuit.allocate(1)
+        Matrix(H.matrix.tolist()) * qr[0]
+        result_src = np.array(circuit.get_statevector()).reshape(-1, 1)
+        Matrix(P(pi / 2).matrix.tolist()) * qr[0]
+        Matrix(P(pi / 2).matrix.tolist()).inv() * qr[0]
+        result_des = np.array(circuit.get_statevector()).reshape(-1, 1)
+        assert np.allclose(result_src, result_des)

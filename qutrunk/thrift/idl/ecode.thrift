@@ -43,19 +43,19 @@ enum ErrCode {
 }
 
 const map<ErrCode, string> ErrMsg = {
-    ErrCode.COM_SUCCESS: "成功", 
-    ErrCode.COM_OTHRE: "未知错误", 
-    ErrCode.COM_INVALID_PARAM: "不合法参数", 
-    ErrCode.COM_TIMEOUT: "超时", 
-    ErrCode.COM_EXCEPTION: "异常", 
-    ErrCode.COM_NOT_EXIST: "不存在",
-    ErrCode.COM_IS_EXIST: "存在",
-    ErrCode.COM_IS_QUEUE: "缓存中",
-    ErrCode.COM_MEM_NOT_ENOUGH: "内存不足", 
-    ErrCode.COM_NOT_INIT: "未初始化",
-    ErrCode.COM_NOT_REGISTER: "机器未注册",
-    ErrCode.COM_NOT_RESOURCE: "无可用的资源",
-    ErrCode.COM_PRASE_ERROR: "数据解析异常",
+    ErrCode.COM_SUCCESS: "success",
+    ErrCode.COM_OTHRE: "unknown error",
+    ErrCode.COM_INVALID_PARAM: "invalid parameter",
+    ErrCode.COM_TIMEOUT: "timeout", 
+    ErrCode.COM_EXCEPTION: "exception", 
+    ErrCode.COM_NOT_EXIST: "non-existence",
+    ErrCode.COM_IS_EXIST: "existence",
+    ErrCode.COM_IS_QUEUE: "be queuing",
+    ErrCode.COM_MEM_NOT_ENOUGH: "out of memory", 
+    ErrCode.COM_NOT_INIT: "uninitialized",
+    ErrCode.COM_NOT_REGISTER: "unregistered",
+    ErrCode.COM_NOT_RESOURCE: "out of resource",
+    ErrCode.COM_PRASE_ERROR: "parse error",
 }
 
 //返回信息
