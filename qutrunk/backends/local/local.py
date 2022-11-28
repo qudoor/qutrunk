@@ -51,6 +51,7 @@ class BackendLocal(Backend):
                 self.circuit.counter.acc_run_time(elapsed)
 
         res, elapsed = self._local_impl.send_circuit(circuit, final)
+
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
 

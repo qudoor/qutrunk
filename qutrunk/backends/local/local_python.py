@@ -192,7 +192,7 @@ class BackendLocalPython:
             self.result.measures[index].measure.sort(key=lambda a: a.idx)
 
     def h(self, cmd):
-        """the single-qubit Hadamard gate.
+        """The single-qubit Hadamard gate.
 
         Args:
            cmd: the Command object.
@@ -200,7 +200,7 @@ class BackendLocalPython:
         targets_len = len(cmd.targets)
         if targets_len != 1:
             raise LocalBackendError(
-                f"h gate takes exactly one targets argument({targets_len} given)."
+                f"H gate takes exactly one targets argument({targets_len} given)."
             )
 
         self.sim.hadamard(cmd.targets[0])

@@ -160,8 +160,7 @@ class Simulator:
 
     # TODO:need to improve.
     def hadamard(self, target):
-        """
-        Apply hadamard gate.
+        """Apply hadamard gate.
 
         Args:
             target: target qubit.
