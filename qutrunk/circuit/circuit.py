@@ -278,18 +278,19 @@ class QCircuit:
         """Get all probabilities of circuit.
 
         Returns:
-            An array contains all probabilities of circuit.
+            A list contains all probabilities of circuit.
         """
         qubits = [i for i in range(self.num_qubits)]
         self.backend.send_circuit(self)
         probs = self.backend.get_probs(qubits)
 
         out_probs = []
-        for i in range(len(probs)):
+        for i, value in enumerate(probs):
             prob = {}
             prob["idx"] = i
             prob["prob"] = probs[i]
             out_probs.append(prob)
+
         return out_probs
 
     def _to_complex(self, state_vector):

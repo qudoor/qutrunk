@@ -117,8 +117,7 @@ class BackendLocalPython:
 
     @timefn
     def get_prob(self, index):
-        """
-        Get the probability of a state-vector at an index in the full state vector.
+        """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
             index: index in state vector of probability amplitudes
