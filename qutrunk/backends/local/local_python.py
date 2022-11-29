@@ -197,7 +197,9 @@ class BackendLocalPython:
         Args:
            cmd: the Command object.
         """
+        # TODO: have problem.
         targets_len = len(cmd.targets)
+        # validate
         if targets_len != 1:
             raise LocalBackendError(
                 f"H gate takes exactly one targets argument({targets_len} given)."
