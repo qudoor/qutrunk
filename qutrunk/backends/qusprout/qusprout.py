@@ -186,13 +186,14 @@ class BackendQuSprout(Backend):
             self.circuit.counter.finish()
 
         result = MeasureResult()
-        if res is not None and res.measures is not None:
-        for meas in res.measures:
+        if res is not None and res.result is not None and res.result.measures is not None:
+            for meas in res.result.measures:
                 meas_temp = MeasureQubits()
-                for mea in meas.measure:
-                    mea_temp = MeasureQubit(mea.idx, mea.value)
-                    meas_temp.measure.append(mea_temp)
-                result.measures.append(meas_temp)
+                if meas.measure is not None:
+                    for mea in meas.measure:
+                        mea_temp = MeasureQubit(mea.idx, mea.value)
+                        meas_temp.measure.append(mea_temp)
+                    result.measures.append(meas_temp)
         """
         1 必须释放连接，不然其它连接无法连上服务端
         2 不能放在__del__中，因为对象释放不代表析构函数会及时调用
