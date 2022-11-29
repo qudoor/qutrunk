@@ -1,4 +1,4 @@
-from qutrunk.backends import Backend, ExecType
+from qutrunk.backends import Backend
 from .httpclient import QuSaasApiServer
 
 
@@ -35,19 +35,19 @@ class BackendQuSaas(Backend):
             # print result
             print(res.get_counts())"""
 
-    def __init__(self, ak, sk, exectype=ExecType.SingleProcess, ):
+    def __init__(self, ak, sk, run_mode: str = "cpu"):
         """
 
         Args:
             ak: Access key
             sk: Secret Key
-            exectype:
-                SingleProcess: use single calculation node;
-                Mpi: parallel calculation using multiple nodes.
+            run_mode: cpu: calculation use single cpu; \
+                cpu_mpi: parallel calculation using multiple cpu; \ 
+                gpu: calculation use single gpu.
 
         """
         self.circuit = None
-        self.exectype = exectype
+        self.run_mode = run_mode
         self._api_server = QuSaasApiServer(ak, sk)
 
     def send_circuit(self, circuit, final=False):
@@ -65,9 +65,17 @@ class BackendQuSaas(Backend):
 
         circuit.forward(stop - start)
 
+        exectype = 0
+        if self.run_mode == "cpu_mpi":
+            exectype = 2
+        elif self.run_mode == "gpu":
+            exectype = 3
+        else:
+            exectype = 1
+            
         if start == 0:
             res, elapsed = self._api_server.init(
-                circuit.num_qubits, circuit.density, self.exectype.value
+                circuit.num_qubits, circuit.density, exectype
             )
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
