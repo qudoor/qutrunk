@@ -11,6 +11,8 @@ from qutrunk.circuit.command import Command, CmdEx, Mat
 class All(BasicGate):
     """Meta operator, provides unified operation of multiple qubits.
 
+    .. note: Only support single qubit gate.
+
     Args:
         gate: The gate will apply to all qubits.
 
