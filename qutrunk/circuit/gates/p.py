@@ -138,7 +138,7 @@ class CP(BasicRotateGate):
         """Access to the matrix property of this gate."""
         eith = np.exp(1j * float(self.rotation))
         # TODO: ??
-        return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, eith, 0], [0, 0, 0, 1]])
+        return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, eith]])
 
     def inv(self):
         """Apply inverse gate."""

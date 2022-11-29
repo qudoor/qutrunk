@@ -131,7 +131,7 @@ class CYGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.array([[0, 0, -1j, 0], [0, 1, 0, 0], [1j, 0, 0, 0], [0, 0, 0, 1]])
+        return np.array([[1, 0, 0, 0], [0, 0, 0, -1j], [0, 0, 1, 0], [0, 1j, 0, 0]])
 
     def inv(self):
         """Apply inverse gate"""

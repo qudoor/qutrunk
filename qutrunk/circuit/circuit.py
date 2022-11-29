@@ -670,7 +670,7 @@ class Result:
 
     def get_measures(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result."""
-        if not self.measure_result.measures or len(self.measure_result.measures) == 0:
+        if not self.measure_result or not self.measure_result.measures or len(self.measure_result.measures) == 0:
             return []
 
         measures = []

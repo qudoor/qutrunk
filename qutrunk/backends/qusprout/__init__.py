@@ -1,2 +1,2 @@
-from .qusprout import BackendQuSprout, ExecType
+from .qusprout import BackendQuSprout
 from .rpcclient import QuSproutApiServer
