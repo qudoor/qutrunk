@@ -420,7 +420,7 @@ class QCircuit:
         for cmd in reversed(cmds):
             if isinstance(cmd.gate, (MeasureGate, AMP)):
                 raise ValueError("The circuit cannot be inverted.")
-            cmd.inverse = True
+            cmd.inverse = not cmd.inverse
             inverse_circuit.append_cmd(cmd)
 
         return inverse_circuit, inverse_circuit.qreg
