@@ -63,6 +63,7 @@ class BackendQuSprout(Backend):
             os._exit(1)
 
         self._api_server = QuSproutApiServer(_ip, _port)
+        self.task_id = self._api_server._taskid
 
     def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
@@ -176,21 +177,25 @@ class BackendQuSprout(Backend):
             shots: Circuit run times, for sampling, default: 1.
 
         Returns:
-            The Result object contain circuit running outcome.
+            result: The Result object contain circuit running outcome.
         """
         res, elapsed = self._api_server.run(shots)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
 
+        if res.base.code != 0:
+            raise Exception("Circuit run failed.")
+
         result = MeasureResult()
-        if res is not None and res.measures is not None:
-            for meas in res.measures:
+        if res is not None and res.result is not None and res.result.measures is not None:
+            for meas in res.result.measures:
                 meas_temp = MeasureQubits()
-                for mea in meas.measure:
-                    mea_temp = MeasureQubit(mea.idx, mea.value)
-                    meas_temp.measure.append(mea_temp)
-                result.measures.append(meas_temp)
+                if meas.measure is not None:
+                    for mea in meas.measure:
+                        mea_temp = MeasureQubit(mea.idx, mea.value)
+                        meas_temp.measure.append(mea_temp)
+                    result.measures.append(meas_temp)
         """
         1 必须释放连接，不然其它连接无法连上服务端
         2 不能放在__del__中，因为对象释放不代表析构函数会及时调用
