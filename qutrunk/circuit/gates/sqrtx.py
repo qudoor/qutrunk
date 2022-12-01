@@ -46,6 +46,7 @@ class SqrtXGate(BasicGate):
             reuse __or__ operator implement."""
         self.__or__(qubit)
 
+    # TODO: have problems.
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
@@ -125,10 +126,12 @@ class CSqrtXGate(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         return np.array(
-            [(1 + 1j) / 2, 0, (1 - 1j) / 2, 0],
-            [0, 1, 0, 0],
-            [(1 - 1j) / 2, 0, (1 + 1j) / 2, 0],
-            [0, 0, 0, 1],
+            [
+                [1, 0, 0, 0],
+                [0, (1 + 1j) / 2, 0, (1 - 1j) / 2],
+                [0, 0, 1, 0],
+                [0, (1 - 1j) / 2, 0, (1 + 1j) / 2],
+            ]
         )
 
     def inv(self):

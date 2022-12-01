@@ -9,25 +9,15 @@ from qutrunk.thrift.qusproutdata import ttypes as qusproutdata
 from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
 
 
-class ExecType(Enum):
-    """Init exec type for quantum circuit.
-
-    Args:
-        ExecBySingleProcess: Execute by single process.
-        ExecByMpi: Execute by multiple processes.
-    """
-
-    SingleProcess = 1
-    Mpi = 2
-
-
 class BackendQuSprout(Backend):
     """
     QuSprout: quamtum circuit simulator, provide multi-threaded OMP, multi node parallel MPI, GPU hardware acceleration.
     To use qusprout, make sure the network is connected and the service IP and Port are set correctly.
 
     Args:
-        exectype: SingleProcess: use single calculation node; Mpi: parallel calculation using multiple nodes.
+        run_mode: cpu: calculation use single cpu; \
+                  cpu_mpi: parallel calculation using multiple cpu; \ 
+                  gpu: calculation use single gpu.
 
     Example:
         .. code-block:: python
@@ -53,10 +43,10 @@ class BackendQuSprout(Backend):
             print(res.get_counts())
     """
 
-    def __init__(self, ip: Optional[str] = None, port: Optional[int] = None, exectype=ExecType.SingleProcess):
+    def __init__(self, run_mode: str = "cpu", ip: Optional[str] = None, port: Optional[int] = None):
         super().__init__()
         self.circuit = None
-        self.exectype = exectype
+        self.run_mode = run_mode
         box_config = get_qubox_setting()
 
         if ip and port:
@@ -73,6 +63,7 @@ class BackendQuSprout(Backend):
             os._exit(1)
 
         self._api_server = QuSproutApiServer(_ip, _port)
+        self.task_id = self._api_server._taskid
 
     def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
@@ -155,10 +146,18 @@ class BackendQuSprout(Backend):
 
         circuit.forward(stop - start)
 
+        exectype = qusproutdata.ExecCmdType.ExecTypeDefault
+        if self.run_mode == "cpu_mpi":
+            exectype = qusproutdata.ExecCmdType.ExecTypeCpuMpi
+        elif self.run_mode == "gpu":
+            exectype = qusproutdata.ExecCmdType.ExecTypeGpuSingle
+        else:
+            exectype = qusproutdata.ExecCmdType.ExecTypeCpuSingle
+            
         # 服务端初始化
         if start == 0:
             res, elapsed = self._api_server.init(
-                circuit.num_qubits, circuit.density, self.exectype.value
+                circuit.num_qubits, circuit.density, exectype
             )
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
@@ -178,20 +177,25 @@ class BackendQuSprout(Backend):
             shots: Circuit run times, for sampling, default: 1.
 
         Returns:
-            The Result object contain circuit running outcome.
+            result: The Result object contain circuit running outcome.
         """
         res, elapsed = self._api_server.run(shots)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
 
+        if res.base.code != 0:
+            raise Exception("Circuit run failed.")
+
         result = MeasureResult()
-        for meas in res.measures:
-            meas_temp = MeasureQubits()
-            for mea in meas.measure:
-                mea_temp = MeasureQubit(mea.idx, mea.value)
-                meas_temp.measure.append(mea_temp)
-            result.measures.append(meas_temp)
+        if res is not None and res.result is not None and res.result.measures is not None:
+            for meas in res.result.measures:
+                meas_temp = MeasureQubits()
+                if meas.measure is not None:
+                    for mea in meas.measure:
+                        mea_temp = MeasureQubit(mea.idx, mea.value)
+                        meas_temp.measure.append(mea_temp)
+                    result.measures.append(meas_temp)
         """
         1 必须释放连接，不然其它连接无法连上服务端
         2 不能放在__del__中，因为对象释放不代表析构函数会及时调用
@@ -242,4 +246,4 @@ class BackendQuSprout(Backend):
 
     @property
     def name(self):
-        return "BackendQuSprout"
+        return "BackendQuSprout-" + self.run_mode
