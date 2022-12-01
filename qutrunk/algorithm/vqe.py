@@ -165,10 +165,11 @@ class AnsatzFac:
             for i in range(self.qb_cnt):
                 Ry(params[d * self.qb_cnt + i]) * qreg[i]
                 Rz(params[(d + 1) * self.qb_cnt + i]) * qreg[i]
-            if self.entangle == "linear":
+
+            if self.entangle.lower() == "linear":
                 for i in range(self.qb_cnt - 1):
                     CNOT * (qreg[i], qreg[i + 1])
-            elif self.entangle == "full":
+            elif self.entangle.lower() == "full":
                 for i in range(self.qb_cnt - 1):
                     for j in range(i + 1, self.qb_cnt):
                         CNOT * (qreg[i], qreg[j])

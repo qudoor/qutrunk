@@ -76,8 +76,8 @@ class Qureg:
         Raises:
           ValueError: If the index of Qubit is not a integer data.
         """
-        if not isinstance(idx, int):
-            raise ValueError("expected integer index into register")
+        if not isinstance(idx, (int, slice)):
+            raise ValueError("expected integer/slice index into register")
         return self.qubits[idx]
 
     def __len__(self):
