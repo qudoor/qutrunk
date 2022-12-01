@@ -6,7 +6,14 @@ from qutrunk.circuit.qubit import QuBit
 
 
 class XGate(BasicGate, Observable):
-    """Apply the single-qubit Pauli-X (also known as the X, sigma-X, NOT or bit-flip) gate.
+    r"""Apply the single-qubit Pauli-X (also known as the X, sigma-X, NOT or bit-flip) gate.
+
+    .. math::
+
+    X = \begin{pmatrix}
+            0 & 1 \\
+            1 & 0
+        \end{pmatrix}
 
     Example:
         .. code-block:: python
