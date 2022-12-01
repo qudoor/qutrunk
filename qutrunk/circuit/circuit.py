@@ -58,7 +58,7 @@ class QCircuit:
         self.qubit_indices = {}
         self.cbit_indices = {}
 
-        # 参数字典{Parameter: value}
+        # dict {Parameter: value}
         self.param_dict = {}
 
         # use local backend(default)
@@ -75,7 +75,7 @@ class QCircuit:
         self.density = density
 
         self.backend.circuit = self
-        # TODO:?
+
         self.outcome = None
 
         if name is None:
@@ -155,7 +155,6 @@ class QCircuit:
         for cmd in circuit.cmds:
             self.append_cmd(cmd)
 
-    # TODO: need to improve.
     def forward(self, num):
         """Update the cmd_cursor when a bunch of quantum operations have been run.
 
@@ -197,7 +196,6 @@ class QCircuit:
             raise IndexError("qubit index out of range.")
         self.creg[qubit].value = value
 
-    # TODO: need to improve.
     def run(self, shots=1):
         """Run quantum circuit through the specified backend and shots.
 
@@ -382,7 +380,7 @@ class QCircuit:
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-        # 1 参数是否在参数表
+        # parameter exist or not
         parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key
@@ -400,7 +398,7 @@ class QCircuit:
             param = self.param_dict[k]
             param.update(v)
 
-        # note: 绑定参数后意味着线路已经改变，需要重新构建线�
+        # note: after binding parameters means that the circuit has changed and needs to be rebuilt
         new_circuit = QCircuit(backend=self.backend, name=self.name)
         new_circuit.allocate(qubits=self.num_qubits)
         new_circuit.set_cmds(self.cmds)
@@ -585,7 +583,6 @@ class QCircuit:
         if format == "openqasm":
             self._print_qasm()
 
-    # TODO: need to improve.
     def depth(
         self,
         counted_gate: Optional[Callable] = lambda x: not isinstance(x, BarrierGate),
@@ -707,7 +704,6 @@ class Result:
 
     def get_counts(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the number of times the measurement results appear."""
-        # TODO:improve
         if self.measure_result is None:
             return None
 

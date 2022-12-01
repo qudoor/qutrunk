@@ -68,8 +68,6 @@ class BackendLocal(Backend):
 
         Returns:
             res: The Result object contain circuit running outcome.
-            taskid: The id of this task
-            errinfo: Error information of this task
         """
         res, elapsed = self._local_impl.run(shots)
 

@@ -178,8 +178,6 @@ class BackendQuSprout(Backend):
 
         Returns:
             result: The Result object contain circuit running outcome.
-            taskid: The id of this task
-            errinfo: Error information of this task
         """
         res, elapsed = self._api_server.run(shots)
         if self.circuit.counter:
