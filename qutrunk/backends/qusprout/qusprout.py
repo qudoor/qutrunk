@@ -63,6 +63,7 @@ class BackendQuSprout(Backend):
             os._exit(1)
 
         self._api_server = QuSproutApiServer(_ip, _port)
+        self.task_id = self._api_server._taskid
 
     def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.
@@ -185,6 +186,9 @@ class BackendQuSprout(Backend):
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
 
+        if res.base.code != 0:
+            raise Exception("Circuit run failed.")
+
         result = MeasureResult()
         if res is not None and res.result is not None and res.result.measures is not None:
             for meas in res.result.measures:
@@ -200,7 +204,7 @@ class BackendQuSprout(Backend):
         """
         self._api_server.close()
 
-        return [result, self._api_server._taskid, res.base.msg]
+        return result
 
     def get_expec_pauli_prod(self, pauli_prod_list):
         """Computes the expected value of a product of Pauli operators.

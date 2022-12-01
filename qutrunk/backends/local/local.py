@@ -34,7 +34,7 @@ class BackendLocal(Backend):
         super().__init__()
         self.circuit = None
         self._local_impl = BackendLocalImpl()
-        self._taskid = uuid.uuid4().hex
+        self.task_id = uuid.uuid4().hex
 
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to local backend.
@@ -77,7 +77,7 @@ class BackendLocal(Backend):
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
             self.circuit.counter.finish()
-        return [res, self._taskid, 'success']
+        return res
 
     def get_prob(self, index):
         """Get the probability of a state-vector at an index in the full state vector.

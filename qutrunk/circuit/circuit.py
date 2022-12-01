@@ -214,7 +214,7 @@ class QCircuit:
             # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
             return result
 
-        res = Result(self.num_qubits, self.backend, result[0], result[1], result[2], arguments={"shots": shots})
+        res = Result(self.backend, result, arguments={"shots": shots})
 
         return res
 
@@ -659,13 +659,10 @@ class Result:
     """
 
     def __init__(
-        self, num_qubits, backend, res, task_id=None, status='successabc', arguments = '{"shots": 1}'
+        self, backend, res, arguments = '{"shots": 1}'
     ):
         self.backend = backend
-        self.task_id = task_id
-        self.status = status
         self.arguments = arguments
-        self.num_qubits = num_qubits
         self.measure_result = res
 
     def get_measures(self, qreg: Union[Qureg, SubQureg] = None):
@@ -675,7 +672,7 @@ class Result:
 
         measures = []
         idxs = None
-        array_step = self.num_qubits
+        array_step = self.backend.circuit.num_qubits
         if qreg is not None:
             idxs = qreg.get_indexs()
             array_step = len(idxs)
@@ -716,8 +713,8 @@ class Result:
         """The resourece of run."""
         result = {
             "backend": self.backend.name,
-            "task_id": self.task_id,
-            "status": self.status,
+            "task_id": self.backend.task_id,
+            "status": 'success',
             "arguments": self.arguments,
         }
         return json.dumps(result)
