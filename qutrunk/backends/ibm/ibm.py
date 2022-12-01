@@ -130,17 +130,16 @@ class BackendIBM(Backend):
         info["maxCredits"] = 10
         info["backend"] = {"name": self.device}
 
-        result = send(
+        res = send(
             info,
             device=self.device,
             token=self._token,
             num_retries=shots,
             verbose=True,
         )
-        return result
+        return self._to_result(res)
 
     def _to_result(self, res):
-        pass
         result = MeasureResult()
         # exception
         # counts = res.get["data"]["counts"]
@@ -148,7 +147,7 @@ class BackendIBM(Backend):
 
         for bit_str, count in counts:
             result.measure_counts.append(MeasureCount(bit_str, count))
-        return res
+        return result
 
     @property
     def name(self):

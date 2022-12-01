@@ -153,4 +153,4 @@ class BackendLocal(Backend):
     @property
     def name(self):
         """The name of Backend."""
-        return "BackendLocalPython"
+        return "BackendLocal"

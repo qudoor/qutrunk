@@ -149,6 +149,8 @@ class MCZ(BasicGate):
         if self.ctrl_cnt == 1:
             return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]])
 
+        # todo: get matrix when ctrl_cnt > 1
+
     def inv(self):
         """Apply inverse gate."""
         gate = MCZ(self.ctrl_cnt)
