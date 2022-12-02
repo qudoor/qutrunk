@@ -14,6 +14,7 @@ class MeasureQubit:
         self.value = value
 
 
+# TODO: need to improve.
 class MeasureQubits:
     """Measure Result of all qubits.
 
@@ -42,6 +43,7 @@ class MeasureQubits:
             raise ValueError("expected integer index into measure")
         return self.measure[idx]
 
+    # TODO: simplify??
     def simplify(self, idxs: set = None):
         """Get the measure result in dict format."""
         meas = []
@@ -52,11 +54,11 @@ class MeasureQubits:
 
     def bit_str(self, idxs: set = None):
         """Get the measure result in str format."""
-        bitstr = ""
+        bit_str = ""
         for m in self.measure[::-1]:
             if idxs is None or m.idx in idxs:
-                bitstr += str(m.value)
-        return bitstr
+                bit_str += str(m.value)
+        return bit_str
 
 
 class MeasureCount:
