@@ -28,25 +28,13 @@ def run_qpe(backend=None):
     # measure q1
     All(Measure) * q1
 
-    # print circuit
-    # qc.print()
-
     # run circuit
-    result = qc.run(shots=100)
-
-    # print result
-    meas = result.get_measures(q1)
-    reslen = len(meas)
-    if reslen > 0:
-        print(meas[reslen-1])
+    result = qc.run()
 
     # calculate the value of theta
-    val = result.get_values(q1)
-    reslen = len(val)
-    if reslen > 0:
-        f = val[reslen-1]
-        theta = f / 2 ** len(q1)
-        print("θ=", theta)
+    vals = result.get_values(q1)
+    theta = vals[0] / 2 ** len(q1)
+    print("θ=", theta)
 
     return qc
 

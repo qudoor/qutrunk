@@ -19,9 +19,6 @@ class QPE(Operator):
             from qutrunk.circuit.gates import NOT, Barrier, P, All, Measure
             from qutrunk.circuit.ops import QPE
 
-            def _bin_int(itrable):
-                return int("".join(map(str, reversed(itrable))), base=2)
-
             # allocate
             qc = QCircuit()
             q1, q2 = qc.allocate([3, 1])
@@ -41,15 +38,11 @@ class QPE(Operator):
             # qc.print()
 
             # run circuit
-            result = qc.run(shots=100)
-
-            # print result
-            out = result.get_measures(q1)[0]
-            print(out)
+            result = qc.run()
 
             # calculate the value of theta
-            f = result.get_values(q1)[0]
-            theta = f / 2 ** len(q1)
+            vals = result.get_values(q1)
+            theta = vals[0] / 2 ** len(q1)
             print("θ=", theta)
 
     """

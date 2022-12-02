@@ -664,6 +664,14 @@ class Result:
             res = qc.run()
             # get measurement from result
             print(res.get_measures())
+            # get bitstrs
+            print(res.get_bitstrs())
+            # get values in decimal format
+            print(res.get_values())
+            # get number of each bitstr
+            print(res.get_counts())
+            # get running info
+            print(res.running_info())
     """
 
     def __init__(
@@ -716,7 +724,7 @@ class Result:
             res.append({out.bitstr: out.count})
         return json.dumps(res)
 
-    def excute_info(self):
+    def running_info(self):
         """The resourece of run."""
         result = {
             "backend": self.backend.name,

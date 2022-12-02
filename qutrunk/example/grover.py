@@ -52,7 +52,7 @@ def run_grover(qubits=10, backend=None):
     circuit.show_resource()
 
     # Print quantum circuit execution information
-    print(res.excute_info())
+    print(res.running_info())
 
     return circuit
 
