@@ -28,9 +28,9 @@ QuTrunk 是启科量子自主研发的一款免费、开源、跨平台的量子
   * 基于每次测量结果取值提供便捷数据访问接口，比如：get_measures(获取所有测量结果)，get_bitstrs(获取每次测量结果对应的位串)，get_counts(获取量子比特组成的位串出现的次数)，get_values(获取每次测量结果对应的数值)
   * 统一各个量子计算后端对测量结果的处理.
 * 新增QuSaas量子计算后端，额外提供量子随机数功能.
-* 删除qutrunk.sim模块，统一到qutrunk.backends
-* 更新测试用例验证自定义矩阵
-
+* 删除qutrunk.sim模块，统一到qutrunk.backends.
+* 更新测试用例验证自定义矩阵.
+* 运行线路增加gpu的方式.
 
 [Back to Top](#0)
 

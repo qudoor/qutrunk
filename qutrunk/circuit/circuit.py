@@ -58,7 +58,7 @@ class QCircuit:
         self.qubit_indices = {}
         self.cbit_indices = {}
 
-        # 参数字典{Parameter: value}
+        # dict {Parameter: value}
         self.param_dict = {}
 
         # use local backend(default)
@@ -75,7 +75,7 @@ class QCircuit:
         self.density = density
 
         self.backend.circuit = self
-        # TODO:?
+
         self.outcome = None
 
         if name is None:
@@ -155,7 +155,6 @@ class QCircuit:
         for cmd in circuit.cmds:
             self.append_cmd(cmd)
 
-    # TODO: need to improve.
     def forward(self, num):
         """Update the cmd_cursor when a bunch of quantum operations have been run.
 
@@ -197,7 +196,6 @@ class QCircuit:
             raise IndexError("qubit index out of range.")
         self.creg[qubit].value = value
 
-    # TODO: need to improve.
     def run(self, shots=1):
         """Run quantum circuit through the specified backend and shots.
 
@@ -210,11 +208,7 @@ class QCircuit:
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
 
-        if self.backend.name == "BackendIBM":
-            # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
-            return result
-
-        res = Result(self.num_qubits, result, self.backend, arguments={"shots": shots})
+        res = Result(self.backend, result, arguments={"shots": shots})
 
         return res
 
@@ -271,6 +265,9 @@ class QCircuit:
         Returns:
             float: The probability of value.
         """
+        if not hasattr(self.backend, "get_prob"):
+            raise NotImplementedError(f"{self.backend.name} not support get_prob method.")
+
         self.backend.send_circuit(self)
         return self.backend.get_prob(value)
 
@@ -280,6 +277,9 @@ class QCircuit:
         Returns:
             A list contains all probabilities of circuit.
         """
+        if not hasattr(self.backend, "get_probs"):
+            raise NotImplementedError(f"{self.backend.name} not support get_probs method.")
+
         qubits = [i for i in range(self.num_qubits)]
         self.backend.send_circuit(self)
         probs = self.backend.get_probs(qubits)
@@ -302,6 +302,9 @@ class QCircuit:
 
     def get_statevector(self):
         """Get state vector of circuit."""
+        if not hasattr(self.backend, "get_statevector"):
+            raise NotImplementedError(f"{self.backend.name} not support get_statevector method.")
+
         self.backend.send_circuit(self)
         result = self._to_complex(self.backend.get_statevector())
         return np.array(result)
@@ -378,7 +381,7 @@ class QCircuit:
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-        # 1 参数是否在参数表
+        # parameter exist or not
         parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key
@@ -396,7 +399,7 @@ class QCircuit:
             param = self.param_dict[k]
             param.update(v)
 
-        # note: 绑定参数后意味着线路已经改变，需要重新构建线路
+        # note: after binding parameters means that the circuit has changed and needs to be rebuilt
         new_circuit = QCircuit(backend=self.backend, name=self.name)
         new_circuit.allocate(qubits=self.num_qubits)
         new_circuit.set_cmds(self.cmds)
@@ -421,7 +424,7 @@ class QCircuit:
         for cmd in reversed(cmds):
             if isinstance(cmd.gate, (MeasureGate, AMP)):
                 raise ValueError("The circuit cannot be inverted.")
-            cmd.inverse = True
+            cmd.inverse = not cmd.inverse
             inverse_circuit.append_cmd(cmd)
 
         return inverse_circuit, inverse_circuit.qreg
@@ -464,6 +467,9 @@ class QCircuit:
         Returns:
             The expected value of a product of Pauli operators.
         """
+        if not hasattr(self.backend, "get_expec_pauli_prod"):
+            raise NotImplementedError(f"{self.backend.name} not support get_expec_pauli_prod method.")
+
         pauli_list = []
         if not isinstance(paulis, list):
             pauli_list.append(paulis)
@@ -491,6 +497,9 @@ class QCircuit:
         Raises:
             ValueError: If the length of paulis in each term greater than self.num_qubits.
         """
+        if not hasattr(self.backend, "get_expec_pauli_sum"):
+            raise NotImplementedError(f"{self.backend.name} not support get_expec_pauli_sum method.")
+
         self.backend.send_circuit(self)
         paulis = []
         coeffs = []
@@ -575,7 +584,6 @@ class QCircuit:
         if format == "openqasm":
             self._print_qasm()
 
-    # TODO: need to improve.
     def depth(
         self,
         counted_gate: Optional[Callable] = lambda x: not isinstance(x, BarrierGate),
@@ -660,23 +668,20 @@ class Result:
     """
 
     def __init__(
-        self, num_qubits, res, backend, arguments, task_id=None, status="success"
+        self, backend, res, arguments = '{"shots": 1}'
     ):
         self.backend = backend
-        self.task_id = task_id
-        self.status = status
         self.arguments = arguments
-        self.num_qubits = num_qubits
         self.measure_result = res
 
     def get_measures(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result."""
-        if not self.measure_result.measures or len(self.measure_result.measures) == 0:
+        if not self.measure_result or not self.measure_result.measures or len(self.measure_result.measures) == 0:
             return []
 
         measures = []
         idxs = None
-        array_step = self.num_qubits
+        array_step = self.backend.circuit.num_qubits
         if qreg is not None:
             idxs = qreg.get_indexs()
             array_step = len(idxs)
@@ -700,7 +705,6 @@ class Result:
 
     def get_counts(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the number of times the measurement results appear."""
-        # TODO:improve
         if self.measure_result is None:
             return None
 
@@ -717,8 +721,8 @@ class Result:
         """The resourece of run."""
         result = {
             "backend": self.backend.name,
-            "task_id": self.task_id,
-            "status": self.status,
+            "task_id": self.backend.task_id,
+            "status": 'success',
             "arguments": self.arguments,
         }
         return json.dumps(result)

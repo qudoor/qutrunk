@@ -117,12 +117,13 @@ class QuSaasApiServer:
         resp = resp.json()
 
         result = MeasureResult()
-        for meas in resp["data"]["measures"]:
-            meas_temp = MeasureQubits()
-            for mea in meas["measure"]:
-                mea_temp = MeasureQubit(mea["target"], mea["value"])
-                meas_temp.measure.append(mea_temp)
-            result.measures.append(meas_temp)
+        if resp["data"] is not None and resp["data"]["measures"] is not None:
+            for meas in resp["data"]["measures"]:
+                meas_temp = MeasureQubits()
+                for mea in meas["measure"]:
+                    mea_temp = MeasureQubit(mea["target"], mea["value"])
+                    meas_temp.measure.append(mea_temp)
+                result.measures.append(meas_temp)
         return result
 
     @timefn
