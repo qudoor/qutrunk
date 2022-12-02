@@ -11,10 +11,9 @@ def run_addition(num_qubits, init_value, number=0):
     qr = circuit.allocate(num_qubits)
 
     Classical(init_value) * qr
-
     ADD(number) * qr
-
     All(Measure) * qr
+
     res = circuit.run()
     print(res.get_bitstrs())
 
