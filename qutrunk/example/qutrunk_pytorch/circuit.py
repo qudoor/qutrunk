@@ -17,6 +17,7 @@ class QuantumCircuit:
         # 参数化 theta
         self.theta = self._circuit.create_parameters(['theta'])
 
+        # TODO: to list
         # 应用量子门
         H * qr[0]
         Barrier * qr

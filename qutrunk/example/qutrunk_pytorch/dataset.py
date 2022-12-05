@@ -52,5 +52,6 @@ def show_data():
         n_samples_show -= 1
     plt.show()
 
+
 if __name__ == '__main__':
     show_data()

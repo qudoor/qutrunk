@@ -1,11 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import json
-
 import torch
 from torch.autograd import Function
-from torchvision import datasets, transforms
-import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -20,8 +15,13 @@ class HybridFunction(Function):
         """ Forward pass computation """
         ctx.shift = shift
         ctx.quantum_circuit = quantum_circuit
-        # TODO:modify
-        expectation_z = ctx.quantum_circuit.run(input[0].tolist())
+        # TODO:modify  {"theta": input[0].tolist()}
+        # expectation_z = ctx.quantum_circuit.run(input[0].tolist())
+        # print(input, type(input))
+        # print(input[0], type(input[0]))
+        # print(input[0].tolist(), type(input[0].tolist()))
+
+        expectation_z = ctx.quantum_circuit.run({"theta": input[0].tolist()[0]})
         result = torch.tensor([expectation_z])
         ctx.save_for_backward(input, result)
 
@@ -38,8 +38,11 @@ class HybridFunction(Function):
 
         gradients = []
         for i in range(len(input_list)):
-            expectation_right = ctx.quantum_circuit.run(shift_right[i])
-            expectation_left = ctx.quantum_circuit.run(shift_left[i])
+            # expectation_right = ctx.quantum_circuit.run(shift_right[i])
+            # expectation_left = ctx.quantum_circuit.run(shift_left[i])
+            # print(shift_left[i])
+            expectation_right = ctx.quantum_circuit.run({"theta": shift_right[i]})
+            expectation_left = ctx.quantum_circuit.run({"theta": shift_left[i]})
 
             gradient = torch.tensor([expectation_right]) - torch.tensor([expectation_left])
             gradients.append(gradient)
@@ -60,6 +63,7 @@ class Hybrid(nn.Module):
 
 
 class Net(nn.Module):
+
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 6, kernel_size=5)
