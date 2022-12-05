@@ -642,12 +642,9 @@ class Result:
     Save the result of quantum circuit running.
 
     Args:
-        num_qubits: The number of qubits.
-        res: The circuit running result from backend.
         backend: The backend that supports the operation of quantum circuits.
-        task_id: Task id will automatic generate when submit a quantum computing job.
-        status: The operating state of a quantum circuit.
-        measure_result: The measure result of MeasureResult.
+        res: The circuit running result from backend.
+        arguments: The additional parameters, default for the expressions of shots.
 
     Example:
         .. code-block:: python
