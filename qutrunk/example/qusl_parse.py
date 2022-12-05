@@ -15,7 +15,6 @@ def run_qusl_parse():
     res = circuit.run(shots=100)
 
     # print result
-    print(res.get_measure())
     print(res.get_counts())
 
     return circuit

@@ -25,10 +25,10 @@ def run_phase_kickback(backend=None):
     qc.print()
 
     # run circuit
-    res = qc.run(shots=100)
+    res = qc.run()
 
     # print result
-    print(res.get_measure())
+    print(res.get_measures())
 
     return qc
 

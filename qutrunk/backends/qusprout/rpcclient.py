@@ -4,8 +4,8 @@ import uuid
 from thrift.protocol import TBinaryProtocol, TMultiplexedProtocol
 from thrift.transport import TSocket, TTransport
 
-from qutrunk.sim.qusprout.qusprout import QuSproutServer
-from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
+from qutrunk.thrift.qusprout import QuSproutServer
+from qutrunk.thrift.qusproutdata import ttypes as qusproutdata
 from qutrunk.tools.function_time import timefn
 
 
@@ -74,7 +74,7 @@ class QuSproutApiServer:
         """
         req = qusproutdata.RunCircuitReq(self._taskid, shots)
         res = self._client.run(req)
-        return res.result
+        return res
 
     @timefn
     def get_prob(self, index):

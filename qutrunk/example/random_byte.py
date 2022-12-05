@@ -25,7 +25,7 @@ def run_random_byte(backend=None):
 
     # Print measure result like:
     # [0, 1, 0, 0, 0, 0, 1, 0]
-    print(res.get_measure())
+    print(res.get_bitstrs())
 
     return qc
 

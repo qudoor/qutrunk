@@ -61,7 +61,7 @@ class AMP(Operator):
             self.numamps = len(self.classicvector)
 
         if (
-            0 <= len(self.classicvector) <= 2 ** len(qureg)
+            0 < len(self.classicvector) <= 2 ** len(qureg)
             and 0 <= self.startind < 2 ** len(qureg)
             and 0 <= self.numamps <= 2 ** len(qureg)
             and (self.startind + self.numamps) <= 2 ** len(qureg)

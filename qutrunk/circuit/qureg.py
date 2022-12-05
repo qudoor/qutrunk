@@ -24,13 +24,13 @@ class SubQureg:
         """
         self.qubits.append(qubit)
 
-    def to_cl(self):
-        """Get measure result of SubQureg"""
+    def get_indexs(self) -> set:
+        """Get qubits indexs of SubQureg"""
         start = self.qubits[0].index
         end = self.qubits[-1].index
-        res = []
+        res = set()
         for i in range(start, end + 1):
-            res.append(self.circuit.creg[i].value)
+            res.add(i)
 
         return res
 
@@ -76,8 +76,8 @@ class Qureg:
         Raises:
           ValueError: If the index of Qubit is not a integer data.
         """
-        if not isinstance(idx, int):
-            raise ValueError("expected integer index into register")
+        if not isinstance(idx, (int, slice)):
+            raise ValueError("expected integer/slice index into register")
         return self.qubits[idx]
 
     def __len__(self):
@@ -98,11 +98,11 @@ class Qureg:
         """
         return self.qubits.index(qubit)
 
-    def to_cl(self):
-        """Get measure result of Qureg."""
-        res = []
+    def get_indexs(self):
+        """Get qubits indexs of Qureg."""
+        res = set()
         for i in range(len(self.qubits)):
-            res.append(self.circuit.creg[i].value)
+            res.add(i)
         return res
 
     def split(self, sections: list):
