@@ -72,7 +72,7 @@ class HybridFunction(Function):
         """ Forward pass computation """
         ctx.shift = shift
         ctx.quantum_circuit = quantum_circuit
-
+        # TODO:modify
         expectation_z = ctx.quantum_circuit.run(input[0].tolist())
         result = torch.tensor([expectation_z])
         ctx.save_for_backward(input, result)
@@ -97,6 +97,18 @@ class HybridFunction(Function):
             gradients.append(gradient)
         gradients = np.array([gradients]).T
         return torch.tensor([gradients]).float() * grad_output.float(), None, None
+
+
+class Hybrid(nn.Module):
+    """ Hybrid quantum - classical layer definition """
+
+    def __init__(self, backend, shots, shift):
+        super(Hybrid, self).__init__()
+        self.quantum_circuit = QuantumCircuit(1, backend, shots)
+        self.shift = shift
+
+    def forward(self, input):
+        return HybridFunction.apply(input, self.quantum_circuit, self.shift)
 
 
 if __name__ == '__main__':
