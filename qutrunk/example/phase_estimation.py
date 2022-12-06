@@ -7,10 +7,6 @@ from qutrunk.circuit.gates import NOT, Barrier, P, All, Measure
 from qutrunk.circuit.ops import QPE
 
 
-def _bin_int(itrable):
-    return int("".join(map(str, reversed(itrable))), base=2)
-
-
 def run_qpe(backend=None):
     """Estimate T-gate phase."""
     # allocate
