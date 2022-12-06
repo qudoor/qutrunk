@@ -38,11 +38,12 @@ class HybridFunction(Function):
 
         gradients = []
         for i in range(len(input_list)):
-            # expectation_right = ctx.quantum_circuit.run(shift_right[i])
-            # expectation_left = ctx.quantum_circuit.run(shift_left[i])
-            # print(shift_left[i])
-            expectation_right = ctx.quantum_circuit.run({"theta": shift_right[i]})
-            expectation_left = ctx.quantum_circuit.run({"theta": shift_left[i]})
+            print(shift_left[i])
+            expectation_right = ctx.quantum_circuit.run(shift_right[i])
+            expectation_left = ctx.quantum_circuit.run(shift_left[i])
+
+            # expectation_right = ctx.quantum_circuit.run({"theta": shift_right[i]})
+            # expectation_left = ctx.quantum_circuit.run({"theta": shift_left[i]})
 
             gradient = torch.tensor([expectation_right]) - torch.tensor([expectation_left])
             gradients.append(gradient)
