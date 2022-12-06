@@ -10,13 +10,17 @@ from qutrunk.circuit.qubit import QuBit
 
 
 class HGate(BasicGate):
-    """Apply the single-qubit Hadamard gate.
+    r"""Apply the single-qubit Hadamard gate.
+
+    .. math::
+        {\rm H}=\frac{1}{\sqrt{2}}\begin{pmatrix}1&1\\1&-1\end{pmatrix}
 
     Example:
         .. code-block:: python
 
             H * qr[0]
     """
+
 
     def __init__(self):
         super().__init__()
