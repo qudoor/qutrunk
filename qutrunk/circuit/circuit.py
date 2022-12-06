@@ -729,4 +729,5 @@ class Result:
             "status": 'success',
             "arguments": self.arguments,
         }
+
         return json.dumps(result)
