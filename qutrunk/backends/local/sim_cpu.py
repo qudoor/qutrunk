@@ -1,3 +1,6 @@
+"""Implementation of quantum compute simulator for cpu running mode."""
+
+
 import math
 import random
 from enum import Enum
@@ -40,8 +43,8 @@ class PauliOpType(Enum):
     PAULI_Z = 3
 
 
-class Simulator:
-    """Simulator implement"""
+class SimulatorCpu:
+    """SimulatorCpu implement"""
 
     def __init__(self):
         self.real = []  # real

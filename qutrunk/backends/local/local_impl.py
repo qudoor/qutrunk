@@ -1,3 +1,6 @@
+"""Preprocess each quantunm gate, include mapping gate to it's handler, \
+    construct the matrix to the corresponding gate etc."""
+
 import math
 from copy import deepcopy
 
@@ -8,12 +11,12 @@ from numpy import pi
 from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
 from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
-from .pysim import Simulator
+from .sim_cpu import SimulatorCpu
 
 
 class BackendLocalPython:
     def __init__(self):
-        self.sim = Simulator()
+        self.sim = SimulatorCpu()
         self.gate_map = {
             "H": "h",
             "P": "p",

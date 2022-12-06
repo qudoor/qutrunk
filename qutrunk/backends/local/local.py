@@ -1,9 +1,10 @@
-"""Python implementation of a quantum computer simulator."""
+"""Interface of quantum compute simulator."""
+
 import uuid
 
 from qutrunk.backends.backend import Backend
 # TODO:need to improve.
-from .local_python import BackendLocalPython as BackendLocalImpl
+from .local_impl import BackendLocalPython as BackendLocalImpl
 
 
 class BackendLocal(Backend):
