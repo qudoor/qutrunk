@@ -93,6 +93,7 @@ class MeasureResult:
         """add measurement results."""
         self.measures.append(measure_qubits)
 
+    # TODO: have some problem.
     def get_measure_counts(self, idxs: set = None) -> MeasureCount:
         """Get the number of times the measurement results appear."""
         if self.measure_counts:

@@ -12,6 +12,7 @@ epochs = 20
 loss_list = []
 
 model.train()
+
 for epoch in range(epochs):
     total_loss = []
     for batch_idx, (data, target) in enumerate(train_loader):

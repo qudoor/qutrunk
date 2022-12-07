@@ -11,9 +11,9 @@ class QuantumCircuit:
         # 定义量子电路
         # Create quantum circuit
         # TODO:3
-        self._circuit = QCircuit(backend)
+        self._circuit = QCircuit()
         # Allocate quantum qubits
-        qr = self._circuit.allocate(n_qubits)
+        qr = self._circuit.allocate(1)
 
         # 参数化 theta
         self.theta = self._circuit.create_parameters(['theta'])
@@ -41,7 +41,7 @@ class QuantumCircuit:
         states = []
         for r in result:
             for key, value in r.items():
-                states.append(key)
+                states.append(int(key, base=2))
                 counts.append(value)
 
         states = np.array(states).astype(float)  # [0. 1.]

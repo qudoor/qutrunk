@@ -38,6 +38,8 @@ class HybridFunction(Function):
         for i in range(len(input_list)):
             expectation_right = ctx.quantum_circuit.run(shift_right[i][0])
             expectation_left = ctx.quantum_circuit.run(shift_left[i][0])
+            # print("expectation_right: " + str(expectation_right))
+            # print("expectation_left: " + str(expectation_left))
 
             # expectation_right = ctx.quantum_circuit.run({"theta": shift_right[i]})
             # expectation_left = ctx.quantum_circuit.run({"theta": shift_left[i]})
@@ -72,7 +74,7 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(256, 64)
         self.fc2 = nn.Linear(64, 1)
         # TODO:1
-        self.hybrid = Hybrid(None, 100, np.pi / 2)
+        self.hybrid = Hybrid(None, 10, np.pi / 2)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
