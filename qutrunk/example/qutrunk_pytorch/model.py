@@ -15,13 +15,11 @@ class HybridFunction(Function):
         """ Forward pass computation """
         ctx.shift = shift
         ctx.quantum_circuit = quantum_circuit
-        # TODO:modify  {"theta": input[0].tolist()}
-        # expectation_z = ctx.quantum_circuit.run(input[0].tolist())
-        # print(input, type(input))
-        # print(input[0], type(input[0]))
-        # print(input[0].tolist(), type(input[0].tolist()))
 
-        expectation_z = ctx.quantum_circuit.run({"theta": input[0].tolist()[0]})
+        # expectation_z = ctx.quantum_circuit.run(input[0].tolist())
+        # print("input[0].tolist()=" ,input[0].tolist())
+
+        expectation_z = ctx.quantum_circuit.run(input[0].tolist()[0])
         result = torch.tensor([expectation_z])
         ctx.save_for_backward(input, result)
 
@@ -38,9 +36,8 @@ class HybridFunction(Function):
 
         gradients = []
         for i in range(len(input_list)):
-            print(shift_left[i])
-            expectation_right = ctx.quantum_circuit.run(shift_right[i])
-            expectation_left = ctx.quantum_circuit.run(shift_left[i])
+            expectation_right = ctx.quantum_circuit.run(shift_right[i][0])
+            expectation_left = ctx.quantum_circuit.run(shift_left[i][0])
 
             # expectation_right = ctx.quantum_circuit.run({"theta": shift_right[i]})
             # expectation_left = ctx.quantum_circuit.run({"theta": shift_left[i]})

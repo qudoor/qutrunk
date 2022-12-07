@@ -383,8 +383,6 @@ class QCircuit:
             raise ValueError("parameters must be dictionary.")
         # parameter exist or not
         parameters_table_key = self.param_dict.keys()
-        print("params=", params)
-        print("parameters_table_key=", parameters_table_key)
         params_not_in_circuit = [
             param_key
             for param_key in params.keys()

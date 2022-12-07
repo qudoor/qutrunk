@@ -15,9 +15,8 @@ class QuantumCircuit:
         qr = self._circuit.allocate(n_qubits)
 
         # 参数化 theta
-        self.theta = self._circuit.create_parameters(['theta', ""])
+        self.theta = self._circuit.create_parameters(['theta'])
 
-        # TODO: to list
         # 应用量子门
         H * qr[0]
         Barrier * qr
@@ -31,12 +30,8 @@ class QuantumCircuit:
         # 运行次数
         self.shots = shots
 
-    def run(self, thetas):
-        # thetas是列表， [0.104]
-        # list to dict
-        t = [{"theta": theta} for theta in thetas]
-        print("t=", t)
-        self._circuit.bind_parameters(t[0])
+    def run(self, theta): # theta need a float.
+        self._circuit.bind_parameters({"theta": theta})
         result = self._circuit.run(shots=self.shots)
         result = result.get_counts()  # <class 'str'> [{"0": 57}, {"1": 43}]
         result = json.loads(result)  # <class 'list'> [{'0': 57}, {'1': 43}]
@@ -64,5 +59,5 @@ if __name__ == '__main__':
     circuit = QuantumCircuit(1, None, 100)
     # circuit.run({"theta": np.pi})  circuit.run([np.pi])[0]
     # print(f'Expected value for rotation pi= {circuit.run({"theta": np.pi})[0]}')
-    print(f'Expected value for rotation pi= {circuit.run([np.pi])[0]}')
+    print(f'Expected value for rotation pi= {circuit.run(np.pi)[0]}')
     circuit._circuit.draw()
