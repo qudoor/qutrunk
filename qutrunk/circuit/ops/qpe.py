@@ -38,13 +38,12 @@ class QPE(Operator):
             # qc.print()
 
             # run circuit
-            result = qc.run(shots=100)
+            result = qc.run()
 
             # calculate the value of theta
-            value = result.get_values(q1)
-            if value:
-                theta = value[-1] / 2 ** len(q1)
-                print("θ=", theta)
+            vals = result.get_values(q1)
+            theta = vals[0] / 2 ** len(q1)
+            print("θ=", theta)
 
     """
     def __init__(self, unitary):

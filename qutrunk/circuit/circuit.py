@@ -643,12 +643,9 @@ class Result:
     Save the result of quantum circuit running.
 
     Args:
-        num_qubits: The number of qubits.
-        res: The circuit running result from backend.
         backend: The backend that supports the operation of quantum circuits.
-        task_id: Task id will automatic generate when submit a quantum computing job.
-        status: The operating state of a quantum circuit.
-        measure_result: The measure result of MeasureResult.
+        res: The circuit running result from backend.
+        arguments: The additional parameters, default for the expressions of shots.
 
     Example:
         .. code-block:: python
@@ -665,6 +662,14 @@ class Result:
             res = qc.run()
             # get measurement from result
             print(res.get_measures())
+            # get bitstrs
+            print(res.get_bitstrs())
+            # get values in decimal format
+            print(res.get_values())
+            # get number of each bitstr
+            print(res.get_counts())
+            # get running info
+            print(res.running_info())
     """
 
     def __init__(
@@ -717,7 +722,7 @@ class Result:
             res.append({out.bitstr: out.count})
         return json.dumps(res)
 
-    def excute_info(self):
+    def running_info(self):
         """The resourece of run."""
         result = {
             "backend": self.backend.name,
@@ -725,4 +730,5 @@ class Result:
             "status": 'success',
             "arguments": self.arguments,
         }
+
         return json.dumps(result)

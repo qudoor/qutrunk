@@ -29,7 +29,7 @@ res = qc.run(shots=1024)
 print("==========circuit running result=========")
 print(res.get_counts())
 print("===========circuit running info==========")
-print(res.excute_info())
+print(res.running_info())
 qc.draw()
 ```
 
@@ -76,7 +76,7 @@ def run_ghz(backend=None):
     print("==========circuit running result=========")
     print(res.get_counts())
     print("===========circuit running info==========")
-    print(res.excute_info()) #打印线路执行信息，包括使用的后端类型
+    print(res.running_info()) #打印线路执行信息，包括使用的后端类型
 
     return qc
 

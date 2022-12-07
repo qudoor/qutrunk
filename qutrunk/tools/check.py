@@ -24,7 +24,7 @@ def run_check(backend=None):
     print("==========circuit running result=========")
     print(res.get_counts())
     print("===========circuit running info==========")
-    print(res.excute_info())
+    print(res.running_info())
 
     print(
         f"qutrunk {qutrunk.__version__} is installed successfully! You can use QuTrunk now."

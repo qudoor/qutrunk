@@ -101,7 +101,7 @@ class MeasureResult:
 
         measure_counts = {}
         for meas in self.measures:
-            bitstr = ""
+            bitstr = "0b"
             for mea in meas.measure:
                 if idxs is None or mea.idx in idxs:
                     bitstr += str(mea.value)
