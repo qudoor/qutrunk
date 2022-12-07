@@ -10,6 +10,7 @@ class QuantumCircuit:
     def __init__(self, n_qubits, backend=None, shots=100):
         # 定义量子电路
         # Create quantum circuit
+        # TODO:3
         self._circuit = QCircuit(backend)
         # Allocate quantum qubits
         qr = self._circuit.allocate(n_qubits)
@@ -30,7 +31,7 @@ class QuantumCircuit:
         # 运行次数
         self.shots = shots
 
-    def run(self, theta): # theta need a float.
+    def run(self, theta): # theta need a float
         self._circuit.bind_parameters({"theta": theta})
         result = self._circuit.run(shots=self.shots)
         result = result.get_counts()  # <class 'str'> [{"0": 57}, {"1": 43}]

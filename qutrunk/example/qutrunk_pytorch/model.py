@@ -53,10 +53,12 @@ class Hybrid(nn.Module):
 
     def __init__(self, backend, shots, shift):
         super(Hybrid, self).__init__()
+        # TODO:2
         self.quantum_circuit = QuantumCircuit(1, backend, shots)
         self.shift = shift
 
     def forward(self, input):
+        # TODO:4
         return HybridFunction.apply(input, self.quantum_circuit, self.shift)
 
 
@@ -69,6 +71,7 @@ class Net(nn.Module):
         self.dropout = nn.Dropout2d()
         self.fc1 = nn.Linear(256, 64)
         self.fc2 = nn.Linear(64, 1)
+        # TODO:1
         self.hybrid = Hybrid(None, 100, np.pi / 2)
 
     def forward(self, x):
