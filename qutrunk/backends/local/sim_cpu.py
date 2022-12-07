@@ -43,13 +43,12 @@ class PauliOpType(Enum):
     PAULI_Z = 3
 
 
-class SimulatorCpu:
-    """SimulatorCpu implement"""
+class SimCpu:
+    """Simulator-cpu implement."""
 
     def __init__(self):
         self.real = []  # real
         self.imag = []  # imag
-        self.qureg = None
         self.qubits = 0
         self.total_num_amps = 0  # numAmpsPerChunk
 
