@@ -95,7 +95,7 @@ class MeasureResult:
 
     def get_measure_counts(self, idxs: set = None) -> MeasureCount:
         """Get the number of times the measurement results appear."""
-        if len(self.measure_counts) > 0:
+        if self.measure_counts:
             return self.measure_counts
 
         measure_counts = {}
