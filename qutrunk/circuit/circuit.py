@@ -701,6 +701,7 @@ class Result:
             idxs = qreg.get_indexs()
         return self.measure_result.get_bitstrs(idxs)
 
+    # TODO: have some problem with this method.
     def get_values(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result of int."""
         idxs = None
