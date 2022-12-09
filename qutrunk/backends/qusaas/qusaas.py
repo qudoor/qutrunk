@@ -49,6 +49,7 @@ class BackendQuSaas(Backend):
         self.circuit = None
         self.run_mode = run_mode
         self._api_server = QuSaasApiServer(ak, sk)
+        self.task_id = self._api_server._taskid
 
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to qusprout backend.
