@@ -65,7 +65,7 @@ class Ry(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Ry(self.rotation)
         gate.is_inverse = not self.is_inverse 
         return gate
@@ -142,11 +142,11 @@ class CRy(BasicRotateGate):
         cos = np.cos(half_theta)
         sin = np.sin(half_theta)
         return np.array(
-            [[cos, 0, -sin, 0], [0, 1, 0, 0], [sin, 0, cos, 0], [0, 0, 0, 1]]
+            [[1, 0, 0, 0], [0, cos, 0, -sin], [0, 0, 1, 0], [0, sin, 0, cos]]
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = CRy(self.rotation)
         gate.is_inverse = not self.is_inverse 
         return gate

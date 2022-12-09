@@ -4,8 +4,8 @@ import uuid
 from thrift.protocol import TBinaryProtocol, TMultiplexedProtocol
 from thrift.transport import TSocket, TTransport
 
-from qutrunk.sim.qusprout.qusprout import QuSproutServer
-from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
+from qutrunk.thrift.qusprout import QuSproutServer
+from qutrunk.thrift.qusproutdata import ttypes as qusproutdata
 from qutrunk.tools.function_time import timefn
 
 
@@ -18,7 +18,7 @@ class QuSproutApiServer:
         port: port, default: 9090.
     """
 
-    def __init__(self, ip='localhost', port=9090):
+    def __init__(self, ip="localhost", port=9090):
         socket = TSocket.TSocket(ip, port)
         self._transport = TTransport.TBufferedTransport(socket)
         protocol = TBinaryProtocol.TBinaryProtocol(self._transport)
@@ -74,7 +74,7 @@ class QuSproutApiServer:
         """
         req = qusproutdata.RunCircuitReq(self._taskid, shots)
         res = self._client.run(req)
-        return res.result
+        return res
 
     @timefn
     def get_prob(self, index):
@@ -102,7 +102,7 @@ class QuSproutApiServer:
         return res.pro_outcomes
 
     @timefn
-    def get_all_state(self):
+    def get_statevector(self):
         """Get the current state vector of probability amplitudes for a set of qubits.
 
         Returns:
@@ -117,20 +117,6 @@ class QuSproutApiServer:
         """Cancel current job."""
         req = qusproutdata.CancelCmdReq(self._taskid)
         return self._client.cancelCmd(req)
-
-    @timefn
-    def qft(self, qubits):
-        """Applies the quantum Fourier transform (QFT) to a specific subset of qubits of the register qureg.
-
-        Args:
-            qubits: A list of the qubits to operate the QFT upon.
-        """
-        if qubits:
-            req = qusproutdata.ApplyQFTReq(self._taskid, qubits)
-            self._client.applyQFT(req)
-        else:
-            req = qusproutdata.ApplyFullQFTReq(self._taskid)
-            self._client.applyFullQFT(req)
 
     @timefn
     def get_expec_pauli_prod(self, pauli_prod_list):

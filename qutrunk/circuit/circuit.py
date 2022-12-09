@@ -1,12 +1,12 @@
 """Circuit Module."""
 import json
-import random
 from typing import List, Optional, Union, Callable
 import numpy as np
+import uuid
 
 from qutrunk.backends import Backend, BackendLocal
-from qutrunk.circuit import CBit, CReg, Counter, QuBit, Qureg
-from qutrunk.circuit.gates import BarrierGate, MeasureGate, Observable
+from qutrunk.circuit import CBit, CReg, Counter, QuBit, SubQureg, Qureg
+from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 from qutrunk.exceptions import QuTrunkError
@@ -49,8 +49,6 @@ class QCircuit:
     ):
         self.qreg = None
         self.creg = None
-        # record the original statement: gate or operator
-        self.statements = []
         self.cmds = []
         self.cmd_cursor = 0
         self.counter = None
@@ -60,7 +58,7 @@ class QCircuit:
         self.qubit_indices = {}
         self.cbit_indices = {}
 
-        # 参数字典表 {Parameter: value}
+        # dict {Parameter: value}
         self.param_dict = {}
 
         # use local backend(default)
@@ -77,7 +75,7 @@ class QCircuit:
         self.density = density
 
         self.backend.circuit = self
-        # TODO:?
+
         self.outcome = None
 
         if name is None:
@@ -86,7 +84,9 @@ class QCircuit:
 
         if resource:
             self.counter = Counter(self)
-    
+        # circuit init state
+        self._init_state = 0
+
     def allocate(self, qubits: Union[int, list]):
         """Allocate qubit in quantum circuit.
 
@@ -96,8 +96,7 @@ class QCircuit:
                     and each value item represents the size of corresponding subqureg.
 
         Returns:
-            # TODO: update description and demo
-            qreg: The register of quantum.
+            The register of quantum.
         """
 
         if not isinstance(qubits, (int, list)):
@@ -107,8 +106,8 @@ class QCircuit:
         if qubit_size <= 0:
             raise TypeError("Number of qubits should be larger than 0.")
 
-        if qubit_size > 20:
-            raise ValueError("Number of qubits should be less than 20.")
+        if qubit_size > 25:
+            raise ValueError("Number of qubits should be less than 25.")
 
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)
@@ -150,19 +149,12 @@ class QCircuit:
             circuit: The target circuit append to current circuit.
         """
         if circuit.num_qubits != self.num_qubits:
-            raise QuTrunkError("The target circuit must have the same qubits as current circuit.")
+            raise QuTrunkError(
+                "The target circuit must have the same qubits as current circuit."
+            )
         for cmd in circuit.cmds:
             self.append_cmd(cmd)
 
-    def append_statement(self, statement):
-        """Append the origin statement when apply gate or operator.
-
-        Args:
-            statement: The statement when apply gate or operator.
-        """
-        self.statements.append(statement)
-
-    # TODO: need to improve.
     def forward(self, num):
         """Update the cmd_cursor when a bunch of quantum operations have been run.
 
@@ -204,7 +196,6 @@ class QCircuit:
             raise IndexError("qubit index out of range.")
         self.creg[qubit].value = value
 
-    # TODO: need to improve.
     def run(self, shots=1):
         """Run quantum circuit through the specified backend and shots.
 
@@ -212,20 +203,12 @@ class QCircuit:
             shots: Run times of the circuit, default: 1.
 
         Returns:
-            result: The Result object contain circuit running outcome.
+            The Result object contain circuit running outcome.
         """
         self.backend.send_circuit(self, True)
         result = self.backend.run(shots)
 
-        if self.backend.name == "BackendIBM":
-            # note: ibm后端运行结果和qutrunk差异较大，目前直接将结果返回不做适配
-            return result
-        # TODO: measureSet
-        if result and result.measureSet:
-            for m in result.measureSet:
-                self.set_measure(m.id, m.value)
-
-        res = Result(self.num_qubits, result, self.backend, arguments={"shots": shots})
+        res = Result(self.backend, result, arguments={"shots": shots})
 
         return res
 
@@ -249,7 +232,10 @@ class QCircuit:
         print(circuit_drawer(circuit=self, output=output, line_length=line_length))
 
     def __str__(self) -> str:
-        return str(self.draw(output="text"))
+        return f"QCircuit({self.num_qubits})"
+
+    def __repr__(self) -> str:
+        return f"QCircuit({self.num_qubits})"
 
     @property
     def qubits(self) -> List[QuBit]:
@@ -263,7 +249,8 @@ class QCircuit:
 
     def _generate_circuit_name(self):
         """Generate circuit name."""
-        return f"{self.prefix}-{str(random.getrandbits(15))}"
+        name = uuid.uuid4()
+        return f"{self.prefix}-{name}"
 
     def __len__(self) -> int:
         """Return the number of operations in circuit."""
@@ -278,6 +265,9 @@ class QCircuit:
         Returns:
             float: The probability of value.
         """
+        if not hasattr(self.backend, "get_prob"):
+            raise NotImplementedError(f"{self.backend.name} not support get_prob method.")
+
         self.backend.send_circuit(self)
         return self.backend.get_prob(value)
 
@@ -287,10 +277,13 @@ class QCircuit:
         Returns:
             An array contains all probabilities of circuit.
         """
+        if not hasattr(self.backend, "get_probs"):
+            raise NotImplementedError(f"{self.backend.name} not support get_probs method.")
+
         qubits = [i for i in range(self.num_qubits)]
         self.backend.send_circuit(self)
         probs = self.backend.get_probs(qubits)
-        
+
         out_probs = []
         for i in range(len(probs)):
             prob = {}
@@ -299,11 +292,21 @@ class QCircuit:
             out_probs.append(prob)
         return out_probs
 
-    # TODO: need to improve.
-    def get_all_state(self):
-        """Get the current state vector of probability amplitudes for a set of qubits."""
+    def _to_complex(self, state_vector):
+        result = []
+        for item in state_vector:
+            r = item.split(",")
+            result.append(complex(float(r[0]), float(r[1])))
+        return result
+
+    def get_statevector(self):
+        """Get state vector of circuit."""
+        if not hasattr(self.backend, "get_statevector"):
+            raise NotImplementedError(f"{self.backend.name} not support get_statevector method.")
+
         self.backend.send_circuit(self)
-        return self.backend.get_all_state()
+        result = self._to_complex(self.backend.get_statevector())
+        return np.array(result)
 
     def find_bit(self, bit):
         """Find locations in the circuit.
@@ -314,7 +317,7 @@ class QCircuit:
             bit: QuBit or CBit.
 
         Returns:
-            index: The index of QuBit or CBit in circuit.
+            The index of QuBit or CBit in circuit.
         """
         try:
             if isinstance(bit, QuBit):
@@ -326,60 +329,58 @@ class QCircuit:
         except KeyError:
             raise Exception(f"Could not locate provided bit:{bit}")
 
-    def parameter(self, name: str):
+    def create_parameter(self, name: str):
         """
-        Get a new object of Parameter.
+        Allocate one Parameter object.
 
         Args:
             name(str): Parameter name.
 
         Returns:
-            p: Parameter object
+            Parameter object
         """
         p = Parameter(name)
         self.param_dict[name] = p
         return p
 
-    def parameters(self, names: list)->tuple:
+    def create_parameters(self, names: list) -> tuple:
         """
-        Get a collection of Parameter.
+        Allocate a batch of parameters.
 
         Args:
-            names(list): A list of Parameter name.
+            names(list): A list of parameter's name.
 
         Returns:
-            Tuple contains Parameter object
-        """ 
+            tuple: a batch of parameters.
+        """
         params = []
         for name in names:
-            params.append(self.parameter(name))
+            params.append(self.create_parameter(name))
 
         return tuple(params)
 
-    def get_parameter(self, name):
-        """get the object of Parameter.
+    def get_parameters(self):
+        """Get all parameters of circuit.
 
         Args:
-            name(str): Parameter name.
+            list: all parameters in circuit.
         """
-        return self.param_dict[name]
+        param_values = [param.value for param in self.param_dict.values()]
+        return param_values
 
     def bind_parameters(self, params):
         """
-        Assign numeric parameters to parameters.
+        Assign specific value to parameters.
 
         Args:
             params (dict): {parameter: value, ...}.
 
         Raises:
             ValueError: parameters variable contains parameters not present in the circuit.
-
-        Returns:
-            QCircuit:Quantum circuit
         """
         if not isinstance(params, dict):
             raise ValueError("parameters must be dictionary.")
-        # 1 参数是否在参数表中
+        # parameter exist or not
         parameters_table_key = self.param_dict.keys()
         params_not_in_circuit = [
             param_key
@@ -397,23 +398,11 @@ class QCircuit:
             param = self.param_dict[k]
             param.update(v)
 
-        # note: 绑定参数后意味着线路已经改变，需要重新构建线路
+        # note: after binding parameters means that the circuit has changed and needs to be rebuilt
         new_circuit = QCircuit(backend=self.backend, name=self.name)
         new_circuit.allocate(qubits=self.num_qubits)
         new_circuit.set_cmds(self.cmds)
         return new_circuit
-
-    def get_parameter_value(self, name):
-        """get the value of Parameter.
-
-        Args:
-            name(str): Parameter name.
-        """
-        for k, v in self.param_dict.items():
-            if name == k:
-                return v.value
-
-        return None
 
     def inverse(self):
         """Invert this circuit.
@@ -421,8 +410,7 @@ class QCircuit:
         Reverses the circuit and returns an error message.
 
         Returns:
-            QCircuit: The inverted circuit.
-            qreg: The register of quantum.
+            tuple: (QCircuit,qreg)
 
         Raises:
             ValueError: if the circuit cannot be inverted.
@@ -435,7 +423,7 @@ class QCircuit:
         for cmd in reversed(cmds):
             if isinstance(cmd.gate, (MeasureGate, AMP)):
                 raise ValueError("The circuit cannot be inverted.")
-            cmd.inverse = True
+            cmd.inverse = not cmd.inverse
             inverse_circuit.append_cmd(cmd)
 
         return inverse_circuit, inverse_circuit.qreg
@@ -449,7 +437,7 @@ class QCircuit:
             format(str): The format of file content.
 
         Return:
-            QCircuit: The QCircuit object for the input qusl or OpenQASM.
+            The QCircuit object for the input qusl or OpenQASM.
 
         """
         if format is None or format == "qusl":
@@ -478,33 +466,55 @@ class QCircuit:
         Returns:
             The expected value of a product of Pauli operators.
         """
+        if not hasattr(self.backend, "get_expec_pauli_prod"):
+            raise NotImplementedError(f"{self.backend.name} not support get_expec_pauli_prod method.")
+
         pauli_list = []
         if not isinstance(paulis, list):
             pauli_list.append(paulis)
         else:
-            pauli_list = paulis 
+            pauli_list = paulis
         self.backend.send_circuit(self)
         expect = self.backend.get_expec_pauli_prod(pauli_list)
         return expect
 
-    def expval_pauli_sum(self, paulis, coeffs, qubitnum=0):
+    def expval_pauli_sum(self, pauli_coeffs: PauliCoeffs):
         """Computes the expected value of a sum of products of Pauli operators.
 
         Args:
-            paulis (list[int]): Pauli operators.
-            coeffs (list[float]): The coefficients of each term in the sum of Pauli products.
+            pauli_coeffs (PauliCoeffs): Maintain a list of PauliCoeff, each PauliCoeff consist of one coefficient \
+                and a series of pauli operators, PauliCoeffs is used to calculate the sum of Pauli products.
+
+         .. note::
+
+            The length of paulis in each term should be equal to self.num_qubits, otherwise \
+                PauliI operator will be filled automatically.
 
         Returns:
-            Returns the operation type and the coefficients of each term in the sum of Pauli products.
+            Returns the sum of Pauli products.
+
+        Raises:
+            ValueError: If the length of paulis in each term greater than self.num_qubits.
         """
+        if not hasattr(self.backend, "get_expec_pauli_sum"):
+            raise NotImplementedError(f"{self.backend.name} not support get_expec_pauli_sum method.")
+
         self.backend.send_circuit(self)
-        if (qubitnum != 0) and (len(coeffs) * qubitnum) != len(paulis):
-            raise AttributeError(
-                "Parameter error: The number of parameters is not correct."
-            )
+        paulis = []
+        coeffs = []
+        for term in pauli_coeffs:
+            if len(term.paulis) > self.num_qubits:
+                raise ValueError(
+                    "The length of paulis in each term should be equal to self.num_qubits"
+                )
+            if len(term.paulis) < self.num_qubits:
+                term.padding(self.num_qubits - len(term.paulis))
+            coeffs.append(term.coeff)
+            paulis.extend(term.paulis)
+
         return self.backend.get_expec_pauli_sum(paulis, coeffs)
 
-    def _dump_qusl(self, file, unroll=True):
+    def _dump_qusl(self, file):
         with open(file, "w", encoding="utf-8") as f:
             qusl_data = {}
             qusl_data["target"] = "QuSL"
@@ -514,12 +524,8 @@ class QCircuit:
             qusl_data["meta"] = meta
 
             inst = []
-            if unroll:
-                for c in self:
-                    inst.append(c.qusl() + "\n")
-            else:
-                for stm in self.statements:
-                    inst.append(stm + "\n")
+            for c in self.cmds:
+                inst.append(c.qusl() + "\n")
 
             qusl_data["code"] = inst
             f.write(json.dumps(qusl_data))
@@ -527,46 +533,34 @@ class QCircuit:
     def _dump_openqasm(self, file):
         with open(file, "w", encoding="utf-8") as f:
             f.write("OPENQASM 2.0;\n")
-            f.write('include "qulib1.inc";\n')
+            f.write('include "qelib1.inc";\n')
             f.write(f"qreg q[{str(len(self.qreg))}];\n")
             f.write(f"creg c[{str(len(self.qreg))}];\n")
-            for c in self:
+            for c in self.cmds:
                 f.write(c.qasm() + ";\n")
 
-    def dump(self, file=None, format=None, unroll=True):
+    def dump(self, file=None, format=None):
         """Serialize Quantum circuit as a JSON formatted stream to file.
 
         Args:
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
             file: Dump the qutrunk instruction to file(json format).
         """
         if file is None:
             raise Exception("file argument need to be supplied.")
 
         if format is None or format == "qusl":
-            self._dump_qusl(file, unroll)
+            self._dump_qusl(file)
 
         if format == "openqasm":
             self._dump_openqasm(file)
 
-    def _print_qusl(self, unroll):
-        """Print quantum circuit in qutrunk form.
-
-        Args:
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
-        """
+    def _print_qusl(self):
+        """Print quantum circuit in qutrunk form."""
         print(f"qreg q[{str(len(self.qreg))}]")
         print(f"creg c[{str(len(self.qreg))}]")
-        if unroll:
-            for c in self:
-                print(c.qusl())
-        else:
-            for stm in self.statements:
-                print(stm)
+
+        for c in self.cmds:
+            print(c.qusl())
 
     def _print_qasm(self):
         """Print quantum circuit in OpenQASM form."""
@@ -574,25 +568,21 @@ class QCircuit:
         print('include "qulib1.inc";')
         print(f"qreg q[{str(len(self.qreg))}];")
         print(f"creg c[{str(len(self.qreg))}];")
-        for c in self:
+        for c in self.cmds:
             print(c.qasm() + ";")
 
-    def print(self, format=None, unroll=True):
+    def print(self, format=None):
         """Print quantum circuit.
 
         Args:
             format(str): The format of needed to print, Default to qusl. options are "qusl" or "openqasm".
-            unroll: True: Dump the detailed instructions, especially, \
-                if the instruction contains an operator, the operator will be expanded.
-                False: Dump the brief instructions, the operator will not be expanded.
         """
         if format is None or format == "qusl":
-            self._print_qusl(unroll)
+            self._print_qusl()
 
         if format == "openqasm":
             self._print_qasm()
 
-    # TODO: need to improve.
     def depth(
         self,
         counted_gate: Optional[Callable] = lambda x: not isinstance(x, BarrierGate),
@@ -645,20 +635,6 @@ class QCircuit:
         if self.counter:
             self.counter.show_verbose()
 
-    # TODO: need to improve.
-    def enter_op(self):
-        """Mark circuit in Operator Context."""
-        self._in_op = True
-
-    # TODO: need to improve.
-    def exit_op(self):
-        """Mark circuit out Operator Context."""
-        self._in_op = False
-
-    # TODO: need to improve.
-    def in_op(self):
-        """Get circuit Operator Context."""
-        return self._in_op
 
 class Result:
     """Result of quantum operation.
@@ -666,11 +642,9 @@ class Result:
     Save the result of quantum circuit running.
 
     Args:
-        num_qubits: The number of qubits.
-        res: The circuit running result from backend.
         backend: The backend that supports the operation of quantum circuits.
-        task_id: Task id will automatic generate when submit a quantum computing job.
-        status: The operating state of a quantum circuit.
+        res: The circuit running result from backend.
+        arguments: The additional parameters, default for the expressions of shots.
 
     Example:
         .. code-block:: python
@@ -686,84 +660,74 @@ class Result:
             # get running result
             res = qc.run()
             # get measurement from result
-            print(res.get_measure())
+            print(res.get_measures())
+            # get bitstrs
+            print(res.get_bitstrs())
+            # get values in decimal format
+            print(res.get_values())
+            # get number of each bitstr
+            print(res.get_counts())
+            # get running info
+            print(res.running_info())
     """
 
     def __init__(
-        self, num_qubits, res, backend, arguments, task_id=None, status="success"
+        self, backend, res, arguments = '{"shots": 1}'
     ):
-        self.states = []
-        self.values = []
         self.backend = backend
-        self.task_id = task_id
-        self.status = status
         self.arguments = arguments
-        # Modified quantum gate annotation.
-        self.measure_result = [-1] * num_qubits
+        self.measure_result = res
 
-        if res and res.measureSet:
-            for m in res.measureSet:
-                self.set_measure(m.id, m.value)
-
-        # Count the number of occurrences of the bit-bit string composed of all qubits.
-        if res and res.outcomeSet:
-            self.outcome = res.outcomeSet
-            for out in self.outcome:
-                # 二进制字符串转换成十进制
-                if out.bitstr:
-                    self.states.append(int(out.bitstr, base=2))
-                    self.values.append(out.count)
-        else:
-            self.outcome = None
-
-    def set_measure(self, qubit, value):
-        """Update qubit measure value.
-
-        Args:
-            qubit: The index of qubit in qureg.
-            value: The qubit measure value(0 or 1).
-        """
-        if qubit >= len(self.measure_result) or qubit < 0:
-            raise IndexError("qubit index out of range.")
-        self.measure_result[qubit] = value
-
-    def get_measure(self):
+    def get_measures(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result."""
-        return self.measure_result
+        if not self.measure_result or not self.measure_result.measures or len(self.measure_result.measures) == 0:
+            return []
 
-    def get_outcome(self):
+        measures = []
+        idxs = None
+        array_step = self.backend.circuit.num_qubits
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+            array_step = len(idxs)
+        for ms in self.measure_result.measures:
+            measures.append(ms.simplify(idxs))
+        return np.array(measures).reshape(-1, array_step)
+
+    def get_bitstrs(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result in binary format."""
-        out = self.measure_result[::-1]
-        # TODO:improve
-        bit_str = "0b"
-        for o in out:
-            bit_str += str(o)
-        return bit_str
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        return self.measure_result.get_bitstrs(idxs)
 
-    def get_counts(self):
+    def get_values(self, qreg: Union[Qureg, SubQureg] = None):
+        """Get the measure result of int."""
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        return self.measure_result.get_values(idxs)
+
+    def get_counts(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the number of times the measurement results appear."""
-        # TODO:improve
-        if self.outcome is None:
+        if self.measure_result is None:
             return None
 
         res = []
-        for out in self.outcome:
+        idxs = None
+        if qreg is not None:
+            idxs = qreg.get_indexs()
+        measure_counts = self.measure_result.get_measure_counts(idxs)
+        for out in measure_counts:
             res.append({out.bitstr: out.count})
         return json.dumps(res)
 
-    def get_states(self):
-        """Get all states"""
-        return self.states
-
-    def get_values(self):
-        """Get all values"""
-        return self.values
-
-    def excute_info(self):
+    def running_info(self):
+        """The resourece of run."""
         result = {
             "backend": self.backend.name,
-            "task_id": self.task_id,
-            "status": self.status,
+            "task_id": self.backend.task_id,
+            "status": 'success',
             "arguments": self.arguments,
         }
+
         return json.dumps(result)

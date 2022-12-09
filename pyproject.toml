@@ -1,14 +1,15 @@
 [tool.poetry]
 name = "qutrunk"
-version = "0.1.11"
+version = "0.1.15"
 description = "qutrunk is an open source library for quantum computing."
 authors = ["qudoorzh2022 <qudoorzh2022@163.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "http://www.qudoor.com/"
 repository = "https://github.com/queco-quantum/qutrunk"
-documentation  = "http://developer.queco.cn/qutrunk_api/"
+documentation = "http://developer.queco.cn/qutrunk_api/"
 keywords = ["qutrunk", "quantum", "sdk"]
+exclude = ["qutrunk/test"]
 classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Operating System :: MacOS",
@@ -21,14 +22,18 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8, <3.11"
 pyyaml = "^6.0"
 thrift = "^0.15.0"
-numpy = "^1.22.3"
+numpy = "^1.21.6"
 ply = "^3.11"
 requests = "^2.27.1"
 networkx = "^2.8"
 retworkx = "^0.11.0"
+amazon-braket-sdk = { version = "^1.32.0", optional = true }
+
+[tool.poetry.extras]
+braket = ["amazon-braket-sdk"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"

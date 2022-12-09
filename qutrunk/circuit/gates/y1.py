@@ -50,10 +50,10 @@ class Y1Gate(BasicGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         factor = 1 / np.sqrt(2)
-        return np.matrix([[factor, -1 * factor], [factor, factor]])
+        return np.array([[factor, -1 * factor], [factor, factor]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Y1Gate()
         gate.is_inverse = not self.is_inverse
         return gate

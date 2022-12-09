@@ -1,54 +1,56 @@
 """Addition operation."""
 
 from qutrunk.circuit import Qureg
-from qutrunk.circuit.ops.operator import Operator, OperatorContext
+from qutrunk.circuit.ops.operator import Operator
 from qutrunk.circuit.gates import X, MCX
 
 
 class ADD(Operator):
     """Addition operation.
 
+    Args:
+        number: The value added to circuit.
+
     Example:
         .. code-block:: python
 
             from qutrunk.circuit import QCircuit
             from qutrunk.circuit.gates import Measure, All
-            from qutrunk.circuit.ops import QSP
+            from qutrunk.circuit.ops import Classical
             from qutrunk.circuit.ops import ADD
 
             circuit = QCircuit()
             qr = circuit.allocate(4)
-            QSP(0) * qr
+            Classical(0) * qr
             ADD(3) * qr
-            All(H) * qr
+            All(Measure) * qr
             res = circuit.run()
-            print(res.get_outcome())
+            print(res.get_bitstrs())
     """
 
-    def __init__(self, number):
+    def __init__(self, number: int):
         super().__init__()
         if number < 0:
-            raise ValueError("number must be more than zero.")
+            raise ValueError("number must be greater than zero.")
         self.number = number
-
-    def _add_statement(self, qr):
-        qr[0].circuit.append_statement(f"ADD({self.number}) * q")
 
     def __mul__(self, qr: Qureg):
         if not isinstance(qr, Qureg):
             raise TypeError("The operand must be Qureg.")
 
         num_qubits = len(qr)
+        init_state = qr.circuit._init_state
+        max_value = 2 ** num_qubits - init_state - 1
 
-        with OperatorContext(qr[0].circuit):
-            for _ in range(self.number):
+        if self.number > max_value:
+            raise IndexError(f"{self.number + init_state} out of range.")
+
+        for _ in range(self.number):
+            ctrl = []
+            for i in range(num_qubits, 1, -1):
+                for j in range(i - 1):
+                    ctrl.append(qr[j])
+                MCX(i - 1) * (*ctrl, qr[i - 1])
                 ctrl = []
-                for i in range(num_qubits, 1, -1):
-                    for j in range(i - 1):
-                        ctrl.append(qr[j])
-                    MCX(i - 1) * (*ctrl, qr[i - 1])
-                    ctrl = []
 
-                X * qr[0]
-
-        self._add_statement(qr)
+            X * qr[0]

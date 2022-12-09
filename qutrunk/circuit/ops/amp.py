@@ -3,18 +3,18 @@ from typing import Optional
 
 from qutrunk.circuit.command import Command, CmdEx, Amplitude
 from qutrunk.circuit import Qureg
-from qutrunk.circuit.ops import QSP
+from qutrunk.circuit.ops import Operator 
 
 
-class AMP(QSP):
+class AMP(Operator):
     """Quantum state preparation Operator.
 
     Init the quantum state to specific amplitude state.
 
     Args:
         classicvector: The amplitude state list.
-        startind: The amplitude start index
-        numamps: The number of amplitude
+        startind: The amplitude start index.
+        numamps: The number of amplitude.
 
     Example:
         .. code-block:: python
@@ -26,7 +26,7 @@ class AMP(QSP):
             circuit = QCircuit()
             qureg = circuit.allocate(2)
             AMP([1-2j, 2+3j, 3-4j, 0.5+0.7j], 1, 2) * qureg
-            print(circuit.get_all_state())
+            print(circuit.get_statevector())
     """
 
     def __init__(
@@ -35,13 +35,23 @@ class AMP(QSP):
         startind: Optional[int] = None,
         numamps: Optional[int] = None,
     ):
-        super().__init__("AMP")
+        super().__init__()
         self.classicvector = classicvector
         self.startind = startind
         self.numamps = numamps
 
     def __str__(self):
         return "AMP"
+
+    def __mul__(self, qureg: Qureg):
+        """Apply the AMP encode operator."""
+        if not isinstance(qureg, Qureg):
+            raise TypeError("the operand must be Qureg.")
+
+        if not self._check_state(qureg):
+            raise ValueError(f"Invalid state: {self.classicvector}, {self.startind}, {self.numamps}")
+
+        self._process_state(qureg)
 
     def _check_state(self, qureg: Qureg):
         if self.startind is None:
@@ -51,7 +61,7 @@ class AMP(QSP):
             self.numamps = len(self.classicvector)
 
         if (
-            0 <= len(self.classicvector) <= 2 ** len(qureg)
+            0 < len(self.classicvector) <= 2 ** len(qureg)
             and 0 <= self.startind < 2 ** len(qureg)
             and 0 <= self.numamps <= 2 ** len(qureg)
             and (self.startind + self.numamps) <= 2 ** len(qureg)
@@ -77,8 +87,3 @@ class AMP(QSP):
         cmd.cmdex.amp.numamps = self.numamps
 
         self.commit(qureg.circuit, cmd)
-
-    def _append_statement(self, qureg: Qureg):
-        qureg.circuit.append_statement(
-            f"AMP({self.classicvector}, {self.startind}, {self.numamps}) * q"
-        )

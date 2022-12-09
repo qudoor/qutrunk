@@ -1,50 +1,65 @@
+import numpy as np
 import pytest
+from qiskit import QuantumCircuit, assemble, Aer
 
+from qutrunk.circuit.gates import H, All, SqrtSwap
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import SqrtSwap
-from qutrunk.backends import BackendQuSprout
-from check_all_state import check_all_state
-from check_all_state_inverse import check_all_state_inverse
+from qutrunk.circuit.gates import Matrix
+from qutrunk.test.gate.backend_fixture import backend, backend_type
 
 
-def test_sqrtswap_gate():
-    """测试 SqrtSwap门"""
-    # 使用本地量子计算模拟器
-    circuit = QCircuit()
-    qr = circuit.allocate(2)
-    SqrtSwap * (qr[0], qr[1])
-    res = circuit.get_all_state()
+class TestSqrtSwap:
+    @pytest.fixture
+    def result_qutrunk(self, backend):
+        # local backend
+        circuit = QCircuit(backend=backend)
+        qr = circuit.allocate(2)
+        All(H) * qr
+        SqrtSwap * (qr[0], qr[1])
+        result_q = np.array(circuit.get_statevector()).reshape(-1, 1)
+        return result_q
 
-    # 使用BackendQuSprout量子计算模拟器
-    circuit_box = QCircuit(backend=BackendQuSprout())
-    qr_box = circuit_box.allocate(2)
-    SqrtSwap * (qr_box[0], qr_box[1])
-    res_box = circuit_box.get_all_state()
+    def test_matrix(self, result_qutrunk):
+        """Test SqrtSwap gate with Matrix."""
+        circuit = QCircuit()
+        qr = circuit.allocate(2)
+        Matrix(H.matrix.tolist()) * qr[0]
+        Matrix(H.matrix.tolist()) * qr[1]
+        Matrix(SqrtSwap.matrix.tolist()) * (qr[0], qr[1])
+        result_m = circuit.get_statevector()
+        result_m = np.array(result_m).reshape(-1, 1)
 
-    # 检查数据是否一致
-    assert check_all_state(res, res_box)
+        assert np.allclose(result_qutrunk, result_m)
 
+    def test_gate_inverse(self):
+        """Test the inverse of SqrtSwap gate."""
+        # local backend
+        circuit = QCircuit()
+        qr = circuit.allocate(2)
+        All(H) * qr
+        # initial state
+        result_init = np.array(circuit.get_statevector()).reshape(-1, 1)
 
-def test_sqrtswap_inverse_gate():
-    """测试反转电路"""
-    # 使用本地量子计算模拟器
-    circuit = QCircuit()
-    qr = circuit.allocate(2)
-    # 获取原始数据
-    org_res = circuit.get_all_state()
+        SqrtSwap * (qr[0], qr[1])
+        SqrtSwap.inv() * (qr[0], qr[1])
+        result_expect = circuit.get_statevector()
+        result_expect = np.array(result_expect).reshape(-1, 1)
 
-    # 进行逆操作
-    SqrtSwap * (qr[0], qr[1])
-    SqrtSwap * (qr[0], qr[1])
-    circuit.cmds[1].inverse = True
+        assert np.allclose(result_init, result_expect)
 
-    # 获取逆操作后数据
-    final_res = circuit.get_all_state()
+    def test_matrix_inverse(self):
+        """Test the inverse of SqrtSwap gate with Matrix."""
+        circuit = QCircuit()
+        qr = circuit.allocate(2)
 
-    # 检查逆操作前后数据是否一致
-    assert check_all_state_inverse(org_res, final_res)
+        Matrix(H.matrix.tolist()) * qr[0]
+        Matrix(H.matrix.tolist()) * qr[1]
+        # initial state
+        result_init = np.array(circuit.get_statevector()).reshape(-1, 1)
 
+        Matrix(SqrtSwap.matrix.tolist()) * (qr[0], qr[1])
+        Matrix(SqrtSwap.matrix.tolist()).inv() * (qr[0], qr[1])
+        result_m = circuit.get_statevector()
+        result_m = np.array(result_m).reshape(-1, 1)
 
-if __name__ == "__main__":
-    """运行test文件"""
-    pytest.main(["-v", "-s", "./test_sqrtswap_gate.py"])
+        assert np.allclose(result_init, result_m)

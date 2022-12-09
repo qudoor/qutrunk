@@ -4,6 +4,7 @@ import math
 
 from qutrunk.backends import Backend
 from qutrunk.circuit.gates import CNOT, H, Measure, Rx, Ry, Rz
+from qutrunk.backends.result import MeasureResult, MeasureCount, MeasureQubits, MeasureQubit
 from .ibm_client import send
 
 
@@ -113,6 +114,14 @@ class BackendIBM(Backend):
             )
 
     def run(self, shots=1):
+        """Run quantum circuit.
+
+        Args:
+            shots: Circuit run times, for sampling, default: 1.
+
+        Returns:
+            JSON: The Result object contain circuit running outcome.
+        """
         info = {}
         info["json"] = self._json
 
@@ -121,15 +130,26 @@ class BackendIBM(Backend):
         info["maxCredits"] = 10
         info["backend"] = {"name": self.device}
 
-        result = send(
+        res = send(
             info,
             device=self.device,
             token=self._token,
             num_retries=shots,
             verbose=True,
         )
+        return self._to_result(res)
+
+    def _to_result(self, res):
+        result = MeasureResult()
+        # exception
+        # counts = res.get["data"]["counts"]
+        counts = res["data"]["counts"]
+
+        for bit_str, count in counts:
+            result.measure_counts.append(MeasureCount(bit_str, count))
         return result
 
     @property
     def name(self):
+        """The name of Backend."""
         return "BackendIBM"

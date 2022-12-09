@@ -19,19 +19,13 @@ def run_bell_pair(backend=None):
 
     # Print quantum circuit
     qc.print()
-    # qc.dump(file="bell_pair.qusl")
 
     # Run quantum circuit with 100 times
     res = qc.run(shots=100)
-
-    # Print result like:
-    #[1, 1]
-    #[{"00": 50}, {"11": 50}]
-    print(res.get_measure())
     print(res.get_counts())
 
     # Print quantum circuit exection information
-    print(res.excute_info())
+    print(res.running_info())
 
     return qc
 

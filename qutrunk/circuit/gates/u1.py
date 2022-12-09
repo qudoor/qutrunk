@@ -65,7 +65,7 @@ class U1(BasicGate):
         return np.array([[1, 0], [0, np.exp(1j * lam)]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = U1(self.rotation)
         gate.is_inverse = not self.is_inverse
         return gate
@@ -150,7 +150,7 @@ class CU1(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = CU1(self.rotation)
         gate.is_inverse = not self.is_inverse
         return gate

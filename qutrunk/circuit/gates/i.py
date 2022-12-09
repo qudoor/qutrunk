@@ -56,12 +56,12 @@ class IGate(BasicGate, Observable):
                 e.g: [{"oper_type": 1, "target": 0}].
         """
         pauli = {}
-        pauli["oper_type"] = PauliType.POT_PAULI_I.value
+        pauli["oper_type"] = PauliType.PAULI_I.value
         pauli["target"] = target.index
         return pauli
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = IGate()
         gate.is_inverse = not self.is_inverse 
         return gate

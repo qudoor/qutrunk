@@ -4,14 +4,6 @@ qutrunk.example package
 Submodules
 ----------
 
-qutrunk.example.allgates module
--------------------------------
-
-.. automodule:: qutrunk.example.allgates
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 qutrunk.example.bell\_pair module
 ---------------------------------
 
@@ -24,14 +16,6 @@ qutrunk.example.bernstein\_vazirani module
 ------------------------------------------
 
 .. automodule:: qutrunk.example.bernstein_vazirani
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.decrement module
---------------------------------
-
-.. automodule:: qutrunk.example.decrement
    :members:
    :undoc-members:
    :show-inheritance:
@@ -60,50 +44,26 @@ qutrunk.example.grover module
    :undoc-members:
    :show-inheritance:
 
-qutrunk.example.increment module
---------------------------------
+qutrunk.example.phase\_estimation module
+----------------------------------------
 
-.. automodule:: qutrunk.example.increment
+.. automodule:: qutrunk.example.phase_estimation
    :members:
    :undoc-members:
    :show-inheritance:
 
-qutrunk.example.openqasm\_parse module
+qutrunk.example.phase\_kickback module
 --------------------------------------
 
-.. automodule:: qutrunk.example.openqasm_parse
+.. automodule:: qutrunk.example.phase_kickback
    :members:
    :undoc-members:
    :show-inheritance:
 
-qutrunk.example.qft module
---------------------------
+qutrunk.example.superdense module
+---------------------------------
 
-.. automodule:: qutrunk.example.qft
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.qusl\_parse module
-----------------------------------
-
-.. automodule:: qutrunk.example.qusl_parse
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.random\_byte module
------------------------------------
-
-.. automodule:: qutrunk.example.random_byte
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.teleport module
--------------------------------
-
-.. automodule:: qutrunk.example.teleport
+.. automodule:: qutrunk.example.superdense
    :members:
    :undoc-members:
    :show-inheritance:

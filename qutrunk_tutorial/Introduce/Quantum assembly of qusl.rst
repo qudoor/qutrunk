@@ -195,8 +195,10 @@ QuSL量子汇编提供三个层面的量子操作语句实现，分别是：基�
     qubits = list(qreg)[::-2]
     QFT * qubits
 	
-    //QSP: 量子态制备算子
-    QSP("+") * qreg (对qreg中的所有量子比特进行QSP操作)
+    //AMP: 通过振幅编码制备任意量子态
+    circuit = QCircuit()
+    qureg = circuit.allocate(2)
+    AMP([1-2j, 2+3j, 3-4j, 0.5+0.7j], 1, 2) * qureg
 
 
 3.Meta: 量子元操作（需要配合其他基础量子门实现特定运算，一般不单独使用）
@@ -241,13 +243,13 @@ circuit导出成QuSL
     Measure * qr[1]
 
     # print circuit
-    qc.print("bell_pair.qusl")
+    qc.dump(file="bell_pair.qusl")
 
 导出QuSL格式文件，内容如下
 
 .. code-block::
 
-    {"target": "QuSL", "version": "1.0", "meta": {"circuit_name": "circuit-23694", "qubits": "2"}, "code": ["H * q[0]\n", "MCX * (q[0], q[1])\n", "Measure * q[0]\n", "Measure * q[1]\n"]}
+    {"target": "QuSL", "version": "1.0", "meta": {"circuit_name": "circuit-19817", "qubits": "2"}, "code": ["H * q[0]\n", "MCX(1) * (q[0], q[1])\n", "Measure * q[0]\n", "Measure * q[1]\n"]}
 
 
 解析并运行QuSL量子线路
@@ -255,18 +257,12 @@ circuit导出成QuSL
 
 .. code-block:: 
 
-	import os
-
 	from qutrunk.circuit import QCircuit
 
-	BASE_DIR = os.getcwd()
-	file_path = BASE_DIR + '/qutrunk/example/bell_pair.qusl'
-
-    circuit = QCircuit.load(file_path, "qusl")
+	qc = QCircuit()
+	circuit = qc.load(file="bell_pair.qusl")
 	circuit.print()
-	result = circuit.run(shots=100)
-	print(result.get_counts())   
-	
+
 运行结果如下
 
 .. code-block::
@@ -277,4 +273,3 @@ circuit导出成QuSL
 	MCX(1) * (q[0], q[1])
 	Measure * q[0]
 	Measure * q[1]
-	[{"00": 50}, {"11": 50}]

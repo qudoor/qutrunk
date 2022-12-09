@@ -1,51 +1,60 @@
 import pytest
+import numpy as np
 from numpy import pi
 
+from qiskit import QuantumCircuit, BasicAer, transpile
+
+from qutrunk.circuit.gates import CRx, All, H
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import CRx
-from qutrunk.backends import BackendQuSprout
-from check_all_state import check_all_state
-from check_all_state_inverse import check_all_state_inverse
+from qutrunk.circuit.gates import Matrix
+from qutrunk.test.gate.backend_fixture import backend, backend_type
 
+class TestCRxGate:
+    @pytest.fixture
+    def result_gate(self, backend):
+        circuit = QCircuit(backend=backend)
+        qr = circuit.allocate(2)
+        All(H) * qr
+        CRx(pi / 2) * (qr[0], qr[1])
+        result_gate = np.array(circuit.get_statevector()).reshape(-1, 1)
+        return result_gate
 
-def test_crx_gate():
-    """测试CRx门"""
-    # 使用本地量子计算模拟器
-    circuit = QCircuit()
-    qr = circuit.allocate(2)
-    CRx(pi / 2) * (qr[0], qr[1])
-    res = circuit.get_all_state()
+    def test_result_matrix(self, result_gate):
+        circuit = QCircuit()
+        qr = circuit.allocate(2)
+        Matrix(H.matrix.tolist()) * qr[0]
+        Matrix(H.matrix.tolist()) * qr[1]
+        Matrix(CRx(pi / 2).matrix.tolist()) * (qr[0], qr[1])
+        result_matrix = np.array(circuit.get_statevector()).reshape(-1, 1)
+        assert np.allclose(result_gate, result_matrix)
 
-    # 使用BackendQuSprout量子计算模拟器
-    circuit_box = QCircuit(backend=BackendQuSprout())
-    qr_box = circuit_box.allocate(2)
-    CRx(pi / 2) * (qr_box[0], qr_box[1])
-    res_box = circuit_box.get_all_state()
+    def test_result_qiskit(self, result_gate):
+        qc = QuantumCircuit(2, 2)
+        backend = BasicAer.get_backend('statevector_simulator')
+        qc.h(0)
+        qc.h(1)
+        qc.crx(pi / 2, 0 ,1)
+        job = backend.run(transpile(qc, backend))
+        result_qiskit = np.array(job.result().get_statevector(qc)).reshape(-1, 1)
+        assert np.allclose(result_gate, result_qiskit)
 
-    # 检查数据是否一致
-    assert check_all_state(res, res_box)
+    def test_gate_inverse(self, backend):
+        circuit = QCircuit(backend=backend)
+        qr = circuit.allocate(2)
+        All(H) * qr
+        result_src = np.array(circuit.get_statevector()).reshape(-1, 1)
+        CRx(pi / 2) * (qr[0], qr[1])
+        CRx(pi / 2).inv() * (qr[0], qr[1])
+        result_des = np.array(circuit.get_statevector()).reshape(-1, 1)
+        assert np.allclose(result_src, result_des)
 
-
-def test_crx_inverse_gate():
-    """测试反转电路"""
-    # 使用本地量子计算模拟器
-    circuit = QCircuit()
-    qr = circuit.allocate(2)
-    # 获取原始数据
-    org_res = circuit.get_all_state()
-
-    # 进行逆操作
-    CRx(pi / 2) | (qr[0], qr[1])
-    CRx(pi / 2) | (qr[0], qr[1])
-    circuit.cmds[1].inverse = True
-
-    # 获取逆操作后数据
-    final_res = circuit.get_all_state()
-
-    # 检查逆操作前后数据是否一致
-    assert check_all_state_inverse(org_res, final_res)
-
-
-if __name__ == "__main__":
-    """运行test文件"""
-    pytest.main(["-v", "-s", "./test_crx_gate.py"])
+    def test_matrix_inverse(self, backend):
+        circuit = QCircuit(backend=backend)
+        qr = circuit.allocate(2)
+        Matrix(H.matrix.tolist()) * qr[0]
+        Matrix(H.matrix.tolist()) * qr[1]
+        result_src = np.array(circuit.get_statevector()).reshape(-1, 1)
+        Matrix(CRx(pi / 2).matrix.tolist()) * (qr[0], qr[1])
+        Matrix(CRx(pi / 2).matrix.tolist()).inv() * (qr[0], qr[1])
+        result_des = np.array(circuit.get_statevector()).reshape(-1, 1)
+        assert np.allclose(result_src, result_des)

@@ -1,4 +1,5 @@
 import cmath
+from cmath import exp
 
 import numpy as np
 
@@ -66,7 +67,7 @@ class Rz(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = Rz(self.rotation)
         gate.is_inverse = not self.is_inverse 
         return gate
@@ -141,12 +142,7 @@ class CRz(BasicRotateGate):
         """Access to the matrix property of this gate."""
         arg = 1j * float(self.rotation) / 2
         return np.array(
-            [
-                [np.exp(-arg), 0, 0, 0],
-                [0, 1, 0, 0],
-                [0, 0, np.exp(arg), 0],
-                [0, 0, 0, 1],
-            ]
+            [[1, 0, 0, 0], [0, exp(-arg), 0, 0], [0, 0, 1, 0], [0, 0, 0, exp(arg)]]
         )
 
     def inv(self):

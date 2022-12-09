@@ -60,14 +60,14 @@ class P(BasicPhaseGate):
         return np.array([[1, 0], [0, np.exp(1j * self.rotation)]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = P(self.rotation)
-        gate.is_inverse = not self.is_inverse 
+        gate.is_inverse = not self.is_inverse
         return gate
 
     def ctrl(self, ctrl_cnt=1):
         """Apply controlled gate.
-        
+
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
@@ -137,10 +137,11 @@ class CP(BasicRotateGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         eith = np.exp(1j * float(self.rotation))
-        return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, eith, 0], [0, 0, 0, 1]])
+        # TODO: ??
+        return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, eith]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = CP(self.rotation)
-        gate.is_inverse = not self.is_inverse 
+        gate.is_inverse = not self.is_inverse
         return gate

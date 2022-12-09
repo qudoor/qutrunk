@@ -63,12 +63,12 @@ class YGate(BasicGate, Observable):
                 e.g: [{"oper_type": 1, "target": 0}].
         """
         pauli = {}
-        pauli["oper_type"] = PauliType.POT_PAULI_Y.value
+        pauli["oper_type"] = PauliType.PAULI_Y.value
         pauli["target"] = target.index
         return pauli
 
     def inv(self):
-        """Apply inverse gate"""
+        """Return inverted Y gate (itself)."""
         gate = YGate()
         gate.is_inverse = not self.is_inverse
         return gate
@@ -131,7 +131,7 @@ class CYGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.array([[0, 0, -1j, 0], [0, 1, 0, 0], [1j, 0, 0, 0], [0, 0, 0, 1]])
+        return np.array([[1, 0, 0, 0], [0, 0, 0, -1j], [0, 0, 1, 0], [0, 1j, 0, 0]])
 
     def inv(self):
         """Apply inverse gate"""

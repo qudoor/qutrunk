@@ -53,7 +53,7 @@ class U3(BasicGate):
                 U3(pi/2,pi/2,pi/2) * qr[0]
 
         Raises:
-            NotImplementedError: If the argument is not a Qubit object.
+            TypeError: If the argument is not a Qubit object.
         """
         if not isinstance(qubit, QuBit):
             raise TypeError("The argument must be Qubit object.")
@@ -88,7 +88,7 @@ class U3(BasicGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = U3(self.theta, self.phi, self.lam)
         gate.is_inverse = not self.is_inverse
         return gate
@@ -198,7 +198,7 @@ class CU3(BasicRotateGate):
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = CU3(self.theta, self.phi,  self.lam)
         gate.is_inverse = not self.is_inverse
         return gate

@@ -69,7 +69,7 @@ class R(BasicRotateGate):
         return np.array([[cos, -1j * exp_m * sin], [-1j * exp_p * sin, cos]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = R(self.theta, self.phi)
         gate.is_inverse = not self.is_inverse 
         return gate

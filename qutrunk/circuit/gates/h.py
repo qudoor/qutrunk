@@ -10,7 +10,10 @@ from qutrunk.circuit.qubit import QuBit
 
 
 class HGate(BasicGate):
-    """Apply the single-qubit Hadamard gate.
+    r"""Apply the single-qubit Hadamard gate.
+
+    .. math::
+        {\rm H}=\frac{1}{\sqrt{2}}\begin{pmatrix}1&1\\1&-1\end{pmatrix}
 
     Example:
         .. code-block:: python
@@ -49,7 +52,7 @@ class HGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return 1.0 / cmath.sqrt(2.0) * np.matrix([[1, 1], [1, -1]])
+        return 1.0 / cmath.sqrt(2.0) * np.array([[1, 1], [1, -1]])
 
     @property
     def label(self):
@@ -57,7 +60,7 @@ class HGate(BasicGate):
         self.__str__()
 
     def inv(self):
-        """Apply inverse gate"""
+        """Return inverted H gate (itself)."""
         gate = HGate()
         gate.is_inverse = not self.is_inverse 
         return gate
@@ -108,12 +111,10 @@ class CHGate(BasicGate):
             AttributeError: If the argument is not a Qubit object.
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
-            # TODO:need to improve.
-            raise NotImplementedError("The argument must be Qubit object.")
+            raise TypeError("The argument must be Qubit object.")
 
         if len(qubits) != 2:
-            # TODO:need to improve.
-            raise AttributeError("Parameter error: One controlled and one target qubit are required.")
+            raise ValueError("Parameter error: One controlled and one target qubit are required.")
 
         self.qubits = qubits
         controls = [qubits[0].index]
@@ -135,15 +136,15 @@ class CHGate(BasicGate):
         _sqrt2o2 = 1 / cmath.sqrt(2)
         return np.array(
             [
-                [_sqrt2o2, 0, _sqrt2o2, 0],
-                [0, 1, 0, 0],
-                [_sqrt2o2, 0, -_sqrt2o2, 0],
-                [0, 0, 0, 1],
+                [1, 0, 0, 0],
+                [0, _sqrt2o2, 0, _sqrt2o2],
+                [0, 0, 1, 0],
+                [0, _sqrt2o2, 0, -_sqrt2o2],
             ]
         )
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = CHGate()
         gate.is_inverse = not self.is_inverse 
         return gate

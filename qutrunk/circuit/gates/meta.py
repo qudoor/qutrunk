@@ -11,6 +11,8 @@ from qutrunk.circuit.command import Command, CmdEx, Mat
 class All(BasicGate):
     """Meta operator, provides unified operation of multiple qubits.
 
+    .. note: Only support single qubit gate.
+
     Args:
         gate: The gate will apply to all qubits.
 
@@ -78,12 +80,20 @@ class Power(BasicGate):
 
 
 class Matrix(BasicGate):
-    """Custom matrix gate."""
+    """Custom matrix gate.
 
-    def __init__(self, matrix, ctrl_cnt=0):
+    Example:
+            .. code-block:: python
+
+                Matrix([[0.5, 0.5], [0.5, -0.5]]) * qr[0]  -- No controlled bit
+                Matrix([[0.5, 0.5], [0.5, -0.5]]).ctrl(1) * (qr[0], qr[1])  -- qr[0] is controlled bit
+                Matrix([[0.5, 0.5], [0.5, -0.5]]).ctrl(2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
+    """
+
+    def __init__(self, matrix):
         super().__init__()
         self.matrix = matrix
-        self.ctrl_cnt = ctrl_cnt
+        self.ctrl_cnt = 0
 
     def __str__(self):
         return "Matrix"
@@ -93,13 +103,6 @@ class Matrix(BasicGate):
 
         Args:
             qubit: The quantum bit to apply X gate.
-
-        Example:
-            .. code-block:: python
-
-                Matrix([[0.5, 0.5], [0.5, -0.5]]) * qr[0]  -- No controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 1) * (qr[0], qr[1])  -- qr[0] is controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
 
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
@@ -151,8 +154,9 @@ class Matrix(BasicGate):
         self.__or__(qubit)
 
     def inv(self):
-        """Apply inverse gate"""
-        gate = Matrix(self.matrix, self.ctrl_cnt)
+        """Apply inverse gate."""
+        gate = Matrix(self.matrix)
+        gate.ctrl_cnt = self.ctrl_cnt
         gate.is_inverse = not self.is_inverse
         return gate
 
@@ -162,7 +166,8 @@ class Matrix(BasicGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
-        gate = Matrix(self.matrix, ctrl_cnt)
+        gate = Matrix(self.matrix)
+        gate.ctrl_cnt = ctrl_cnt
         gate.is_inverse = self.is_inverse
         return gate
 
@@ -180,11 +185,14 @@ class Matrix(BasicGate):
         return True
 
     def is_unitary(self, mat):
-        """
-        Test a matrix is unitary or not
-        m = [[1, 0], [0, 1]]
-        m = np.matrix(m)
-        print(is_unitary(m))
+        """Test a matrix is unitary or not.
+
+         Example:
+            .. code-block:: python
+
+                m = [[1, 0], [0, 1]]
+                m = np.matrix(m)
+                print(is_unitary(m))
         """
         return np.allclose(np.eye(mat.shape[0]), mat.H * mat)
 
@@ -197,13 +205,13 @@ class Gate(BasicGate):
     Example:
         .. code-block:: python
 
-        @Gate
-        def my_gate(a, b, c, d):
-            return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
-                << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
-                << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
+            @Gate
+            def my_gate(a, b, c, d):
+                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]]).ctrl(2).inv(), (a, b, c)) \
+                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl(1).inv(), (a, c)) \
+                    << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
 
-        my_gate * (q[3], q[1], q[0], q[2])
+            my_gate * (q[3], q[1], q[0], q[2])
     """
 
     def __init__(self, func: Optional[callable] = None):
@@ -241,22 +249,3 @@ class Gate(BasicGate):
 
     def __mul__(self, qubits: Union[QuBit, tuple]):
         self.__or__(qubits)
-
-
-# note: 该方法会导致部分门操作产生状态污染，比如通过对象实例调用的门操作
-# 只要设置过状态，那么后续所有该量子门操作都带了这个状态
-# def Inv(gate):
-#     """Inverse gate.
-
-#     Args:
-#         gate: The gate will apply inverse operator.
-
-#     Example:
-#         .. code-block:: python
-
-#             Inv(H) * q[0]
-#     """
-#     if isinstance(gate, BasicGate):
-#         gate.is_inverse = not gate.is_inverse
-
-#     return gate

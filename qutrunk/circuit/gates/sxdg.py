@@ -49,10 +49,10 @@ class SqrtXdgGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        return np.matrix([[1 - 1j, 1 + 1j], [1 + 1j, 1 - 1j]]) / 2
+        return 0.5 * np.array([[1 - 1j, 1 + 1j], [1 + 1j, 1 - 1j]])
 
     def inv(self):
-        """Apply inverse gate"""
+        """Apply inverse gate."""
         gate = SqrtXdgGate()
         gate.is_inverse = not self.is_inverse
         return gate
