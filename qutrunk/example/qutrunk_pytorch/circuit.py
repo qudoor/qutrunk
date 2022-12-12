@@ -32,7 +32,12 @@ class QuantumCircuit:
         self.shots = shots
 
     def run(self, theta): # theta need a float
+        # TODO: update theta
+        # if self._circuit.param_dict.get("theta", None):
+        #     self.theta = self._circuit.param_dict["theta"] = theta
+        # else:
         self._circuit.bind_parameters({"theta": theta})
+
         result = self._circuit.run(shots=self.shots)
         result = result.get_counts()  # <class 'str'> [{"0": 57}, {"1": 43}]
         result = json.loads(result)  # <class 'list'> [{'0': 57}, {'1': 43}]
@@ -61,4 +66,5 @@ if __name__ == '__main__':
     # circuit.run({"theta": np.pi})  circuit.run([np.pi])[0]
     # print(f'Expected value for rotation pi= {circuit.run({"theta": np.pi})[0]}')
     print(f'Expected value for rotation pi= {circuit.run(np.pi)[0]}')
-    circuit._circuit.draw()
+    print(f'Expected value for rotation pi= {circuit.run(1.233)[0]}')
+    # circuit._circuit.draw()

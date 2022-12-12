@@ -18,8 +18,11 @@ class HybridFunction(Function):
 
         # expectation_z = ctx.quantum_circuit.run(input[0].tolist())
         # print("input[0].tolist()=" ,input[0].tolist())
+        print("input[0].tolist()=", input[0].tolist())  # [0.042811132967472076]
 
-        expectation_z = ctx.quantum_circuit.run(input[0].tolist()[0])
+        expectation_z = ctx.quantum_circuit.run(input[0].tolist()[0]) # [0.3]
+        print("expectation_z=", expectation_z)  # [0.5]
+
         result = torch.tensor([expectation_z])
         ctx.save_for_backward(input, result)
 
@@ -37,13 +40,13 @@ class HybridFunction(Function):
         gradients = []
         for i in range(len(input_list)):
             expectation_right = ctx.quantum_circuit.run(shift_right[i][0])
+            # TODO: 一直是0.6
             expectation_left = ctx.quantum_circuit.run(shift_left[i][0])
             # print("expectation_right: " + str(expectation_right))
             # print("expectation_left: " + str(expectation_left))
 
             # expectation_right = ctx.quantum_circuit.run({"theta": shift_right[i]})
             # expectation_left = ctx.quantum_circuit.run({"theta": shift_left[i]})
-
             gradient = torch.tensor([expectation_right]) - torch.tensor([expectation_left])
             gradients.append(gradient)
         gradients = np.array([gradients]).T
