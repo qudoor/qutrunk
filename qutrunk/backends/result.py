@@ -130,6 +130,8 @@ class MeasureResult:
         """Get the measure result of int."""
         bit_strs = []
         for m in self.measures:
-            bit_strs.append(int(m.bit_str(idxs),base=2))
+            bitstr = m.bit_str(idxs)
+            if bitstr:
+                bit_strs.append(int(bitstr, base=2))
 
         return bit_strs
