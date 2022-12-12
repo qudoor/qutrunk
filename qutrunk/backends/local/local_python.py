@@ -5,7 +5,7 @@ from copy import deepcopy
 import numpy as np
 from numpy import pi
 
-from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
+from qutrunk.backends.result import MeasureQubits, MeasureResult
 from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
 from .pysim import Simulator
@@ -176,13 +176,14 @@ class BackendLocalPython:
         # TODO: need to improve.
         if str(cmd.gate) == "Measure":
             res = self.sim.measure(cmd.targets[0])
-            mr = MeasureQubit(cmd.targets[0], res)
             index = self.run_times
             meassize = len(self.result.measures)
             if index >= meassize:
                 mrs = MeasureQubits()
+                mrs.add_measure(cmd.targets[0], res)
                 self.result.measures.append(mrs)
-            self.result.measures[index].measure.append(mr)
+            else:
+                self.result.measures[index].add_measure(cmd.targets[0], res)
             return
 
         return getattr(self, self.gate_map[str(cmd.gate)])(cmd)
@@ -190,7 +191,7 @@ class BackendLocalPython:
     def pack_result(self):
         index = self.run_times
         if index < len(self.result.measures):
-            self.result.measures[index].measure.sort(key=lambda a: a.idx)
+            self.result.measures[index].sort()
 
     def h(self, cmd):
         """the single-qubit Hadamard gate.

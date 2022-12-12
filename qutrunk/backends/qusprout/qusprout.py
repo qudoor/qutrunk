@@ -6,7 +6,7 @@ from qutrunk.backends.backend import Backend
 from qutrunk.tools.read_qubox import get_qubox_setting
 from .rpcclient import QuSproutApiServer
 from qutrunk.thrift.qusproutdata import ttypes as qusproutdata
-from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
+from qutrunk.backends.result import MeasureQubits, MeasureResult
 
 
 class BackendQuSprout(Backend):
@@ -202,8 +202,7 @@ class BackendQuSprout(Backend):
                 meas_temp = MeasureQubits()
                 if meas.measure is not None:
                     for mea in meas.measure:
-                        mea_temp = MeasureQubit(mea.idx, mea.value)
-                        meas_temp.measure.append(mea_temp)
+                        meas_temp.add_measure(mea.idx, mea.value)
                     result.measures.append(meas_temp)
         """
         1 必须释放连接，不然其它连接无法连上服务端
