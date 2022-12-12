@@ -6,7 +6,7 @@ import requests
 
 from qutrunk.config import configuration
 from qutrunk.tools.function_time import timefn
-from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
+from qutrunk.backends.result import MeasureQubits, MeasureResult
 
 
 class QuSaasApiServer:
@@ -121,8 +121,7 @@ class QuSaasApiServer:
             for meas in resp["data"]["measures"]:
                 meas_temp = MeasureQubits()
                 for mea in meas["measure"]:
-                    mea_temp = MeasureQubit(mea["target"], mea["value"])
-                    meas_temp.measure.append(mea_temp)
+                    meas_temp.add_measure(mea["target"], mea["value"])
                 result.measures.append(meas_temp)
         return result
 

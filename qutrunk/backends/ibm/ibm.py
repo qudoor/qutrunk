@@ -5,7 +5,7 @@ import uuid
 
 from qutrunk.backends import Backend
 from qutrunk.circuit.gates import CNOT, H, Measure, Rx, Ry, Rz
-from qutrunk.backends.result import MeasureResult, MeasureCount, MeasureQubits, MeasureQubit
+from qutrunk.backends.result import MeasureResult, MeasureQubits
 from .ibm_client import send
 
 
@@ -148,7 +148,7 @@ class BackendIBM(Backend):
         counts = res["data"]["counts"]
 
         for bit_str, count in counts:
-            result.measure_counts.append(MeasureCount(bit_str, count))
+            result.measure_counts[bit_str] = count
         return result
 
     @property
