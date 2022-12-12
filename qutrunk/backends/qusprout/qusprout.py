@@ -43,7 +43,12 @@ class BackendQuSprout(Backend):
             print(res.get_counts())
     """
 
-    def __init__(self, run_mode: str = "cpu", ip: Optional[str] = None, port: Optional[int] = None):
+    def __init__(
+        self,
+        run_mode: str = "cpu",
+        ip: Optional[str] = None,
+        port: Optional[int] = None,
+    ):
         super().__init__()
         self.circuit = None
         self.run_mode = run_mode
@@ -54,7 +59,7 @@ class BackendQuSprout(Backend):
             _port = port
         elif ip is None and port is None:
             _ip = box_config.get("ip")
-            _port = port=box_config.get("port")
+            _port = port = box_config.get("port")
         else:
             if ip is None:
                 print("Please specify ip in BackendQuSprout()!")
@@ -153,7 +158,7 @@ class BackendQuSprout(Backend):
             exectype = qusproutdata.ExecCmdType.ExecTypeGpuSingle
         else:
             exectype = qusproutdata.ExecCmdType.ExecTypeCpuSingle
-            
+
         # 服务端初始化
         if start == 0:
             res, elapsed = self._api_server.init(
@@ -188,7 +193,11 @@ class BackendQuSprout(Backend):
             raise Exception("Circuit run failed.")
 
         result = MeasureResult()
-        if res is not None and res.result is not None and res.result.measures is not None:
+        if (
+            res is not None
+            and res.result is not None
+            and res.result.measures is not None
+        ):
             for meas in res.result.measures:
                 meas_temp = MeasureQubits()
                 if meas.measure is not None:

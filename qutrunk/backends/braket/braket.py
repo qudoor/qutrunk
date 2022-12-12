@@ -1,6 +1,7 @@
 """AWS Braket backends."""
 
 import datetime
+import uuid
 
 from braket.aws import AwsDevice
 from braket.circuits import Circuit
@@ -46,6 +47,7 @@ class BackendBraket(Backend):
         self._online_date = online_date
         self._status = device.status
         self._circuit = None
+        self.task_id = uuid.uuid4().hex
 
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to Braket backend.

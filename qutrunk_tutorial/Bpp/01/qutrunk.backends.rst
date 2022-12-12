@@ -9,6 +9,8 @@ Subpackages
 
    qutrunk.backends.braket
    qutrunk.backends.ibm
+   qutrunk.backends.local
+   qutrunk.backends.qusaas
    qutrunk.backends.qusprout
 
 Submodules
@@ -22,10 +24,10 @@ qutrunk.backends.backend module
    :undoc-members:
    :show-inheritance:
 
-qutrunk.backends.local module
------------------------------
+qutrunk.backends.result module
+------------------------------
 
-.. automodule:: qutrunk.backends.local
+.. automodule:: qutrunk.backends.result
    :members:
    :undoc-members:
    :show-inheritance:

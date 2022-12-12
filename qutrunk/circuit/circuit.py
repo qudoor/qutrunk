@@ -685,12 +685,11 @@ class Result:
 
         measures = []
         idxs = None
-        array_step = self.backend.circuit.num_qubits
         if qreg is not None:
             idxs = qreg.get_indexs()
-            array_step = len(idxs)
         for ms in self.measure_result.measures:
             measures.append(ms.simplify(idxs))
+        array_step = len(measures)
         return np.array(measures).reshape(-1, array_step)
 
     def get_bitstrs(self, qreg: Union[Qureg, SubQureg] = None):
@@ -729,4 +728,5 @@ class Result:
             "status": 'success',
             "arguments": self.arguments,
         }
+
         return json.dumps(result)

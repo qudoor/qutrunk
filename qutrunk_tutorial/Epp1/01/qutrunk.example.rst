@@ -4,14 +4,6 @@ qutrunk.example package
 Submodules
 ----------
 
-qutrunk.example.addition module
--------------------------------
-
-.. automodule:: qutrunk.example.addition
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 qutrunk.example.bell\_pair module
 ---------------------------------
 
@@ -24,14 +16,6 @@ qutrunk.example.bernstein\_vazirani module
 ------------------------------------------
 
 .. automodule:: qutrunk.example.bernstein_vazirani
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.decrement module
---------------------------------
-
-.. automodule:: qutrunk.example.decrement
    :members:
    :undoc-members:
    :show-inheritance:
@@ -60,22 +44,6 @@ qutrunk.example.grover module
    :undoc-members:
    :show-inheritance:
 
-qutrunk.example.increment module
---------------------------------
-
-.. automodule:: qutrunk.example.increment
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.openqasm\_parse module
---------------------------------------
-
-.. automodule:: qutrunk.example.openqasm_parse
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 qutrunk.example.phase\_estimation module
 ----------------------------------------
 
@@ -92,26 +60,10 @@ qutrunk.example.phase\_kickback module
    :undoc-members:
    :show-inheritance:
 
-qutrunk.example.qft module
---------------------------
+qutrunk.example.superdense module
+---------------------------------
 
-.. automodule:: qutrunk.example.qft
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.qusl\_parse module
-----------------------------------
-
-.. automodule:: qutrunk.example.qusl_parse
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.example.random\_byte module
------------------------------------
-
-.. automodule:: qutrunk.example.random_byte
+.. automodule:: qutrunk.example.superdense
    :members:
    :undoc-members:
    :show-inheritance:

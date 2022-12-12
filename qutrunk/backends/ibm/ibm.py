@@ -1,6 +1,7 @@
 """IBM Backend"""
 
 import math
+import uuid
 
 from qutrunk.backends import Backend
 from qutrunk.circuit.gates import CNOT, H, Measure, Rx, Ry, Rz
@@ -54,6 +55,7 @@ class BackendIBM(Backend):
         self._json = []
         # measured qubit id
         self._measured_ids = []
+        self.task_id = uuid.uuid4().hex
 
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to IBM backend.

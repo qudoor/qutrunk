@@ -9,7 +9,7 @@ from qutrunk.circuit.gates import H, CNOT, Measure
 
 def run_check_sprout(ip: Optional[str] = None, port: Optional[int] = None):
     # allocate
-    qc = QCircuit(backend=BackendQuSprout(ip, port))
+    qc = QCircuit(backend=BackendQuSprout(ip=ip, port=port))
     qr = qc.allocate(2)
 
     # apply gate
