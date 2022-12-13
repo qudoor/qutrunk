@@ -4,6 +4,7 @@ import numpy
 
 from mpi4py import MPI
 from .sim_cpu import SimCpu
+from typing import List, Union
 
 REAL_EPS = 1e-13
 
@@ -332,3 +333,219 @@ class SimDistribute:
                 + rot2.real * state_real_lo - rot2.imag * state_imag_lo
             state_vec_out[this_task] = rot1.real * state_imag_up + rot1.imag * state_real_up \
                 + rot2.real * state_imag_lo + rot2.imag * state_real_lo
+
+    def __validate_target(self, target_qubit: Union[int, list]):
+        if isinstance(target_qubit, int): 
+            if target_qubit < 0 or target_qubit >= self.reg.num_qubits_in_state_vec:
+                raise ValueError("Invalid target qubit. Must be >=0 and <numQubits.")
+        elif isinstance(target_qubit, list):
+            for target in target_qubit:
+                self.__validate_target(target)
+        else:
+            raise TypeError("qubits parameter should be type of int or list.")
+        
+    def __validate_multi_qubit_matrix_fits_in_node(self, num_targets: int):
+        if self.reg.num_amps_per_chunk < (1 << num_targets):
+            raise ValueError("The specified matrix targets too many qubits; the batches of amplitudes to modify cannot all fit in a single distributed node's memory allocation.")
+
+    def __validate_matrix(self, ureal, uimag, row_num: int, column_num: int):
+        if len(ureal) != row_num or len(ureal[0]) != column_num or len(uimag) != row_num or len(uimag[0]) != column_num:
+            raise ValueError("expected arrary length of ureal or uimag")
+
+    def __mask_contains_bit(self, mask: int, bit_ind: int):
+        return mask & (1 << bit_ind)
+   
+    def __flip_bit(self, number: int, bit_ind: int):
+        return self.sim_cpu.flip_bit(number, bit_ind)
+
+    def __insert_zero_bit(self, number: int, index: int):
+        return self.sim_cpu.insert_zero_bit(number, index)
+
+    def __insert_two_zero_bits(self, number: int, bit1: int, bit2: int):
+        return self.sim_cpu.insert_two_zero_bits(number, bit1, bit2)
+
+    def __extract_bit(self, ctrl: int, index: int):
+        return self.sim_cpu.__extract_bit(ctrl, index)
+
+    def __is_odd_parity(number: int, qb1: int, qb2: int):
+        return self.__extract_bit(qb1, number) != self.__extract_bit(qb2, number)
+    
+    def __swap_qubit_amps_local(self, qb1: int, qb2: int):
+        num_tasks = self.reg.num_amps_per_chunk >> 2
+        for this_task in range(num_tasks):
+            ind00 = self.__insert_two_zero_bits(this_task, qb1, qb2)
+            ind01 = self.__flip_bit(ind00, qb1)
+            ind10 = self.__flip_bit(ind00, qb2)
+
+            # extract statevec amplitudes 
+            re01 = self.reg.state_vec.real[ind01]
+            im01 = self.reg.state_vec.imag[ind01]
+            re10 = self.reg.state_vec.real[ind10]
+            im10 = self.reg.state_vec.imag[ind10]
+
+            # swap 01 and 10 amps
+            self.reg.state_vec.real[ind01] = re10
+            self.reg.state_vec.real[ind10] = re01
+            self.reg.state_vec.imag[ind01] = im10
+            self.reg.state_vec.imag[ind10] = im01
+
+    def __get_global_ind_of_odd_parity_in_chunk(self, qb1: int, qb2: int):
+        chunk_start_ind = self.reg.num_amps_per_chunk * self.reg.chunk_id
+        chunk_end_ind = chunk_start_ind + self.reg.num_amps_per_chunk
+        
+        if (self.__extract_bit(qb1, chunk_start_ind) != self.__extract_bit(qb2, chunk_start_ind)):
+            return chunk_start_ind
+        
+        odd_parity_ind = self.__flip_bit(chunk_start_ind, qb1)
+        if (odd_parity_ind >= chunk_start_ind and odd_parity_ind < chunk_end_ind):
+            return odd_parity_ind
+            
+        odd_parity_ind = self.__flip_bit(chunk_start_ind, qb2)
+        if (odd_parity_ind >= chunk_start_ind and odd_parity_ind < chunk_end_ind):
+            return odd_parity_ind
+        
+        return -1
+    
+    def __swap_qubit_amps_distributed(self, pair_rank, qb1: int, qb2: int):
+        global_start_ind = self.reg.chunk_id * self.reg.num_amps_per_chunk
+        pair_global_start_ind = pair_rank * self.reg.num_amps_per_chunk
+        for local_ind in range(self.reg.num_amps_per_chunk):
+            global_ind = global_start_ind + local_ind
+            if self.__is_odd_parity(global_ind, qb1, qb2):
+                
+                pair_global_ind = self.__flip_bit(self.__flip_bit(global_ind, qb1), qb2)
+                pair_local_ind = pair_global_ind - pair_global_start_ind
+                
+                self.reg.state_vec.real[local_ind] = self.reg.pair_state_vec.real[pair_local_ind]
+                self.reg.state_vec.imag[local_ind] = self.reg.pair_state_vec.imag [pair_local_ind]
+    
+    def __swap_qubit_amps(self, qb1: int, qb2: int):
+        # perform locally if possible 
+        qb_big = qb1 if qb1 > qb2 else qb2
+        if (self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, qb_big)):
+            return self.__swap_qubit_amps_local(qb1, qb2)
+        
+        # do nothing if this node contains no amplitudes to swap
+        odd_parity_global_ind = self.__get_global_ind_of_odd_parity_in_chunk(qb1, qb2)
+        if odd_parity_global_ind == -1:
+            return
+        
+        # determine and swap amps with pair node
+        pair_rank = self.__flip_bit(self.__flip_bit(odd_parity_global_ind, qb1), qb2) // self.reg.num_amps_per_chunk
+        self.__exchange_state_vectors(pair_rank)
+        self.__swap_qubit_amps_distributed(pair_rank, qb1, qb2)
+        
+    def __multi_controlled_two_qubit_unitary_local(self, ctrl_mask: int, q1: int, q2: int, ureal, uimag):
+        global_ind_start = self.reg.chunk_id * self.reg.num_amps_per_chunk
+        num_tasks = self.reg.num_amps_per_chunk >> 2
+        for this_task in range(num_tasks):
+            # determine ind00 of |..0..0..>
+            ind00 = self.__insert_two_zero_bits(this_task, q1, q2)
+            
+            # skip amplitude if controls aren't in 1 state (overloaded for speed)
+            this_global_ind00 = ind00 + global_ind_start
+            if ctrl_mask and ((ctrl_mask & this_global_ind00) != ctrl_mask):
+                continue
+            
+            # inds of |..0..1..>, |..1..0..> and |..1..1..>
+            ind01 = self.__flip_bit(ind00, q1)
+            ind10 = self.__flip_bit(ind00, q2)
+            ind11 = self.__flip_bit(ind01, q2)
+
+            # extract statevec amplitudes 
+            re00 = self.reg.state_vec.real[ind00]
+            im00 = self.reg.state_vec.imag[ind00]
+            re01 = self.reg.state_vec.real[ind01]
+            im01 = self.reg.state_vec.imag[ind01]
+            re10 = self.reg.state_vec.real[ind10]
+            im10 = self.reg.state_vec.imag[ind10]
+            re11 = self.reg.state_vec.real[ind11]
+            im11 = self.reg.state_vec.imag[ind11]
+
+			# apply u * {amp00, amp01, amp10, amp11}
+            self.reg.state_vec.real[ind00] = \
+                ureal[0][0]*re00 - uimag[0][0]*im00 + \
+                ureal[0][1]*re01 - uimag[0][1]*im01 + \
+                ureal[0][2]*re10 - uimag[0][2]*im10 + \
+                ureal[0][3]*re11 - uimag[0][3]*im11
+            self.reg.state_vec.imag[ind00] = \
+                uimag[0][0]*re00 + ureal[0][0]*im00 + \
+                uimag[0][1]*re01 + ureal[0][1]*im01 + \
+                uimag[0][2]*re10 + ureal[0][2]*im10 + \
+                uimag[0][3]*re11 + ureal[0][3]*im11
+                
+            self.reg.state_vec.real[ind01] = \
+                ureal[1][0]*re00 - uimag[1][0]*im00 + \
+                ureal[1][1]*re01 - uimag[1][1]*im01 + \
+                ureal[1][2]*re10 - uimag[1][2]*im10 + \
+                ureal[1][3]*re11 - uimag[1][3]*im11
+            self.reg.state_vec.imag[ind01] = \
+                uimag[1][0]*re00 + ureal[1][0]*im00 + \
+                uimag[1][1]*re01 + ureal[1][1]*im01 + \
+                uimag[1][2]*re10 + ureal[1][2]*im10 + \
+                uimag[1][3]*re11 + ureal[1][3]*im11
+                
+            self.reg.state_vec.real[ind10] = \
+                ureal[2][0]*re00 - uimag[2][0]*im00 + \
+                ureal[2][1]*re01 - uimag[2][1]*im01 + \
+                ureal[2][2]*re10 - uimag[2][2]*im10 + \
+                ureal[2][3]*re11 - uimag[2][3]*im11
+            self.reg.state_vec.imag[ind10] = \
+                uimag[2][0]*re00 + ureal[2][0]*im00 + \
+                uimag[2][1]*re01 + ureal[2][1]*im01 + \
+                uimag[2][2]*re10 + ureal[2][2]*im10 + \
+                uimag[2][3]*re11 + ureal[2][3]*im11  
+                
+            self.reg.state_vec.real[ind11] = \
+                ureal[3][0]*re00 - uimag[3][0]*im00 + \
+                ureal[3][1]*re01 - uimag[3][1]*im01 + \
+                ureal[3][2]*re10 - uimag[3][2]*im10 + \
+                ureal[3][3]*re11 - uimag[3][3]*im11
+            self.reg.state_vec.imag[ind11] = \
+                uimag[3][0]*re00 + ureal[3][0]*im00 + \
+                uimag[3][1]*re01 + ureal[3][1]*im01 + \
+                uimag[3][2]*re10 + ureal[3][2]*im10 + \
+                uimag[3][3]*re11 + ureal[3][3]*im11
+                
+    def __multi_controlled_two_qubit_unitary(self, ctrl_mask: int, q1: int, q2: int, ureal, uimag):
+        q1_fits_in_node = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, q1)
+        q2_fits_in_node = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, q2)
+        
+        if q1_fits_in_node and q2_fits_in_node:  
+            self.__multi_controlled_two_qubit_unitary_local(ctrl_mask, q1, q2, ureal, uimag)
+        elif q1_fits_in_node:
+            qswap = (q1-1) if q1 > 0 else (q1+1)
+            if self.__mask_contains_bit(ctrl_mask, qswap):
+                ctrl_mask = self.__flip_bit(self.__flip_bit(ctrl_mask, q2), qswap)
+            
+            self.__swap_qubit_amps(q2, qswap)
+            self.__multi_controlled_two_qubit_unitary_local(ctrl_mask, q1, qswap, ureal, uimag)
+            self.__swap_qubit_amps(q2, qswap)
+        elif q2_fits_in_node:
+            qswap = (q2-1) if q2 > 0 else (q2+1)
+            if self.__mask_contains_bit(ctrl_mask, qswap):
+                ctrl_mask = self.__flip_bit(self.__flip_bit(ctrl_mask, q1), qswap)
+            
+            self.__swap_qubit_amps(q1, qswap)
+            self.__multi_controlled_two_qubit_unitary_local(ctrl_mask, q2, qswap, ureal, uimag)
+            self.__swap_qubit_amps(q1, qswap)
+        else:
+            swap1 = 0
+            swap2 = 1
+            if self.__mask_contains_bit(ctrl_mask, swap1):
+                ctrl_mask = self.__flip_bit(self.__flip_bit(ctrl_mask, swap1), q1)
+            if self.__mask_contains_bit(ctrl_mask, swap2):
+                ctrl_mask = self.__flip_bit(self.__flip_bit(ctrl_mask, swap2), q2)
+            
+            self.__swap_qubit_amps(q1, swap1)
+            self.__swap_qubit_amps(q2, swap2)
+            self.__multi_controlled_two_qubit_unitary_local(ctrl_mask, swap1, swap2, ureal, uimag)
+            self.__swap_qubit_amps(q1, swap1)
+            self.__swap_qubit_amps(q2, swap2)
+            
+    def __apply_matrix4(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
+        self.__validate_target(target_qubit1)
+        self.__validate_target(target_qubit2)
+        self.__validate_matrix(ureal, uimag, 4, 4)
+        self.__validate_multi_qubit_matrix_fits_in_node(2)
+        self.__multi_controlled_two_qubit_unitary(0, target_qubit1, target_qubit2, ureal, uimag)
