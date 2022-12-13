@@ -1,7 +1,11 @@
 """Implementation of quantum compute simulator for distributed running mode."""
 import math
+import numpy
+
 from mpi4py import MPI
-from sim_cpu import SimCpu
+from .sim_cpu import SimCpu
+
+REAL_EPS = 1e-13
 
 class Env:
     """Represents run environment."""
@@ -62,13 +66,13 @@ class SimDistribute:
         self.sim_cpu = SimCpu()
 
         total_num_amps = 2**num_qubits
-        num_amps_per_rank = total_num_amps/self.env.num_ranks
-        self.reg.state_vec.real = [0] * total_num_amps
-        self.reg.state_vec.imag = [0] * total_num_amps
+        num_amps_per_rank = total_num_amps//self.env.num_ranks
+        self.reg.state_vec.real = [0] * num_amps_per_rank
+        self.reg.state_vec.imag = [0] * num_amps_per_rank
 
         if self.env.num_ranks > 1:
-            self.reg.pair_state_vec.real = [0] * total_num_amps
-            self.reg.pair_state_vec.imag = [0] * total_num_amps
+            self.reg.pair_state_vec.real = [0] * num_amps_per_rank
+            self.reg.pair_state_vec.imag = [0] * num_amps_per_rank
 
         self.reg.num_amps_total = total_num_amps
         self.reg.num_amps_per_chunk = num_amps_per_rank
@@ -79,7 +83,7 @@ class SimDistribute:
         self.sim_cpu.real = self.reg.state_vec.real
         self.sim_cpu.imag = self.reg.state_vec.imag
         self.sim_cpu.qubits = self.reg.num_qubits_in_state_vec
-        self.sim_cpu.total_num_amps = self.reg.num_amps_total
+        self.sim_cpu.num_amps_per_rank = self.reg.num_amps_per_chunk
 
     def init_zero_state(self):
         """Init zero state"""
@@ -94,20 +98,20 @@ class SimDistribute:
         for i in range(self.reg.num_amps_per_chunk):
             self.reg.state_vec.real[i] = 0.0
             self.reg.state_vec.imag[i] = 0.0
-
+    
     def __half_matrix_block_fits_in_chunk(self, chunkSize, target_qubit):
-        size_half_block = 1 << (target_qubit)
+        size_half_block = (1 << target_qubit)
         return 1 if chunkSize > size_half_block else 0
 
-    def __chunk_isupper(self, chunk_id, chunk_size, target_ubit):
-        size_half_block = 1 << target_ubit
+    def __chunk_isupper(self, chunk_id, chunk_size, target_qubit):
+        size_half_block = 1 << target_qubit
         size_block = size_half_block * 2
         pos_in_block = (chunk_id * chunk_size) % size_block
         return pos_in_block < size_half_block
 
     def __get_chunk_pair_id(self, chunk_isupper, chunk_id, chunk_size, target_qubit):
         size_half_block = 1 << target_qubit
-        chunks_per_half_block = size_half_block/chunk_size
+        chunks_per_half_block = size_half_block // chunk_size
         if chunk_isupper:
             return chunk_id + chunks_per_half_block
         else:
@@ -122,16 +126,87 @@ class SimDistribute:
         return rank_isupper
 
     def __exchange_state_vectors(self, pair_rank):
-        # MPI send/receive vars
-        tag = 100
-        status = MPI.Status()
+        send_buffer = numpy.zeros(1, dtype='float')
+        recv_buffer = numpy.zeros(1, dtype='float')
         # send my state vector to pairRank's qureg.pairStateVec
         # receive pairRank's state vector into qureg.pairStateVec
         for i in range(self.reg.num_amps_per_chunk):
-            self.comm.Sendrecv(self.reg.state_vec.real[i], pair_rank, tag,
-                    self.reg.pair_state_vec.real[i], pair_rank, tag, status)
-            self.comm.Sendrecv(self.reg.state_vec.imag[i], pair_rank, tag,
-                    self.reg.pair_state_vec.imag[i], pair_rank, tag, status)
+            send_buffer[0] = self.reg.state_vec.real[i]
+            self.comm.Sendrecv(send_buffer, pair_rank, 0,
+                    recv_buffer, pair_rank, 0)
+            self.reg.pair_state_vec.real[i] = recv_buffer[0]
+
+            send_buffer[0] = self.reg.state_vec.imag[i]
+            self.comm.Sendrecv(send_buffer, pair_rank, 0,
+                    recv_buffer, pair_rank, 0)
+            self.reg.pair_state_vec.imag[i] = recv_buffer[0]
+
+    def __is_chunk_to_skip_in_find_prob_zero(self, chunk_id, chunk_size, measure_qubit):
+        size_half_block = 1 << measure_qubit
+        num_chunks_to_skip = size_half_block // chunk_size
+        # calculate probability by summing over numChunksToSkip, then skipping numChunksToSkip, etc
+        bit_to_check = chunk_id and num_chunks_to_skip
+        return bit_to_check
+
+    def __find_Prob_of_zero_distributed(self):
+        total_prob = 0.0
+        for this_task in range(self.reg.num_amps_per_chunk):
+            total_prob = total_prob + self.reg.state_vec.real[this_task] * self.reg.state_vec.real[this_task] + self.reg.state_vec.imag[this_task] * self.reg.state_vec.imag[this_task]
+
+        return total_prob
+
+    def __collapse_to_known_prob_outcome_distributed_renorm(self, measure_qubit, total_probability):
+        renorm=1/math.sqrt(total_probability)
+        for this_task in range(self.reg.num_amps_per_chunk):
+            self.reg.state_vec.real[this_task] = self.reg.state_vec.real[this_task] * renorm
+            self.reg.state_vec.imag[this_task] = self.reg.state_vec.imag[this_task] * renorm
+
+    def __collapse_to_outcome_distributed_set_zero(self):
+        for this_task in range(self.reg.num_amps_per_chunk):
+            self.reg.state_vec.real[this_task] = 0
+            self.reg.state_vec.real[this_task] = 0
+
+    def measure(self, target):
+        zero_prob = self.__calc_prob_of_outcome(target, 0)
+        outcome, outcome_prob = self.sim_cpu.generate_measure_outcome(zero_prob)
+        self.__collapse_to_know_prob_outcome(target, outcome, outcome_prob)
+        return outcome
+
+    def __calc_prob_of_outcome(self, measure_qubit, outcome):
+        skip_values_within_rank = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, measure_qubit)
+        if skip_values_within_rank:
+            state_prob = self.sim_cpu.find_prob_of_zero(measure_qubit)
+        else:
+            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk, measure_qubit):
+                state_prob = self.__find_Prob_of_zero_distributed()
+            else:
+                state_prob = 0
+
+        state_prob_buffer = numpy.zeros(1, dtype='float') + state_prob
+        total_state_prob_buffer = numpy.zeros(1, dtype='float')
+        self.comm.Allreduce(state_prob_buffer, total_state_prob_buffer)
+        total_state_prob = total_state_prob_buffer[0]
+        if outcome == 1:
+            total_state_prob = 1.0 - total_state_prob
+        return total_state_prob
+
+    def __collapse_to_know_prob_outcome(self, measure_qubit, outcome, total_state_prob):
+        skip_values_within_rank = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, measure_qubit)
+        if skip_values_within_rank:
+            self.sim_cpu.collapse_to_know_prob_outcome(measure_qubit, outcome, total_state_prob)
+        else:
+            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk, measure_qubit):
+                # chunk has amps for q=0
+                if outcome == 0:
+                    self.__collapse_to_known_prob_outcome_distributed_renorm(measure_qubit, total_state_prob)
+                else:
+                    self.__collapse_to_outcome_distributed_set_zero()
+            else:
+                # chunk has amps for q=1
+                if outcome == 1:
+                    self.__collapse_to_known_prob_outcome_distributed_renorm(measure_qubit, total_state_prob)
+                else:
+                    self.__collapse_to_outcome_distributed_set_zero()
 
     def hadamard(self, target_qubit):
         # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
@@ -179,4 +254,11 @@ class SimDistribute:
         else:
             # exchange state vectors between ranks
             self.__exchange_state(target_qubit)
-            self.__statevec_controlled_not_distributed(control_qubit, self.reg.pair_state_vec, self.reg.state_vec)
+            self.__controlled_not_distributed(control_qubit, self.reg.pair_state_vec, self.reg.state_vec)
+
+    def __controlled_not_distributed(self, control_qubit, state_vec_in, state_vec_out):
+        for this_task in range(self.reg.num_amps_per_chunk):
+            control_bit = self.sim_cpu.extract_bit(control_qubit, this_task + self.reg.chunk_id * self.reg.num_amps_per_chunk)
+            if control_bit:
+                state_vec_out.real[this_task] = state_vec_in.real[this_task]
+                state_vec_out.imag[this_task] = state_vec_in.imag[this_task]

@@ -47,10 +47,10 @@ class SimCpu:
     """Simulator-cpu implement."""
 
     def __init__(self):
-        self.real = []  # real
-        self.imag = []  # imag
+        self.real = []
+        self.imag = []
         self.qubits = 0
-        self.total_num_amps = 0  # numAmpsPerChunk
+        self.num_amps_per_rank = 0
 
     def create_qureg(self, num_qubits):
         """Allocate resource.
@@ -60,14 +60,14 @@ class SimCpu:
         """
         self.qubits = num_qubits
         num_amps = 2**num_qubits
-        self.total_num_amps = num_amps
+        self.num_amps_per_rank = num_amps
         # TODO: need to improve.
         self.real = [0] * num_amps
         self.imag = [0] * num_amps
 
     def init_blank_state(self):
         """Init blank state"""
-        for i in range(self.total_num_amps):
+        for i in range(self.num_amps_per_rank):
             self.real[i] = 0.0
             self.imag[i] = 0.0
 
@@ -80,7 +80,7 @@ class SimCpu:
     def init_plus_state(self):
         """Init plus state"""
         # dimension of the state vector
-        chunk_size = self.total_num_amps
+        chunk_size = self.num_amps_per_rank
         state_vec_size = chunk_size
         normFactor = 1.0 / math.sqrt(state_vec_size)
 
@@ -112,7 +112,7 @@ class SimCpu:
         ctrlMask = self.get_qubit_bit_mask(controls, len(controls))
 
         numTargs = len(targets)
-        numTasks = self.total_num_amps >> numTargs
+        numTasks = self.num_amps_per_rank >> numTargs
         numTargAmps = 1 << numTargs
 
         ampInds = [0]*numTargAmps
@@ -170,8 +170,7 @@ class SimCpu:
         """
         size_half_block = 2**target
         size_block = size_half_block * 2
-        num_task = self.total_num_amps // 2
-
+        num_task = self.num_amps_per_rank // 2
         rec_root = 1.0 / math.sqrt(2)
         for this_task in range(num_task):
             this_block = this_task // size_half_block
@@ -213,7 +212,7 @@ class SimCpu:
             target: target qubit
             angle: amount by which to shift the phase in radians.
         """
-        state_vec_size = self.total_num_amps
+        state_vec_size = self.num_amps_per_rank
         cos_angle = math.cos(angle)
         sin_angle = math.sin(angle)
 
@@ -276,7 +275,7 @@ class SimCpu:
 
     def control_not(self, ctrl, target):
         """Control not gate"""
-        num_task = self.total_num_amps // 2
+        num_task = self.num_amps_per_rank // 2
         size_half_block = 2**target
         size_block = size_half_block * 2
 
@@ -306,7 +305,7 @@ class SimCpu:
         self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
 
     def swap(self, target_bit0, target_bit1):
-        num_task = self.total_num_amps >> 2
+        num_task = self.num_amps_per_rank >> 2
         for this_task in range(num_task):
             # determine ind00 of |..0..0..>, |..0..1..> and |..1..0..>
             ind00 = self.insert_two_zero_bits(this_task, target_bit0, target_bit1)
@@ -332,7 +331,7 @@ class SimCpu:
 
     def cy(self, control_bit, target_bit):
         conj_fac = 1
-        num_task = self.total_num_amps >> 1
+        num_task = self.num_amps_per_rank >> 1
         size_half_block = 2**target_bit
         size_block = size_half_block * 2
         for this_task in range(num_task):
@@ -352,7 +351,7 @@ class SimCpu:
                 self.imag[index_lo] = conj_fac * state_real_up
 
     def cz(self, control_bits, num_control_bits):
-        state_vec_size = self.total_num_amps
+        state_vec_size = self.num_amps_per_rank
         mask = self.get_qubit_bit_mask(control_bits, num_control_bits)
         for index in range(state_vec_size):
             if mask == (mask & index):
@@ -369,7 +368,7 @@ class SimCpu:
         self.unitary(target_bit, ureal, uimag)
 
     def unitary(self, target_bit, ureal, uimag):
-        num_task = self.total_num_amps >> 1
+        num_task = self.num_amps_per_rank >> 1
         size_half_block = 2**target_bit
         size_block = size_half_block * 2
 
@@ -436,7 +435,7 @@ class SimCpu:
         beta_real = math.sin(angle / 2.0) * unit_vec[1]
         beta_imag = -math.sin(angle / 2.0) * unit_vec[0]
 
-        num_task = self.total_num_amps >> 1
+        num_task = self.num_amps_per_rank >> 1
         size_half_block = 2**target_bit
         size_block = size_half_block * 2
         for this_task in range(num_task):
@@ -492,7 +491,7 @@ class SimCpu:
         beta_real = math.sin(angle / 2.0) * unit_vec[1]
         beta_imag = -math.sin(angle / 2.0) * unit_vec[0]
 
-        num_task = self.total_num_amps >> 1
+        num_task = self.num_amps_per_rank >> 1
         size_half_block = 2**target_bit
         size_block = size_half_block * 2
         for this_task in range(num_task):
@@ -574,7 +573,7 @@ class SimCpu:
         return mask
 
     def apply_matrix2(self, target, ureal, uimag):
-        num_task = self.total_num_amps // 2
+        num_task = self.num_amps_per_rank // 2
         size_half_block = 2**target
         size_block = size_half_block * 2
         for this_task in range(num_task):
@@ -615,8 +614,8 @@ class SimCpu:
 
     def apply_matrix4(self, target0, target1, ureal, uimag):
         ctrl_mask = 0
-        global_ind_start = self.total_num_amps
-        num_task = self.total_num_amps >> 2
+        global_ind_start = self.num_amps_per_rank
+        num_task = self.num_amps_per_rank >> 2
         for this_task in range(num_task):
             ind00 = self.insert_two_zero_bits(this_task, target0, target1)
             this_global_ind00 = ind00 + global_ind_start
@@ -724,7 +723,7 @@ class SimCpu:
             )
 
     def controlled_unitary(self, control_bit, target_bit, ureal, uimag):
-        num_task = self.total_num_amps >> 1
+        num_task = self.num_amps_per_rank >> 1
         size_half_block = 1 << target_bit
         size_block = 2 * size_half_block
 
@@ -790,7 +789,7 @@ class SimCpu:
         ctrl_mask = self.get_qubit_bit_mask(control_bits, num_control_bits)
         targ_mask = self.get_qubit_bit_mask(target_bits, num_target_bits)
 
-        for amp_ind in range(self.total_num_amps):
+        for amp_ind in range(self.num_amps_per_rank):
 
             # /* it may be a premature optimisation to remove the seemingly wasteful continues below,
             #  * because the maximum skipped amplitudes is 1/2 that stored in the node
@@ -825,7 +824,7 @@ class SimCpu:
     def controlled_two_qubit_unitary(
         self, control_bit, target_bit0, targetbi_bit1, ureal, uimag
     ):
-        num_task = self.total_num_amps >> 2
+        num_task = self.num_amps_per_rank >> 2
         for this_task in range(num_task):
             #  determine ind00 of |..0..0..>.
             ind00 = self.insert_two_zero_bits(this_task, target_bit0, targetbi_bit1)
@@ -954,7 +953,7 @@ class SimCpu:
         return outcome, outcome_prob
 
     def collapse_to_know_prob_outcome(self, target, outcome, outcome_prob):
-        num_task = self.total_num_amps // 2
+        num_task = self.num_amps_per_rank // 2
         size_half_block = 2**target
         size_block = 2 * size_half_block
 
@@ -991,7 +990,7 @@ class SimCpu:
         return outcome_prob
 
     def find_prob_of_zero(self, target):
-        num_task = self.total_num_amps // 2
+        num_task = self.num_amps_per_rank // 2
         size_half_block = 2**target
         size_block = size_half_block * 2
         total_prob = 0.0
@@ -1017,7 +1016,7 @@ class SimCpu:
         Returns:
             the probability of target index
         """
-        if index < 0 or index >= self.total_num_amps:
+        if index < 0 or index >= self.num_amps_per_rank:
             raise ValueError(f"{index} is illegal parameter.")
 
         real = self.real[index]
@@ -1034,7 +1033,7 @@ class SimCpu:
         """
         num_outcome_probs = len(qubits)
         outcome_probs = [0] * (2**num_outcome_probs)
-        for i in range(self.total_num_amps):
+        for i in range(self.num_amps_per_rank):
             outcome_ind = 0
             for q in range(num_outcome_probs):
                 outcome_ind += self.extract_bit(qubits[q], i) * (2**q)
@@ -1053,7 +1052,7 @@ class SimCpu:
         """
         # todo better in float or ndarray
         state_list = []
-        for i in range(self.total_num_amps):
+        for i in range(self.num_amps_per_rank):
             real = self.real[i]
             imag = self.imag[i]
             # TODO: need to improve.
@@ -1081,7 +1080,7 @@ class SimCpu:
         i = 0
         max_num_regs_apply_arbitrary_phase = 100
         phase_inds = [0] * max_num_regs_apply_arbitrary_phase
-        for index in range(self.total_num_amps):
+        for index in range(self.num_amps_per_rank):
             flat_ind = 0
             for r in range(num_regs):
                 phase_inds[r] = 0
@@ -1241,7 +1240,7 @@ class SimCpu:
         return self.insert_zero_bit(self.insert_zero_bit(number, small), big)
 
     def swap_qubit_amps(self, qb1, qb2):
-        num_task = self.total_num_amps >> 2
+        num_task = self.num_amps_per_rank >> 2
         for this_task in range(num_task):
             ind00 = self.insert_two_zero_bits(this_task, qb1, qb2)
             ind01 = self.flip_bit(ind00, qb1)
@@ -1258,11 +1257,11 @@ class SimCpu:
     # TODO:need to improve.
     def paulix_local(self, work_real, work_imag, target_qubit):
         """pauli-X"""
-        # jpaulix_local(target_qubit, self.total_num_amps, List(work_real), List(work_imag))
+        # jpaulix_local(target_qubit, self.num_amps_per_rank, List(work_real), List(work_imag))
         size_half_block = 2**target_qubit
         size_block = 2 * size_half_block
 
-        num_task = self.total_num_amps // 2
+        num_task = self.num_amps_per_rank // 2
         for this_task in range(num_task):
             this_block = this_task // size_half_block
             index_up = this_block * size_block + this_task % size_half_block
@@ -1282,7 +1281,7 @@ class SimCpu:
         size_half_block = 2**target_qubit
         size_block = 2 * size_half_block
 
-        num_task = self.total_num_amps // 2
+        num_task = self.num_amps_per_rank // 2
         for this_task in range(num_task):
             this_block = this_task // size_half_block
             index_up = this_block * size_block + this_task % size_half_block
@@ -1298,7 +1297,7 @@ class SimCpu:
             work_imag[index_lo] = conj_fac * state_real_up
 
     def phase_shift_by_term(self, real, imag, target_qubit, term_real, term_imag):
-        state_vec_size = self.total_num_amps
+        state_vec_size = self.num_amps_per_rank
         cos_angle = term_real
         sin_angle = term_imag
         for index in range(state_vec_size):
@@ -1320,7 +1319,7 @@ class SimCpu:
     def calc_inner_product_local(self, bra_real, bra_imag, ket_real, ket_imag):
         inner_prod_real = 0
         inner_prod_imag = 0
-        for index in range(self.total_num_amps):
+        for index in range(self.num_amps_per_rank):
             bra_re = bra_real[index]
             bra_im = bra_imag[index]
             ket_re = ket_real[index]
@@ -1340,9 +1339,9 @@ class SimCpu:
         Returns:
             the expected value of a product of Pauli operators.
         """
-        work_real = [0] * self.total_num_amps
-        work_imag = [0] * self.total_num_amps
-        for i in range(self.total_num_amps):
+        work_real = [0] * self.num_amps_per_rank
+        work_imag = [0] * self.num_amps_per_rank
+        for i in range(self.num_amps_per_rank):
             work_real[i] = self.real[i]
             work_imag[i] = self.imag[i]
         for pauli_op in pauli_prod_list:
