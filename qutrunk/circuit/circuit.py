@@ -182,20 +182,6 @@ class QCircuit:
         """
         return len(self.cmds)
 
-    def set_measure(self, qubit, value):
-        """Store the measure result for target qubit.
-
-        Args:
-            qubit: The index of qubit in qureg.
-            value: The qubit measure value(0 or 1).
-
-        Raises:
-            IndexError: Qubit index must be less than then length of qreg.
-        """
-        if qubit >= len(self.qreg) or qubit < 0:
-            raise IndexError("qubit index out of range.")
-        self.creg[qubit].value = value
-
     def run(self, shots=1):
         """Run quantum circuit through the specified backend and shots.
 
