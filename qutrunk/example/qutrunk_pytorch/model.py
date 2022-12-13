@@ -18,10 +18,10 @@ class HybridFunction(Function):
 
         # expectation_z = ctx.quantum_circuit.run(input[0].tolist())
         # print("input[0].tolist()=" ,input[0].tolist())
-        print("input[0].tolist()=", input[0].tolist())  # [0.042811132967472076]
+        # print("input[0].tolist()=", input[0].tolist())  # [0.042811132967472076]
 
         expectation_z = ctx.quantum_circuit.run(input[0].tolist()[0]) # [0.3]
-        print("expectation_z=", expectation_z)  # [0.5]
+        # print("expectation_z=", expectation_z)  # [0.5]
 
         result = torch.tensor([expectation_z])
         ctx.save_for_backward(input, result)

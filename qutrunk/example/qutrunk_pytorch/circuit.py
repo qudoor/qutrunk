@@ -66,5 +66,5 @@ if __name__ == '__main__':
     # circuit.run({"theta": np.pi})  circuit.run([np.pi])[0]
     # print(f'Expected value for rotation pi= {circuit.run({"theta": np.pi})[0]}')
     print(f'Expected value for rotation pi= {circuit.run(np.pi)[0]}')
-    print(f'Expected value for rotation pi= {circuit.run(1.233)[0]}')
+    print(f'Expected value for rotation pi= {circuit.run(0.233)[0]}')
     # circuit._circuit.draw()

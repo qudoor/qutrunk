@@ -63,6 +63,7 @@ class CR(BasicRotateGate):
         """Overwrite * operator to achieve quantum logic gate operation, reuse __or__ operator implement."""
         self.__or__(qubits)
 
+    # TODO: have some problem.
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
