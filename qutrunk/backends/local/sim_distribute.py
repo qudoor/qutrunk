@@ -66,7 +66,7 @@ class SimDistribute:
         self.sim_cpu = SimCpu()
 
         total_num_amps = 2**num_qubits
-        num_amps_per_rank = total_num_amps//self.env.num_ranks
+        num_amps_per_rank = total_num_amps // self.env.num_ranks
         self.reg.state_vec.real = [0] * num_amps_per_rank
         self.reg.state_vec.imag = [0] * num_amps_per_rank
 
@@ -84,7 +84,7 @@ class SimDistribute:
         self.sim_cpu.imag = self.reg.state_vec.imag
         self.sim_cpu.qubits = self.reg.num_qubits_in_state_vec
         self.sim_cpu.num_amps_per_rank = self.reg.num_amps_per_chunk
-
+    
     def init_zero_state(self):
         """Init zero state"""
         self.__init_blank_state()
@@ -166,12 +166,6 @@ class SimDistribute:
             self.reg.state_vec.real[this_task] = 0
             self.reg.state_vec.real[this_task] = 0
 
-    def measure(self, target):
-        zero_prob = self.__calc_prob_of_outcome(target, 0)
-        outcome, outcome_prob = self.sim_cpu.generate_measure_outcome(zero_prob)
-        self.__collapse_to_know_prob_outcome(target, outcome, outcome_prob)
-        return outcome
-
     def __calc_prob_of_outcome(self, measure_qubit, outcome):
         skip_values_within_rank = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, measure_qubit)
         if skip_values_within_rank:
@@ -207,6 +201,12 @@ class SimDistribute:
                     self.__collapse_to_known_prob_outcome_distributed_renorm(measure_qubit, total_state_prob)
                 else:
                     self.__collapse_to_outcome_distributed_set_zero()
+
+    def measure(self, target):
+        zero_prob = self.__calc_prob_of_outcome(target, 0)
+        outcome, outcome_prob = self.sim_cpu.generate_measure_outcome(zero_prob)
+        self.__collapse_to_know_prob_outcome(target, outcome, outcome_prob)
+        return outcome
 
     def hadamard(self, target_qubit):
         # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
@@ -262,3 +262,73 @@ class SimDistribute:
             if control_bit:
                 state_vec_out.real[this_task] = state_vec_in.real[this_task]
                 state_vec_out.imag[this_task] = state_vec_in.imag[this_task]
+
+    def phase_shift(self, target, angle):
+        """Shift the phase between |0> and |1> of a single qubit by a given angle.
+
+        Args:
+            target: qubit to undergo a phase shift.
+            angle:  amount by which to shift the phase in radians.
+        """
+        self.sim_cpu.phase_shift(target, angle)
+
+    def controlled_phase_shift(self, ctrl, target, angle):
+        """
+        Controlled-Phase gate.
+
+        Args:
+            ctrl: control qubit
+            target: target qubit
+            angle: amount by which to shift the phase in radians.
+        """
+        self.sim_cpu.controlled_phase_shift(ctrl, target, angle)
+
+    def rotate(self, target, ureal, uimag):
+        """Rotate gate."""
+        self.__apply_matrix2(target, ureal, uimag)
+
+    def __apply_matrix2(self, target_qubit, ureal, uimag):
+        # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
+        use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_qubit)
+        rot1 = complex()
+        rot2 = complex()
+        if use_local_data_only:
+            # all values required to update state vector lie in this rank
+            self.sim_cpu.apply_matrix2(target_qubit, ureal, uimag)
+        else:
+            # need to get corresponding chunk of state vector from other rank
+            rank_isupper = self.__exchange_state()
+            self.__get_rot_angle_from_unitary_matrix(rank_isupper, rot1, rot2, ureal, uimag)
+
+            # this rank's values are either in the upper of lower half of the block. 
+            # send values to compactUnitaryDistributed in the correct order
+            if rank_isupper:
+                self.__apply_matrix2_distributed(rot1, rot2, self.reg.state_vec, self.reg.pair_state_vec, self.reg.state_vec)
+            else:
+                self.__apply_matrix2_distributed(rot1, rot2, self.reg.pair_state_vec, self.reg.state_vec, self.reg.state_vec)
+
+    def __get_rot_angle_from_unitary_matrix(self, rank_isupper, rot1, rot2, ureal, uimag):
+        if rank_isupper:
+            rot1.real = ureal[0][0]
+            rot1.imag = uimag[0][0]
+            rot2.real = ureal[0][1]
+            rot2.imag = uimag[0][1]
+        else:
+            rot1.real = ureal[1][0]
+            rot1.imag = uimag[1][0]
+            rot2.real = ureal[1][1]
+            rot2.imag = uimag[1][1]
+
+    def __apply_matrix2_distributed(self, rot1, rot2, state_vec_up, state_vec_lo, state_vec_out):
+        for this_task in range(self.reg.num_amps_per_chunk):
+            # store current state vector values in temp variables
+            state_real_up = state_vec_up.real[this_task]
+            state_imag_up = state_vec_up.imag[this_task]
+
+            state_real_lo = state_vec_lo.real[this_task]
+            state_imag_lo = state_vec_lo.imag[this_task]
+
+            state_vec_out[this_task] = rot1.real * state_real_up - rot1.imag * state_imag_up \
+                + rot2.real * state_real_lo - rot2.imag * state_imag_lo
+            state_vec_out[this_task] = rot1.real * state_imag_up + rot1.imag * state_real_up \
+                + rot2.real * state_imag_lo + rot2.imag * state_real_lo
