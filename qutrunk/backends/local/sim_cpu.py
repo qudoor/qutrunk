@@ -51,6 +51,7 @@ class SimCpu:
         self.imag = []
         self.qubits = 0
         self.num_amps_per_rank = 0
+        self.chunk_id = 0
 
     def create_qureg(self, num_qubits):
         """Allocate resource.
@@ -284,7 +285,7 @@ class SimCpu:
             index_up = this_block * size_block + this_task % size_half_block
             index_lo = index_up + size_half_block
 
-            control_bit = self.extract_bit(ctrl, index_up)
+            control_bit = self.extract_bit(ctrl, index_up + self.chunk_id * self.num_amps_per_rank)
             if control_bit:
                 state_real_up = self.real[index_up]
                 state_imag_up = self.imag[index_up]

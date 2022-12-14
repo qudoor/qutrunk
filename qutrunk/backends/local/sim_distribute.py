@@ -90,7 +90,8 @@ class SimDistribute:
         self.sim_cpu.imag = self.reg.state_vec.imag
         self.sim_cpu.qubits = self.reg.num_qubits_in_state_vec
         self.sim_cpu.num_amps_per_rank = self.reg.num_amps_per_chunk
-
+        self.sim_cpu.chunk_id = self.reg.chunk_id
+        
     def init_zero_state(self):
         """Init zero state"""
         self.__init_blank_state()
@@ -218,13 +219,9 @@ class SimDistribute:
             # this rank's values are either in the upper of lower half of the block. send values to hadamardDistributed
             # in the correct order
             if rank_isupper:
-                self.__hadamard_distributed(self.reg.state_vec,  # upper
-                                            self.reg.pair_state_vec,  # lower
-                                            self.reg.state_vec, rank_isupper);  # output
+                self.__hadamard_distributed(self.reg.state_vec, self.reg.pair_state_vec, self.reg.state_vec, rank_isupper)
             else:
-                self.__hadamard_distributed(self.reg.pair_state_vec,  # upper
-                                            self.reg.state_vec,  # lower
-                                            self.reg.state_vec, rank_isupper);  # output
+                self.__hadamard_distributed(self.reg.pair_state_vec, self.reg.state_vec, self.reg.state_vec, rank_isupper)
 
     def __hadamard_distributed(self, state_vec_up, state_vec_lo, state_vec_out, update_upper):
         sign = 1 if update_upper else -1
@@ -548,6 +545,9 @@ class SimDistribute:
         self.__validate_matrix(ureal, uimag, 4, 4)
         self.__validate_multi_qubit_matrix_fits_in_node(2)
         self.__multi_controlled_two_qubit_unitary(0, target_qubit1, target_qubit2, ureal, uimag)
+
+    def apply_matrix4(self, target1, target2, ureal, uimag):
+        self.__apply_matrix4(target1, target2, ureal, uimag)
 
     def rotate_x(self, target, angle):
         """rx gate."""
