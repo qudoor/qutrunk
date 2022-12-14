@@ -549,3 +549,154 @@ class SimDistribute:
         self.__validate_matrix(ureal, uimag, 4, 4)
         self.__validate_multi_qubit_matrix_fits_in_node(2)
         self.__multi_controlled_two_qubit_unitary(0, target_qubit1, target_qubit2, ureal, uimag)
+
+    def rotate_x(self, target, angle):
+        """rx gate."""
+        unit_axis = [1, 0, 0]
+        self.rotate_around_axis(target, angle, unit_axis)
+
+    def rotate_y(self, target, angle):
+        """ry gate."""
+        unit_axis = [0, 1, 0]
+        self.rotate_around_axis(target, angle, unit_axis)
+    
+    def rotate_z(self, target, angle):
+        """rz gate."""
+        unit_axis = [0, 0, 1]
+        self.rotate_around_axis(target, angle, unit_axis)
+
+    def rotate_around_axis(self, target_bit, angle, unit_axis):
+        mag = math.sqrt(
+            unit_axis[0] * unit_axis[0]
+            + unit_axis[1] * unit_axis[1]
+            + unit_axis[2] * unit_axis[2]
+        )
+        unit_vec = [unit_axis[0] / mag, unit_axis[1] / mag, unit_axis[2] / mag]
+
+        rot1 = complex()
+        rot2 = complex()
+        alpha = complex()
+        beta = complex()
+
+        alpha.real = math.cos(angle / 2.0)
+        alpha.imag = -math.sin(angle / 2.0) * unit_vec[2]
+        beta.real = math.sin(angle / 2.0) * unit_vec[1]
+        beta.imag = -math.sin(angle / 2.0) * unit_vec[0]
+
+        # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
+        use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_bit)
+        
+        # rank's chunk is in upper half of block 
+        if use_local_data_only:
+            # all values required to update state vector lie in this rank
+            self.sim_cpu.rotate_around_axis(target_bit, angle, unit_axis)
+        else:
+            # need to get corresponding chunk of state vector from other rank
+            rank_isupper = self.__exchange_state()
+            self.__get_rot_angle(rank_isupper, rot1, rot2, alpha, beta)
+
+            # this rank's values are either in the upper of lower half of the block. 
+            # send values to compactUnitaryDistributed in the correct order
+            if rank_isupper:
+                self.__rotate_around_axis_distributed(rot1, rot2, self.reg.state_vec, self.reg.pair_state_vec, self.reg.state_vec)
+            else:
+                self.__rotate_around_axis_distributed(rot1, rot2, self.reg.pair_state_vec, self.reg.state_vec, self.reg.state_vec)
+
+    def __get_rot_angle(rank_isupper, rot1, rot2, alpha, beta):
+        if rank_isupper:
+            rot1.real = alpha.real
+            rot1.imag = alpha.imag
+            rot2.real = -beta.real
+            rot2.imag = -beta.imag
+        else:
+            rot1.real = beta.real
+            rot1.imag = beta.imag
+            rot2.real = alpha.real
+            rot2.imag = alpha.imag
+
+    def __rotate_around_axis_distributed(self, rot1, rot2, state_vec_up, state_vec_lo, state_vec_out):
+        for this_task in range(self.reg.num_amps_per_chunk):
+            # store current state vector values in temp variables
+            state_real_up = state_vec_up.real[this_task]
+            state_imag_up = state_vec_up.imag[this_task]
+
+            state_real_lo = state_vec_lo.real[this_task]
+            state_imag_lo = state_vec_lo.imag[this_task]
+
+            state_vec_out.real[this_task] = rot1.real * state_real_up - rot1.imag * state_imag_up + rot2.real * state_real_lo + rot2.imag * state_imag_lo
+            state_vec_out.imag[this_task] = rot1.real * state_imag_up + rot1.imag * state_real_up + rot2.real * state_imag_lo - rot2.imag * state_real_lo
+
+    def pauli_x(self, target_bit):
+        """The single-qubit Pauli-X gate."""
+        # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
+        use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_bit)
+        # rank's chunk is in upper half of block 
+        if use_local_data_only:
+            # all values required to update state vector lie in this rank
+            self.sim_cpu.pauli_x()
+        else:
+            # need to get corresponding chunk of state vector from other rank
+            self.__exchange_state()
+            # this rank's values are either in the upper of lower half of the block. pauliX just replaces
+            # this rank's values with pair values
+            self.__pauliX_distributed(self.reg.pair_state_vec, self.reg.state_vec)
+
+    def __pauliX_distributed(self, stateVecIn, stateVecOut):
+        for this_task in range(self.reg.num_amps_per_chunk):
+            stateVecOut.real[this_task] = stateVecIn.real[this_task]
+            stateVecOut.imag[this_task] = stateVecIn.imag[this_task]
+
+    def pauli_y(self, target_bit):
+        """The single-qubit Pauli-Y gate."""
+        conj_fac = 1
+
+        # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
+        use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_bit)
+        if use_local_data_only:
+            self.sim_cpu.pauli_y()
+        else:
+            # need to get corresponding chunk of state vector from other rank
+            rank_isupper = self.__exchange_state()
+            # this rank's values are either in the upper of lower half of the block
+            self.__pauliY_distributed(self.reg.pair_state_vec, self.reg.state_vec, rank_isupper, conj_fac)
+
+    def __pauliY_distributed(self, stateVecIn, stateVecOut, update_upper, conj_fac):
+        real_sign = 1
+        imag_sign = 1
+        if update_upper:
+            imag_sign = -1
+        else:
+            real_sign = -1
+
+        for this_task in range(self.reg.num_amps_per_chunk):
+            stateVecOut.real[this_task] = conj_fac * real_sign * stateVecIn.imag[this_task]
+            stateVecOut.imag[this_task] = conj_fac * imag_sign * stateVecIn.real[this_task]
+
+    def pauli_z(self, target):
+        """The single-qubit Pauli-Z gate."""
+        real = -1
+        imag = 0
+        self.__phase_shift_by_term(target, real, imag)
+
+    def s_gate(self, target):
+        """The single-qubit S gate."""
+        real = 0
+        imag = 1
+        self.__phase_shift_by_term(target, real, imag)
+
+    def t_gate(self, target):
+        """The single-qubit T gate."""
+        real = 1 / math.sqrt(2)
+        imag = 1 / math.sqrt(2)
+        self.__phase_shift_by_term(target, real, imag)
+
+    def __phase_shift_by_term(self, target_qubit, real, imag):
+        for index in range(self.reg.num_amps_per_chunk):
+            # update the coeff of the |1> state of the target qubit
+            target_bit = self.sim_cpu.extract_bit(target_qubit, index + self.reg.chunk_id * self.reg.num_amps_per_chunk)
+            if target_bit:
+                state_real_lo = self.reg.state_vec.real[index]
+                state_imag_lo = self.reg.state_vec.imag[index]
+                
+                self.reg.state_vec.real[index] = real * state_real_lo - imag * state_imag_lo
+                self.reg.state_vec.imag[index] = imag*state_real_lo + real * state_imag_lo;  
