@@ -6,4 +6,4 @@ from .qusprout import BackendQuSprout
 # from .braket import BackendAWSLocal, BackendAWSDevice
 from .qusaas import BackendQuSaas
 from .ibm import BackendIBM
-from .result import MeasureQubit, MeasureQubits, MeasureCount, MeasureResult
+from .result import MeasureQubits, MeasureResult
