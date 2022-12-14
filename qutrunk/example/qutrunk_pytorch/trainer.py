@@ -1,5 +1,7 @@
 import torch.optim as optim
 import torch.nn as nn
+from matplotlib import pyplot as plt
+
 from qutrunk.example.qutrunk_pytorch.model import Net
 from qutrunk.example.qutrunk_pytorch.dataset import train_loader
 
@@ -29,5 +31,14 @@ for epoch in range(epochs):
         total_loss.append(loss.item())
 
     loss_list.append(sum(total_loss) / len(total_loss))
-    print('Training [{:.0f}%]\tLoss: {:.4f}'.format(
-        100. * (epoch + 1) / epochs, loss_list[-1]))
+    print(
+        "Training [{:.0f}%]\tLoss: {:.4f}".format(
+            100.0 * (epoch + 1) / epochs, loss_list[-1]
+        )
+    )
+
+plt.plot(loss_list)
+plt.title("Hybrid NN Training Convergence")
+plt.xlabel("Training Iterations")
+plt.ylabel("Neg Log Likelihood Loss")
+plt.show()

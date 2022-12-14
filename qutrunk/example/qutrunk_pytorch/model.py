@@ -15,14 +15,7 @@ class HybridFunction(Function):
         """ Forward pass computation """
         ctx.shift = shift
         ctx.quantum_circuit = quantum_circuit
-
-        # expectation_z = ctx.quantum_circuit.run(input[0].tolist())
-        # print("input[0].tolist()=" ,input[0].tolist())
-        # print("input[0].tolist()=", input[0].tolist())  # [0.042811132967472076]
-
-        expectation_z = ctx.quantum_circuit.run(input[0].tolist()[0]) # [0.3]
-        # print("expectation_z=", expectation_z)  # [0.5]
-
+        expectation_z = ctx.quantum_circuit.run(input[0].tolist()[0])
         result = torch.tensor([expectation_z])
         ctx.save_for_backward(input, result)
 
@@ -40,13 +33,7 @@ class HybridFunction(Function):
         gradients = []
         for i in range(len(input_list)):
             expectation_right = ctx.quantum_circuit.run(shift_right[i][0])
-            # TODO: 一直是0.6
             expectation_left = ctx.quantum_circuit.run(shift_left[i][0])
-            # print("expectation_right: " + str(expectation_right))
-            # print("expectation_left: " + str(expectation_left))
-
-            # expectation_right = ctx.quantum_circuit.run({"theta": shift_right[i]})
-            # expectation_left = ctx.quantum_circuit.run({"theta": shift_left[i]})
             gradient = torch.tensor([expectation_right]) - torch.tensor([expectation_left])
             gradients.append(gradient)
         gradients = np.array([gradients]).T
@@ -56,19 +43,16 @@ class HybridFunction(Function):
 class Hybrid(nn.Module):
     """ Hybrid quantum - classical layer definition """
 
-    def __init__(self, backend, shots, shift):
+    def __init__(self, shift):
         super(Hybrid, self).__init__()
-        # TODO:2
-        self.quantum_circuit = QuantumCircuit(1, backend, shots)
+        self.quantum_circuit = QuantumCircuit()
         self.shift = shift
 
     def forward(self, input):
-        # TODO:4
         return HybridFunction.apply(input, self.quantum_circuit, self.shift)
 
 
 class Net(nn.Module):
-
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 6, kernel_size=5)
@@ -76,8 +60,7 @@ class Net(nn.Module):
         self.dropout = nn.Dropout2d()
         self.fc1 = nn.Linear(256, 64)
         self.fc2 = nn.Linear(64, 1)
-        # TODO:1
-        self.hybrid = Hybrid(None, 10, np.pi / 2)
+        self.hybrid = Hybrid(shift=np.pi / 2)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
