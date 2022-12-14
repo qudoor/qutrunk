@@ -190,7 +190,7 @@ class BackendQuSprout(Backend):
             self.circuit.counter.finish()
 
         if res.base.code != 0:
-            raise Exception("Circuit run failed.")
+            raise Exception(f"Circuit run failed, {res.base.msg}")
 
         result = MeasureResult()
         if (
@@ -251,6 +251,34 @@ class BackendQuSprout(Backend):
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res
+
+    def get_rand(self, length, cnt=1):
+        """
+        generate random number by QuDoor RandomCard integrated in QuSprout
+
+        Args:
+            length: length of the random number
+            cnt: amount of random number
+
+        Examples:
+            .. code-block:: python
+
+                from qutrunk.backends import BackendQuSprout
+
+                be = BackendQuSprout(ip='your QuBox ip', port=9091)
+                rands = be.get_rand(21, 2)
+                print(rands)
+
+        Returns:
+            list of random numbers
+
+        """
+        res = self._api_server.get_rand(length, cnt)
+
+        if res.base.code != 0:
+            raise Exception(f"get_rand failed, {res.base.msg}")
+
+        return res.randoms
 
     @property
     def name(self):
