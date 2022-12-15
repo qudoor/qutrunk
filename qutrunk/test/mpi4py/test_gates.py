@@ -1,5 +1,8 @@
+import sys
+import trace
+
 from qutrunk.circuit import QCircuit
-from qutrunk.circuit.gates import H, Swap
+from qutrunk.circuit.gates import H, Swap, Sdg
 
 
 def test_swap():
@@ -7,15 +10,18 @@ def test_swap():
     qr = cir.allocate(2)
     H * qr[0]
 
-    # print(cir.get_statevector())
-
     Swap * (qr[0], qr[1])
 
     print(cir.get_statevector())
 
 
-import sys
-import trace
+def test_sdg():
+    cir = QCircuit()
+    qr = cir.allocate(1)
+    H * qr[0]
+    Sdg * qr[0]
+    print(cir.get_statevector())
+
 
 # define Trace object: trace line numbers at runtime, exclude some modules
 tracer = trace.Trace(
@@ -31,4 +37,4 @@ tracer = trace.Trace(
 # redirect to a different file for each processes
 # sys.stdout = open('trace_{:04d}.txt'.format(COMM_WORLD.rank), 'w')
 
-tracer.runfunc(test_swap)
+tracer.runfunc(test_sdg)

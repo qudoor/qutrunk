@@ -291,18 +291,18 @@ class SimDistribute:
     def __apply_matrix2(self, target_qubit, ureal, uimag):
         # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
         use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_qubit)
-        rot1 = complex()
-        rot2 = complex()
+
         if use_local_data_only:
             # all values required to update state vector lie in this rank
             self.sim_cpu.apply_matrix2(target_qubit, ureal, uimag)
         else:
             # need to get corresponding chunk of state vector from other rank
             rank_isupper = self.__chunk_isupper(self.reg.chunk_id, self.reg.num_amps_per_chunk, target_qubit)
-            self.__get_rot_angle_from_unitary_matrix(rank_isupper, rot1, rot2, ureal, uimag)
+            rot1, rot2 = self.__get_rot_angle_from_unitary_matrix(rank_isupper, ureal, uimag)
 
             pair_rank = self.__get_chunk_pair_id(rank_isupper, self.reg.chunk_id, self.reg.num_amps_per_chunk, target_qubit)
-            self.__exchange_state(pair_rank)
+            print(rank_isupper, self.reg.chunk_id, pair_rank, self.reg.num_amps_per_chunk, target_qubit)
+            self.__exchange_state_vectors(pair_rank)
 
             # this rank's values are either in the upper of lower half of the block.
             # send values to compactUnitaryDistributed in the correct order
@@ -313,17 +313,14 @@ class SimDistribute:
                 self.__apply_matrix2_distributed(rot1, rot2, self.reg.pair_state_vec, self.reg.state_vec,
                                                  self.reg.state_vec)
 
-    def __get_rot_angle_from_unitary_matrix(self, rank_isupper, rot1, rot2, ureal, uimag):
+    def __get_rot_angle_from_unitary_matrix(self, rank_isupper, ureal, uimag):
         if rank_isupper:
-            rot1.real = ureal[0][0]
-            rot1.imag = uimag[0][0]
-            rot2.real = ureal[0][1]
-            rot2.imag = uimag[0][1]
+            rot1 = complex(ureal[0][0], uimag[0][0])
+            rot2 = complex(ureal[0][1], uimag[0][1])
         else:
-            rot1.real = ureal[1][0]
-            rot1.imag = uimag[1][0]
-            rot2.real = ureal[1][1]
-            rot2.imag = uimag[1][1]
+            rot1 = complex(ureal[1][0], uimag[1][0])
+            rot2 = complex(ureal[1][1], uimag[1][1])
+        return rot1, rot2
 
     def __apply_matrix2_distributed(self, rot1, rot2, state_vec_up, state_vec_lo, state_vec_out):
         for this_task in range(self.reg.num_amps_per_chunk):
@@ -334,9 +331,9 @@ class SimDistribute:
             state_real_lo = state_vec_lo.real[this_task]
             state_imag_lo = state_vec_lo.imag[this_task]
 
-            state_vec_out[this_task] = rot1.real * state_real_up - rot1.imag * state_imag_up \
+            state_vec_out.real[this_task] = rot1.real * state_real_up - rot1.imag * state_imag_up \
                                        + rot2.real * state_real_lo - rot2.imag * state_imag_lo
-            state_vec_out[this_task] = rot1.real * state_imag_up + rot1.imag * state_real_up \
+            state_vec_out.imag[this_task] = rot1.real * state_imag_up + rot1.imag * state_real_up \
                                        + rot2.real * state_imag_lo + rot2.imag * state_real_lo
 
     def __validate_target(self, target_qubit: Union[int, list]):
