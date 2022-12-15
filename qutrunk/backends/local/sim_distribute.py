@@ -349,6 +349,14 @@ class SimDistribute:
         if len(ureal) != row_num or len(ureal[0]) != column_num or len(uimag) != row_num or len(uimag[0]) != column_num:
             raise ValueError("expected arrary length of ureal or uimag")
 
+    def __validate_numamps(self, start_ind: int, numamps: int):
+        if start_ind < 0 or start_ind >= self.reg.num_qubits_in_state_vec:
+            raise ValueError("Invalid state index. Must be >=0 and <2^numQubits.") 
+        if numamps < 0 or numamps > self.reg.num_amps_total:
+            raise ValueError("Invalid number of amplitudes. Must be >=0 and <=2^numQubits.") 
+        if numamps + start_ind > self.reg.num_amps_total:
+            raise ValueError("More amplitudes given than exist in the statevector from the given starting index.") 
+                
     def __mask_contains_bit(self, mask: int, bit_ind: int):
         return mask & (1 << bit_ind)
 
@@ -845,44 +853,76 @@ class SimDistribute:
             else:
                 self.__controlled_unitary_distributed(control_qubit, rot1, rot2, self.reg.pair_state_vec, self.reg.state_vec)
     
-    def __controlled_two_qubit_unitary(self, control_qubit: int, target_qubit1: int, target_qubit2: int, ureal, uimage):
+    def __controlled_two_qubit_unitary(self, control_qubit: int, target_qubit1: int, target_qubit2: int, ureal, uimag):
         ctrl_mask = 1 << control_qubit
-        self.__multi_controlled_two_qubit_unitary(ctrl_mask, target_qubit1, target_qubit2, ureal, uimage)
+        self.__multi_controlled_two_qubit_unitary(ctrl_mask, target_qubit1, target_qubit2, ureal, uimag)
         
     def z1(self, target: int, ureal, uimag):
+        self.__validate_target(target)
+        self.__validate_matrix(ureal, uimag, 2, 2)
         self.__apply_matrix2(target, ureal, uimag)
 
     def cu1(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
+        self.__validate_target(target_qubit1)
+        self.__validate_target(target_qubit2)
+        self.__validate_matrix(ureal, uimag, 4, 4)
         self.__apply_matrix4(target_qubit1, target_qubit2, ureal, uimag)
 
     def cu3(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
+        self.__validate_target(target_qubit1)
+        self.__validate_target(target_qubit2)
+        self.__validate_matrix(ureal, uimag, 4, 4)
         self.__apply_matrix4(target_qubit1, target_qubit2, ureal, uimag)
         
     def cu(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
+        self.__validate_target(target_qubit1)
+        self.__validate_target(target_qubit2)
+        self.__validate_matrix(ureal, uimag, 4, 4)
         self.__apply_matrix4(target_qubit1, target_qubit2, ureal, uimag)
         
     def cr(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
+        self.__validate_target(target_qubit1)
+        self.__validate_target(target_qubit2)
+        self.__validate_matrix(ureal, uimag, 4, 4)
         self.__apply_matrix4(target_qubit1, target_qubit2, ureal, uimag)
 
     def iswap(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
+        self.__validate_target(target_qubit1)
+        self.__validate_target(target_qubit2)
+        self.__validate_matrix(ureal, uimag, 4, 4)
         self.__apply_matrix4(target_qubit1, target_qubit2, ureal, uimag)
         
     def sqrtx(self, target: int, ureal, uimag):
+        self.__validate_target(target)
+        self.__validate_matrix(ureal, uimag, 2, 2)
         self.__apply_matrix2(target, ureal, uimag)
 
-    def ch(self, control_qubit: int, target_qubit: int, ureal, uimage):
-        self.__controlled_unitary(control_qubit, target_qubit, ureal, uimage)
+    def ch(self, control_qubit: int, target_qubit: int, ureal, uimag):
+        self.__validate_target(control_qubit)
+        self.__validate_target(target_qubit)
+        self.__validate_matrix(ureal, uimag, 2, 2)
+        self.__controlled_unitary(control_qubit, target_qubit, ureal, uimag)
         
     def sqrtxdg(self, target: int, ureal, uimag):
+        self.__validate_target(target)
+        self.__validate_matrix(ureal, uimag, 2, 2)
         self.__apply_matrix2(target, ureal, uimag)
      
-    def csqrtx(self, control_qubit: int, target_qubit: int, ureal, uimage):
-        self.__controlled_unitary(control_qubit, target_qubit, ureal, uimage)
+    def csqrtx(self, control_qubit: int, target_qubit: int, ureal, uimag):
+        self.__validate_target(control_qubit)
+        self.__validate_target(target_qubit)
+        self.__validate_matrix(ureal, uimag, 2, 2)
+        self.__controlled_unitary(control_qubit, target_qubit, ureal, uimag)
            
-    def cswap(self, control_qubit: int, target_qubit1: int, target_qubit2: int, ureal, uimage):
-        self.__controlled_two_qubit_unitary(control_qubit, target_qubit1, target_qubit2, ureal, uimage)
+    def cswap(self, control_qubit: int, target_qubit1: int, target_qubit2: int, ureal, uimag):
+        self.__validate_target(control_qubit)
+        self.__validate_target(target_qubit1)
+        self.__validate_target(target_qubit2)
+        self.__validate_matrix(ureal, uimag, 4, 4)
+        self.__controlled_two_qubit_unitary(control_qubit, target_qubit1, target_qubit2, ureal, uimag)
         
     def amp(self, reals, imags, startindex: int, numamps: int):
+        self.__validate_numamps(startindex, numamps)
         # this is actually distributed, since the user's code runs on every node
         # local start/end indices of the given amplitudes, assuming they fit in this chunk
         # these may be negative or above reg.num_amps_per_chunk
