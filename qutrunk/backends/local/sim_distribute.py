@@ -133,6 +133,7 @@ class SimDistribute:
         return rank_isupper
 
     def __exchange_state_vectors(self, pair_rank):
+        # print(self.reg.chunk_id, self.reg.state_vec.real, self.reg.state_vec.imag)
         self.reg.pair_state_vec = self.comm.sendrecv(self.reg.state_vec, pair_rank, source=pair_rank)
 
     def __is_chunk_to_skip_in_find_prob_zero(self, chunk_id, chunk_size, measure_qubit):
@@ -146,7 +147,7 @@ class SimDistribute:
         total_prob = 0.0
         for this_task in range(self.reg.num_amps_per_chunk):
             total_prob += self.reg.state_vec.real[this_task] * self.reg.state_vec.real[this_task] + \
-                         self.reg.state_vec.imag[this_task] * self.reg.state_vec.imag[this_task]
+                          self.reg.state_vec.imag[this_task] * self.reg.state_vec.imag[this_task]
 
         return total_prob
 
@@ -166,7 +167,8 @@ class SimDistribute:
         if skip_values_within_rank:
             state_prob = self.sim_cpu.find_prob_of_zero(measure_qubit)
         else:
-            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk, measure_qubit):
+            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk,
+                                                             measure_qubit):
                 state_prob = self.__find_Prob_of_zero_distributed()
             else:
                 state_prob = 0
@@ -185,7 +187,8 @@ class SimDistribute:
         if skip_values_within_rank:
             self.sim_cpu.collapse_to_know_prob_outcome(measure_qubit, outcome, total_state_prob)
         else:
-            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk, measure_qubit):
+            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk,
+                                                             measure_qubit):
                 # chunk has amps for q=0
                 if outcome == 0:
                     self.__collapse_to_known_prob_outcome_distributed_renorm(measure_qubit, total_state_prob)
@@ -219,9 +222,13 @@ class SimDistribute:
             # this rank's values are either in the upper of lower half of the block. send values to hadamardDistributed
             # in the correct order
             if rank_isupper:
-                self.__hadamard_distributed(self.reg.state_vec, self.reg.pair_state_vec, self.reg.state_vec, rank_isupper)
+                self.__hadamard_distributed(self.reg.state_vec,  # upper
+                                            self.reg.pair_state_vec,  # lower
+                                            self.reg.state_vec, rank_isupper);  # output
             else:
-                self.__hadamard_distributed(self.reg.pair_state_vec, self.reg.state_vec, self.reg.state_vec, rank_isupper)
+                self.__hadamard_distributed(self.reg.pair_state_vec,  # upper
+                                            self.reg.state_vec,  # lower
+                                            self.reg.state_vec, rank_isupper);  # output
 
     def __hadamard_distributed(self, state_vec_up, state_vec_lo, state_vec_out, update_upper):
         sign = 1 if update_upper else -1
@@ -251,7 +258,8 @@ class SimDistribute:
 
     def __controlled_not_distributed(self, control_qubit, state_vec_in, state_vec_out):
         for this_task in range(self.reg.num_amps_per_chunk):
-            control_bit = self.sim_cpu.extract_bit(control_qubit, this_task + self.reg.chunk_id * self.reg.num_amps_per_chunk)
+            control_bit = self.sim_cpu.extract_bit(control_qubit,
+                                                   this_task + self.reg.chunk_id * self.reg.num_amps_per_chunk)
             if control_bit:
                 state_vec_out.real[this_task] = state_vec_in.real[this_task]
                 state_vec_out.imag[this_task] = state_vec_in.imag[this_task]
@@ -350,12 +358,12 @@ class SimDistribute:
 
     def __validate_numamps(self, start_ind: int, numamps: int):
         if start_ind < 0 or start_ind >= self.reg.num_qubits_in_state_vec:
-            raise ValueError("Invalid state index. Must be >=0 and <2^numQubits.") 
+            raise ValueError("Invalid state index. Must be >=0 and <2^numQubits.")
         if numamps < 0 or numamps > self.reg.num_amps_total:
-            raise ValueError("Invalid number of amplitudes. Must be >=0 and <=2^numQubits.") 
+            raise ValueError("Invalid number of amplitudes. Must be >=0 and <=2^numQubits.")
         if numamps + start_ind > self.reg.num_amps_total:
-            raise ValueError("More amplitudes given than exist in the statevector from the given starting index.") 
-                
+            raise ValueError("More amplitudes given than exist in the statevector from the given starting index.")
+
     def __mask_contains_bit(self, mask: int, bit_ind: int):
         return mask & (1 << bit_ind)
 
@@ -778,17 +786,17 @@ class SimDistribute:
                 state = str(real) + ", " + str(imag)
                 state_list.append(state)
         return state_list
-         
+
     def __controlled_unitary_local(self, control_qubit: int, target_qubit: int, ureal, uimag):
         num_tasks = self.reg.num_amps_per_chunk >> 1
         size_half_block = 1 << target_qubit
         size_block = 2 * size_half_block
         for this_task in range(num_tasks):
             this_block = this_task / size_half_block
-            index_up = this_block*size_block + this_task%size_half_block
+            index_up = this_block * size_block + this_task % size_half_block
             index_lo = index_up + size_half_block
 
-            control_bit = self.__extract_bit(control_qubit, index_up+self.reg.chunk_id*self.reg.num_amps_per_chunk)
+            control_bit = self.__extract_bit(control_qubit, index_up + self.reg.chunk_id * self.reg.num_amps_per_chunk)
             if control_bit:
                 # store current state vector values in temp variables
                 state_real_up = self.reg.state_vec.real[index_up]
@@ -798,28 +806,33 @@ class SimDistribute:
                 state_imag_lo = self.reg.state_vec.imag[index_lo]
 
                 # state[index_up] = u00 * state[index_up] + u01 * state[index_lo]
-                self.reg.state_vec.real[index_up] = ureal[0][0]*state_real_up -uimag[0][0]*state_imag_Up + ureal[0][1]*state_real_lo - uimag[0][1]*state_imag_lo
-                self.reg.state_vec.imag[index_up] = ureal[0][0]*state_imag_Up + uimag[0][0]*state_real_up + ureal[0][1]*state_imag_lo + uimag[0][1]*state_real_lo
+                self.reg.state_vec.real[index_up] = ureal[0][0] * state_real_up - uimag[0][0] * state_imag_Up + \
+                                                    ureal[0][1] * state_real_lo - uimag[0][1] * state_imag_lo
+                self.reg.state_vec.imag[index_up] = ureal[0][0] * state_imag_Up + uimag[0][0] * state_real_up + \
+                                                    ureal[0][1] * state_imag_lo + uimag[0][1] * state_real_lo
 
                 # state[index_lo] = u10  * state[index_up] + u11 * state[index_lo]
-                self.reg.state_vec.real[index_lo] = ureal[1][0]*state_real_up  - uimag[1][0]*state_imag_Up + ureal[1][1]*state_real_lo - uimag[1][1]*state_imag_lo
-                self.reg.state_vec.imag[index_lo] = ureal[1][0]*state_imag_Up + uimag[1][0]*state_real_up + ureal[1][1]*state_imag_lo + uimag[1][1]*state_real_lo
+                self.reg.state_vec.real[index_lo] = ureal[1][0] * state_real_up - uimag[1][0] * state_imag_Up + \
+                                                    ureal[1][1] * state_real_lo - uimag[1][1] * state_imag_lo
+                self.reg.state_vec.imag[index_lo] = ureal[1][0] * state_imag_Up + uimag[1][0] * state_real_up + \
+                                                    ureal[1][1] * state_imag_lo + uimag[1][1] * state_real_lo
 
     def __get_rot_angle_grom_unitary_matrix(self, chunk_is_upper: int, rot1: complex, rot2: complex, ureal, uimag):
         if chunk_is_upper:
-            rot1.real=ureal[0][0]
-            rot1.imag=uimag[0][0]
-            rot2.real=ureal[0][1]
-            rot2.imag=uimag[0][1]
+            rot1.real = ureal[0][0]
+            rot1.imag = uimag[0][0]
+            rot2.real = ureal[0][1]
+            rot2.imag = uimag[0][1]
         else:
-            rot1.real=ureal[1][0]
-            rot1.imag=uimag[1][0]
-            rot2.real=ureal[1][1]
-            rot2.imag=uimag[1][1]
-        
-    def __controlled_unitary_distributed(self, control_qubit: int, rot1: complex, rot2: complex, state_vec_up: StateVec, state_vec_lo: StateVec):
+            rot1.real = ureal[1][0]
+            rot1.imag = uimag[1][0]
+            rot2.real = ureal[1][1]
+            rot2.imag = uimag[1][1]
+
+    def __controlled_unitary_distributed(self, control_qubit: int, rot1: complex, rot2: complex, state_vec_up: StateVec,
+                                         state_vec_lo: StateVec):
         for this_task in range(self.reg.num_amps_per_chunk):
-            control_bit = self.__extract_bit(control_qubit, this_task+self.reg.chunk_id*self.reg.num_amps_per_chunk)
+            control_bit = self.__extract_bit(control_qubit, this_task + self.reg.chunk_id * self.reg.num_amps_per_chunk)
             if control_bit:
                 # store current state vector values in temp variables
                 stateRealUp = state_vec_up.real[this_task]
@@ -828,9 +841,11 @@ class SimDistribute:
                 stateRealLo = state_vec_lo.real[this_task]
                 stateImagLo = state_vec_lo.imag[this_task]
 
-                self.reg.state_vec.real[this_task] = rot1.real*stateRealUp - rot1.imag*stateImagUp + rot2.real*stateRealLo - rot2.imag*stateImagLo
-                self.reg.state_vec.imag[this_task] = rot1.real*stateImagUp + rot1.imag*stateRealUp + rot2.real*stateImagLo + rot2.imag*stateRealLo
-            
+                self.reg.state_vec.real[
+                    this_task] = rot1.real * stateRealUp - rot1.imag * stateImagUp + rot2.real * stateRealLo - rot2.imag * stateImagLo
+                self.reg.state_vec.imag[
+                    this_task] = rot1.real * stateImagUp + rot1.imag * stateRealUp + rot2.real * stateImagLo + rot2.imag * stateRealLo
+
     def __controlled_unitary(self, control_qubit: int, target_qubit: int, ureal, uimag):
         use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_qubit)
         rot1 = complex()
@@ -842,20 +857,23 @@ class SimDistribute:
             # need to get corresponding chunk of state vector from other rank
             rank_is_upper = self.__chunk_isupper(self.reg.chunk_id, self.reg.num_amps_per_chunk, target_qubit)
             self.__get_rot_angle_grom_unitary_matrix(rank_is_upper, rot1, rot2, ureal, uimag)
-            pair_rank = self.__get_chunk_pair_id(rank_is_upper, self.reg.chunk_id, self.reg.num_amps_per_chunk, target_qubit)
+            pair_rank = self.__get_chunk_pair_id(rank_is_upper, self.reg.chunk_id, self.reg.num_amps_per_chunk,
+                                                 target_qubit)
             # get corresponding values from my pair
             self.__exchange_state_vectors(pair_rank)
 
             # this rank's values are either in the upper of lower half of the block. send values to controlledUnitaryDistributed in the correct order
             if rank_is_upper:
-                self.__controlled_unitary_distributed(control_qubit, rot1, rot2, self.reg.state_vec, self.reg.pair_state_vec)
+                self.__controlled_unitary_distributed(control_qubit, rot1, rot2, self.reg.state_vec,
+                                                      self.reg.pair_state_vec)
             else:
-                self.__controlled_unitary_distributed(control_qubit, rot1, rot2, self.reg.pair_state_vec, self.reg.state_vec)
-    
+                self.__controlled_unitary_distributed(control_qubit, rot1, rot2, self.reg.pair_state_vec,
+                                                      self.reg.state_vec)
+
     def __controlled_two_qubit_unitary(self, control_qubit: int, target_qubit1: int, target_qubit2: int, ureal, uimag):
         ctrl_mask = 1 << control_qubit
         self.__multi_controlled_two_qubit_unitary(ctrl_mask, target_qubit1, target_qubit2, ureal, uimag)
-        
+
     def z1(self, target: int, ureal, uimag):
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
@@ -872,13 +890,13 @@ class SimDistribute:
         self.__validate_target(target_qubit2)
         self.__validate_matrix(ureal, uimag, 4, 4)
         self.__apply_matrix4(target_qubit1, target_qubit2, ureal, uimag)
-        
+
     def cu(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
         self.__validate_target(target_qubit1)
         self.__validate_target(target_qubit2)
         self.__validate_matrix(ureal, uimag, 4, 4)
         self.__apply_matrix4(target_qubit1, target_qubit2, ureal, uimag)
-        
+
     def cr(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
         self.__validate_target(target_qubit1)
         self.__validate_target(target_qubit2)
@@ -890,7 +908,7 @@ class SimDistribute:
         self.__validate_target(target_qubit2)
         self.__validate_matrix(ureal, uimag, 4, 4)
         self.__apply_matrix4(target_qubit1, target_qubit2, ureal, uimag)
-        
+
     def sqrtx(self, target: int, ureal, uimag):
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
@@ -901,45 +919,231 @@ class SimDistribute:
         self.__validate_target(target_qubit)
         self.__validate_matrix(ureal, uimag, 2, 2)
         self.__controlled_unitary(control_qubit, target_qubit, ureal, uimag)
-        
+
     def sqrtxdg(self, target: int, ureal, uimag):
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
         self.__apply_matrix2(target, ureal, uimag)
-     
+
     def csqrtx(self, control_qubit: int, target_qubit: int, ureal, uimag):
         self.__validate_target(control_qubit)
         self.__validate_target(target_qubit)
         self.__validate_matrix(ureal, uimag, 2, 2)
         self.__controlled_unitary(control_qubit, target_qubit, ureal, uimag)
-           
+
     def cswap(self, control_qubit: int, target_qubit1: int, target_qubit2: int, ureal, uimag):
         self.__validate_target(control_qubit)
         self.__validate_target(target_qubit1)
         self.__validate_target(target_qubit2)
         self.__validate_matrix(ureal, uimag, 4, 4)
         self.__controlled_two_qubit_unitary(control_qubit, target_qubit1, target_qubit2, ureal, uimag)
-        
+
     def amp(self, reals, imags, startindex: int, numamps: int):
         self.__validate_numamps(startindex, numamps)
         # this is actually distributed, since the user's code runs on every node
         # local start/end indices of the given amplitudes, assuming they fit in this chunk
         # these may be negative or above reg.num_amps_per_chunk
-        local_start_ind = startindex - self.reg.chunk_id*self.reg.num_amps_per_chunk
+        local_start_ind = startindex - self.reg.chunk_id * self.reg.num_amps_per_chunk
         local_end_ind = local_start_ind + numamps
-        
+
         # add this to a local index to get corresponding elem in reals & imags
-        offset = self.reg.chunk_id*self.reg.num_amps_per_chunk - startindex
-        
+        offset = self.reg.chunk_id * self.reg.num_amps_per_chunk - startindex
+
         # restrict these indices to fit into this chunk
         if local_start_ind < 0:
             local_start_ind = 0
         if local_end_ind > self.reg.num_amps_per_chunk:
             local_end_ind = self.reg.num_amps_per_chunk
-            
+
         # they may now be out of order = no iterations
         # iterate these local inds - this might involve no iterations
         for index in range(local_start_ind, local_end_ind, 1):
             self.reg.state_vec.real[index] = reals[index + offset]
             self.reg.state_vec.imag[index] = imags[index + offset]
-        
+
+    def sdg(self, target_bit, ureal, uimag):
+        self.__apply_matrix2(target_bit, ureal, uimag)
+
+    def tdg(self, target_bit, ureal, uimag):
+        self.__apply_matrix2(target_bit, ureal, uimag)
+
+    def sqrtswap(self, target_bit0, target_bit1, ureal, uimag):
+        self.__apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+
+    def multi_controlled_multi_qubit_not(self, ctrl_qbs, ctrl_cnt, targ_qbs, tar_cnt):
+        ctrl_mask = self.sim_cpu.get_qubit_bit_mask(ctrl_qbs, ctrl_cnt)
+        targ_mask = self.sim_cpu.get_qubit_bit_mask(targ_qbs, tar_cnt)
+
+        first_idx = self.reg.chunk_id * self.reg.num_amps_per_chunk
+
+        if (first_idx | ctrl_mask) - first_idx >= self.reg.num_amps_per_chunk:
+            return
+
+        pair_idx = first_idx ^ targ_mask
+        pair_rank = pair_idx / self.reg.num_amps_per_chunk
+
+        use_local_data_only = (pair_rank == self.reg.chunk_id)
+
+        if use_local_data_only:
+            self.sim_cpu.multi_controlled_multi_qubit_not(ctrl_qbs, ctrl_cnt, targ_qbs, tar_cnt)
+        else:
+            self.__exchange_state_vectors(pair_rank)
+            self.__multi_controlled_multi_qubit_not_dis(
+                ctrl_mask, targ_mask, self.reg.pair_state_vec, self.reg.state_vec)
+
+    def __multi_controlled_multi_qubit_not_dis(self, ctrl_mask, targ_mask, state_vec_in, state_vec_out):
+        num_amps = self.reg.num_amps_per_chunk
+        global_offset = self.reg.chunk_id * num_amps
+
+        in_real = state_vec_in.real
+        in_imag = state_vec_in.imag
+        out_real = state_vec_out.real
+        out_imag = state_vec_out.imag
+
+        for out_idx in range(num_amps):
+            out_idx_global = out_idx + global_offset
+            if ctrl_mask and (ctrl_mask & out_idx_global) != ctrl_mask:
+                continue
+
+            in_idx_global = out_idx_global ^ targ_mask
+            in_idx = in_idx_global % num_amps
+            out_real[out_idx] = in_real[in_idx]
+            out_imag[out_idx] = in_imag[in_idx]
+
+    def cy(self, ctrl_bit, targ_bit):
+        conj_fac = 1
+
+        use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, targ_bit)
+
+        if use_local_data_only:
+            self.sim_cpu.cy(ctrl_bit, targ_bit)
+        else:
+            rank_isupper = self.__chunk_isupper(self.reg.chunk_id, self.reg.num_amps_per_chunk, targ_bit)
+            pair_rank = self.__get_chunk_pair_id(rank_isupper, self.reg.chunk_id, self.reg.num_amps_per_chunk, targ_bit)
+
+            self.__exchange_state_vectors(pair_rank)
+
+            if rank_isupper:
+                self.__cy_dis(ctrl_bit, self.reg.pair_state_vec, self.reg.state_vec, conj_fac)
+            else:
+                self.__cy_dis(ctrl_bit, self.reg.pair_state_vec, self.reg.state_vec, -conj_fac)
+
+    def __cy_dis(self, ctrl_bit, state_vec_in, state_vec_out, conj_fac):
+        num_tasks = self.reg.num_amps_per_chunk
+        chunk_size = self.reg.num_amps_per_chunk
+        chunk_id = self.reg.chunk_id
+
+        state_vec_real_in = state_vec_in.real
+        state_vec_imag_in = state_vec_in.imag
+        state_vec_real_out = state_vec_out.real
+        state_vec_imag_out = state_vec_out.imag
+
+        for this_task in range(num_tasks):
+            ctrl_bit = self.__extract_bit(ctrl_bit, this_task + chunk_id * chunk_size)
+            if ctrl_bit:
+                state_vec_real_out[this_task] = conj_fac * state_vec_real_in[this_task]
+                state_vec_imag_out[this_task] = conj_fac * -state_vec_imag_in[this_task]
+
+    def cz(self, ctrl_bits, ctrl_cnt):
+        self.sim_cpu.cz(ctrl_bits, ctrl_cnt)
+
+    def u3(self, target_bit, ureal, uimag):
+        self.__apply_matrix2(target_bit, ureal, uimag)
+
+    def u2(self, target_bit, ureal, uimag):
+        self.__apply_matrix2(target_bit, ureal, uimag)
+
+    def u1(self, target_bit, ureal, uimag):
+        self.__apply_matrix2(target_bit, ureal, uimag)
+
+    def crx(self, control_bit, target_bit, angle):
+        unit_axis = [1, 0, 0]
+        self.__controlled_rotate_around_axis(control_bit, target_bit, angle, unit_axis)
+
+    def cry(self, control_bit, target_bit, angle):
+        unit_axis = [0, 1, 0]
+        self.__controlled_rotate_around_axis(control_bit, target_bit, angle, unit_axis)
+
+    def crz(self, control_bit, target_bit, angle):
+        unit_axis = [0, 0, 1]
+        self.__controlled_rotate_around_axis(control_bit, target_bit, angle, unit_axis)
+
+    def __controlled_rotate_around_axis(self, ctrl_bit, targ_bit, angle, axis):
+        use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, targ_bit)
+
+        if use_local_data_only:
+            self.sim_cpu.controlled_rotate_around_axis(ctrl_bit, targ_bit, angle, axis)
+        else:
+            mag = math.sqrt(
+                axis[0] * axis[0]
+                + axis[1] * axis[1]
+                + axis[2] * axis[2]
+            )
+            unit_vec = [axis[0] / mag, axis[1] / mag, axis[2] / mag]
+
+            alpha_real = math.cos(angle / 2.0)
+            alpha_imag = -math.sin(angle / 2.0) * unit_vec[2]
+            beta_real = math.sin(angle / 2.0) * unit_vec[1]
+            beta_imag = -math.sin(angle / 2.0) * unit_vec[0]
+
+            rank_isupper = self.__chunk_isupper(self.reg.chunk_id, self.reg.num_amps_per_chunk, targ_bit)
+            if rank_isupper:
+                rot = [alpha_real, alpha_imag, -beta_real, -beta_imag]
+            else:
+                rot = [beta_real, beta_imag, alpha_real, alpha_imag]
+
+            pair_rank = self.__get_chunk_pair_id(rank_isupper, self.reg.chunk_id, self.reg.num_amps_per_chunk, targ_bit)
+
+            self.__exchange_state_vectors(pair_rank)
+
+            if rank_isupper:
+                self.__controlled_rotate_around_axis_dis(ctrl_bit, rot,
+                                                         self.reg.state_vec,  # upper
+                                                         self.reg.pair_state_vec,  # lower
+                                                         self.reg.state_vec)  # output
+            else:
+                self.__controlled_rotate_around_axis_dis(ctrl_bit, rot,
+                                                         self.reg.pair_state_vec,  # upper
+                                                         self.reg.state_vec,  # lower
+                                                         self.reg.state_vec)  # output
+
+    def __controlled_rotate_around_axis_dis(self, ctrl_bit, rot, state_vec_up, state_vec_lo, state_vec_out):
+        num_tasks = self.reg.num_amps_per_chunk
+        chunk_size = self.reg.num_amps_per_chunk
+        chunk_id = self.reg.chunk_id
+
+        rot1_real = rot[0]
+        rot1_imag = rot[1]
+        rot2_real = rot[2]
+        rot2_imag = rot[3]
+
+        state_vec_real_up = state_vec_up.real
+        state_vec_image_up = state_vec_up.imag
+        state_vec_real_lo = state_vec_lo.real
+        state_vec_imag_lo = state_vec_lo.imag
+        state_vec_real_out = state_vec_out.real
+        state_vec_imag_out = state_vec_out.imag
+
+        for this_task in range(num_tasks):
+            ctrl_bit = self.__extract_bit(ctrl_bit, this_task + chunk_id * chunk_size)
+            if ctrl_bit:
+                state_real_up = state_vec_real_up[this_task]
+                state_imag_up = state_vec_image_up[this_task]
+
+                state_real_lo = state_vec_real_lo[this_task]
+                state_imag_lo = state_vec_imag_lo[this_task]
+
+                state_vec_real_out[this_task] = (rot1_real * state_real_up - rot1_imag * state_imag_up +
+                                                 rot2_real * state_real_lo + rot2_imag * state_imag_lo)
+                state_vec_imag_out[this_task] = (rot1_real * state_imag_up + rot1_imag * state_real_up +
+                                                 rot2_real * state_imag_lo - rot2_imag * state_real_lo)
+
+    def x1(self, target, ureal, uimag):
+        self.__validate_target(target)
+        self.__validate_matrix(ureal, uimag, 2, 2)
+        self.__apply_matrix2(target, ureal, uimag)
+
+    def y1(self, target, ureal, uimag):
+        self.__validate_target(target)
+        self.__validate_matrix(ureal, uimag, 2, 2)
+        self.__apply_matrix2(target, ureal, uimag)
