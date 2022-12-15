@@ -106,9 +106,12 @@ class SimDistribute:
             self.reg.state_vec.real[i] = 0.0
             self.reg.state_vec.imag[i] = 0.0
 
-    def __half_matrix_block_fits_in_chunk(self, chunkSize, target_qubit):
+    def __half_matrix_block_fits_in_chunk(self, chunk_size, target_qubit):
         size_half_block = (1 << target_qubit)
-        return 1 if chunkSize > size_half_block else 0
+        if chunk_size > size_half_block:
+            return 1
+        else:
+            return 0
 
     def __chunk_isupper(self, chunk_id, chunk_size, target_qubit):
         size_half_block = 1 << target_qubit
@@ -145,8 +148,7 @@ class SimDistribute:
     def __find_Prob_of_zero_distributed(self):
         total_prob = 0.0
         for this_task in range(self.reg.num_amps_per_chunk):
-            total_prob += self.reg.state_vec.real[this_task] * self.reg.state_vec.real[this_task] + \
-                         self.reg.state_vec.imag[this_task] * self.reg.state_vec.imag[this_task]
+            total_prob += (self.reg.state_vec.real[this_task] * self.reg.state_vec.real[this_task] + self.reg.state_vec.imag[this_task] * self.reg.state_vec.imag[this_task])
 
         return total_prob
 
@@ -159,7 +161,7 @@ class SimDistribute:
     def __collapse_to_outcome_distributed_set_zero(self):
         for this_task in range(self.reg.num_amps_per_chunk):
             self.reg.state_vec.real[this_task] = 0
-            self.reg.state_vec.real[this_task] = 0
+            self.reg.state_vec.imag[this_task] = 0
 
     def __calc_prob_of_outcome(self, measure_qubit, outcome):
         skip_values_within_rank = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, measure_qubit)
@@ -171,11 +173,7 @@ class SimDistribute:
             else:
                 state_prob = 0
 
-        state_prob_buffer = numpy.zeros(1, dtype='float')
-        total_state_prob_buffer = numpy.zeros(1, dtype='float')
-        state_prob_buffer[0] = state_prob
-        self.comm.Allreduce(state_prob_buffer, total_state_prob_buffer)
-        total_state_prob = total_state_prob_buffer[0]
+        total_state_prob = self.comm.allreduce(state_prob)
         if outcome == 1:
             total_state_prob = 1.0 - total_state_prob
         return total_state_prob
@@ -643,7 +641,7 @@ class SimDistribute:
         # rank's chunk is in upper half of block
         if use_local_data_only:
             # all values required to update state vector lie in this rank
-            self.sim_cpu.pauli_x()
+            self.sim_cpu.pauli_x(target_bit)
         else:
             # need to get corresponding chunk of state vector from other rank
             self.__exchange_state()
