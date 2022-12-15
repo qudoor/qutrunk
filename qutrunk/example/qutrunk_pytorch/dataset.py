@@ -4,6 +4,7 @@ import torch
 from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 
+# train dataset
 # Concentrating on the first 100 samples
 n_samples = 100
 
@@ -17,10 +18,9 @@ idx = np.append(np.where(X_train.targets == 0)[0][:n_samples],
 X_train.data = X_train.data[idx]
 X_train.targets = X_train.targets[idx]
 
-# 训练数据集
 train_loader = torch.utils.data.DataLoader(X_train, batch_size=1, shuffle=True)
 
-# 测试数据集
+# test dataset
 n_samples = 50
 
 X_test = datasets.MNIST(root='./data', train=False, download=True,
