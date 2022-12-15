@@ -133,7 +133,7 @@ class SimDistribute:
         return rank_isupper
 
     def __exchange_state_vectors(self, pair_rank):
-        self.reg.pair_state_vec = self.comm.sendrecv(self.reg.state_vec, pair_rank)
+        self.reg.pair_state_vec = self.comm.sendrecv(self.reg.state_vec, pair_rank, source=pair_rank)
 
     def __is_chunk_to_skip_in_find_prob_zero(self, chunk_id, chunk_size, measure_qubit):
         size_half_block = 1 << measure_qubit
