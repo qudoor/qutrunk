@@ -298,8 +298,11 @@ class SimDistribute:
             self.sim_cpu.apply_matrix2(target_qubit, ureal, uimag)
         else:
             # need to get corresponding chunk of state vector from other rank
-            rank_isupper = self.__exchange_state()
+            rank_isupper = self.__chunk_isupper(self.reg.chunk_id, self.reg.num_amps_per_chunk, target_qubit)
             self.__get_rot_angle_from_unitary_matrix(rank_isupper, rot1, rot2, ureal, uimag)
+
+            pair_rank = self.__get_chunk_pair_id(rank_isupper, self.reg.chunk_id, self.reg.num_amps_per_chunk, target_qubit)
+            self.__exchange_state(pair_rank)
 
             # this rank's values are either in the upper of lower half of the block.
             # send values to compactUnitaryDistributed in the correct order
