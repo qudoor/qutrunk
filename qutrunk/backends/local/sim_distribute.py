@@ -299,7 +299,6 @@ class SimDistribute:
             rot1, rot2 = self.__get_rot_angle_from_unitary_matrix(rank_isupper, ureal, uimag)
 
             pair_rank = self.__get_chunk_pair_id(rank_isupper, self.reg.chunk_id, self.reg.num_amps_per_chunk, target_qubit)
-            print(rank_isupper, self.reg.chunk_id, pair_rank, self.reg.num_amps_per_chunk, target_qubit)
             self.__exchange_state_vectors(pair_rank)
 
             # this rank's values are either in the upper of lower half of the block.
@@ -375,7 +374,7 @@ class SimDistribute:
         return self.sim_cpu.insert_two_zero_bits(number, bit1, bit2)
 
     def __extract_bit(self, ctrl: int, index: int):
-        return self.sim_cpu.__extract_bit(ctrl, index)
+        return self.sim_cpu.extract_bit(ctrl, index)
 
     def __is_odd_parity(self, number: int, qb1: int, qb2: int):
         return self.__extract_bit(qb1, number) != self.__extract_bit(qb2, number)
@@ -1039,8 +1038,8 @@ class SimDistribute:
         for this_task in range(num_tasks):
             ctrl_bit = self.__extract_bit(ctrl_bit, this_task + chunk_id * chunk_size)
             if ctrl_bit:
-                state_vec_real_out[this_task] = conj_fac * state_vec_real_in[this_task]
-                state_vec_imag_out[this_task] = conj_fac * -state_vec_imag_in[this_task]
+                state_vec_real_out[this_task] = conj_fac * state_vec_imag_in[this_task]
+                state_vec_imag_out[this_task] = conj_fac * -state_vec_real_in[this_task]
 
     def cz(self, ctrl_bits, ctrl_cnt):
         self.sim_cpu.cz(ctrl_bits, ctrl_cnt)
