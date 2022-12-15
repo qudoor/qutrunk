@@ -91,7 +91,7 @@ class SimDistribute:
         self.sim_cpu.qubits = self.reg.num_qubits_in_state_vec
         self.sim_cpu.num_amps_per_rank = self.reg.num_amps_per_chunk
         self.sim_cpu.chunk_id = self.reg.chunk_id
-        
+
     def init_zero_state(self):
         """Init zero state"""
         self.__init_blank_state()
@@ -139,13 +139,13 @@ class SimDistribute:
         size_half_block = 1 << measure_qubit
         num_chunks_to_skip = size_half_block // chunk_size
         # calculate probability by summing over numChunksToSkip, then skipping numChunksToSkip, etc
-        bit_to_check = chunk_id and num_chunks_to_skip
+        bit_to_check = chunk_id & num_chunks_to_skip
         return bit_to_check
 
     def __find_Prob_of_zero_distributed(self):
         total_prob = 0.0
         for this_task in range(self.reg.num_amps_per_chunk):
-            total_prob = total_prob + self.reg.state_vec.real[this_task] * self.reg.state_vec.real[this_task] + \
+            total_prob += self.reg.state_vec.real[this_task] * self.reg.state_vec.real[this_task] + \
                          self.reg.state_vec.imag[this_task] * self.reg.state_vec.imag[this_task]
 
         return total_prob
@@ -166,14 +166,14 @@ class SimDistribute:
         if skip_values_within_rank:
             state_prob = self.sim_cpu.find_prob_of_zero(measure_qubit)
         else:
-            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk,
-                                                             measure_qubit):
+            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk, measure_qubit):
                 state_prob = self.__find_Prob_of_zero_distributed()
             else:
                 state_prob = 0
 
-        state_prob_buffer = numpy.zeros(1, dtype='float') + state_prob
+        state_prob_buffer = numpy.zeros(1, dtype='float')
         total_state_prob_buffer = numpy.zeros(1, dtype='float')
+        state_prob_buffer[0] = state_prob
         self.comm.Allreduce(state_prob_buffer, total_state_prob_buffer)
         total_state_prob = total_state_prob_buffer[0]
         if outcome == 1:
@@ -185,8 +185,7 @@ class SimDistribute:
         if skip_values_within_rank:
             self.sim_cpu.collapse_to_know_prob_outcome(measure_qubit, outcome, total_state_prob)
         else:
-            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk,
-                                                             measure_qubit):
+            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk, measure_qubit):
                 # chunk has amps for q=0
                 if outcome == 0:
                     self.__collapse_to_known_prob_outcome_distributed_renorm(measure_qubit, total_state_prob)
@@ -210,6 +209,7 @@ class SimDistribute:
         use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_qubit)
 
         # rank's chunk is in upper half of block 
+
         if use_local_data_only:
             # all values required to update state vector lie in this rank
             self.sim_cpu.hadamard(target_qubit)
@@ -251,8 +251,7 @@ class SimDistribute:
 
     def __controlled_not_distributed(self, control_qubit, state_vec_in, state_vec_out):
         for this_task in range(self.reg.num_amps_per_chunk):
-            control_bit = self.sim_cpu.extract_bit(control_qubit,
-                                                   this_task + self.reg.chunk_id * self.reg.num_amps_per_chunk)
+            control_bit = self.sim_cpu.extract_bit(control_qubit, this_task + self.reg.chunk_id * self.reg.num_amps_per_chunk)
             if control_bit:
                 state_vec_out.real[this_task] = state_vec_in.real[this_task]
                 state_vec_out.imag[this_task] = state_vec_in.imag[this_task]
