@@ -175,7 +175,7 @@ class SimDistribute:
             else:
                 state_prob = 0
 
-        total_state_prob = self.comm.allreduce(state_prob)
+        total_state_prob = self.comm.allreduce(state_prob, MPI.SUM)
         if outcome == 1:
             total_state_prob = 1.0 - total_state_prob
         return total_state_prob
@@ -201,7 +201,15 @@ class SimDistribute:
 
     def measure(self, target):
         zero_prob = self.__calc_prob_of_outcome(target, 0)
-        outcome, outcome_prob = self.sim_cpu.generate_measure_outcome(zero_prob)
+        if self.reg.chunk_id == 0:
+            outcome, outcome_prob = self.sim_cpu.generate_measure_outcome(zero_prob)
+        else:
+            outcome = None
+            outcome_prob = None
+
+        outcome = self.comm.bcast(outcome, root=0)
+        outcome_prob = self.comm.bcast(outcome_prob, root=0)
+
         self.__collapse_to_know_prob_outcome(target, outcome, outcome_prob)
         return outcome
 
