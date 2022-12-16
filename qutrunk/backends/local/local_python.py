@@ -117,8 +117,7 @@ class BackendLocalPython:
 
     @timefn
     def get_prob(self, index):
-        """
-        Get the probability of a state-vector at an index in the full state vector.
+        """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
             index: index in state vector of probability amplitudes
@@ -194,15 +193,17 @@ class BackendLocalPython:
             self.result.measures[index].sort()
 
     def h(self, cmd):
-        """the single-qubit Hadamard gate.
+        """The single-qubit Hadamard gate.
 
         Args:
            cmd: the Command object.
         """
+        # TODO: have problem.
         targets_len = len(cmd.targets)
+        # validate
         if targets_len != 1:
             raise LocalBackendError(
-                f"h gate takes exactly one targets argument({targets_len} given)."
+                f"H gate takes exactly one targets argument({targets_len} given)."
             )
 
         self.sim.hadamard(cmd.targets[0])

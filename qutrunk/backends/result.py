@@ -1,4 +1,5 @@
 # TODO: need to improve.
+# TODO: need to improve.
 class MeasureQubits:
     """Measure Result of all qubits.
 
@@ -39,12 +40,12 @@ class MeasureQubits:
 
     def bit_str(self, idxs: set = None):
         """Get the measure result in str format."""
-        bitstr = ""
+        bit_str = ""
         measures = dict(sorted(self.measure.items(), key=lambda x: x[0], reverse=True))
         for key, value in measures.items():
             if idxs is None or key in idxs:
-                bitstr += str(value)
-        return bitstr
+                bit_str += str(value)
+        return bit_str
 
     def add_measure(self, idx: int, value: float):
         """Add the measure result."""
@@ -76,7 +77,7 @@ class MeasureResult:
 
     def get_measure_counts(self, idxs: set = None) -> dict:
         """Get the number of times the measurement results appear."""
-        if len(self.measure_counts) > 0:
+        if self.measure_counts:
             return self.measure_counts
 
         for meas in self.measures:

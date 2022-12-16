@@ -53,6 +53,7 @@ class iSwapGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
+        # TODO: have problem.
         return np.matrix([[1, 0, 0, 0], [0, 0, 1j, 0], [0, 1j, 0, 0], [0, 0, 0, 1]])
 
     def inv(self):

@@ -160,8 +160,7 @@ class Simulator:
 
     # TODO:need to improve.
     def hadamard(self, target):
-        """
-        Apply hadamard gate.
+        """Apply hadamard gate.
 
         Args:
             target: target qubit.
@@ -1006,8 +1005,7 @@ class Simulator:
         return total_prob
 
     def get_prob(self, index):
-        """
-        Get the probability of a state-vector at an index in the full state vector.
+        """Get the probability of a state-vector at an index in the full state vector.
 
         Args:
             index: index in state vector of probability amplitudes
@@ -1020,8 +1018,7 @@ class Simulator:
 
         real = self.real[index]
         imag = self.imag[index]
-        # TODO:doing
-        # print("in pysim=", real * real + imag * imag)
+
         return real * real + imag * imag
 
     def get_probs(self, qubits):

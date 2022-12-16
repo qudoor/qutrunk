@@ -76,7 +76,5 @@ class QPE(Operator):
         Barrier * qreg_second
         IQFT * qreg_first
 
-        # 4 measure qreg_first
-        # All(Measure) * qreg_first
 
 
