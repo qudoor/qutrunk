@@ -654,7 +654,7 @@ class SimDistribute:
             self.sim_cpu.pauli_x(target_bit)
         else:
             # need to get corresponding chunk of state vector from other rank
-            self.__exchange_state()
+            self.__exchange_state(target_bit)
             # this rank's values are either in the upper of lower half of the block. pauliX just replaces
             # this rank's values with pair values
             self.__pauliX_distributed(self.reg.pair_state_vec, self.reg.state_vec)
