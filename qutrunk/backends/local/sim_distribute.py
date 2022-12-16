@@ -5,7 +5,7 @@ from typing import Union
 import numpy
 from mpi4py import MPI
 
-from .sim_local import SimCpu, PauliOpType
+from .sim_local import SimLocal, PauliOpType
 
 REAL_EPS = 1e-13
 
@@ -61,6 +61,7 @@ class SimDistribute:
 
         self.env.rank = self.comm.Get_rank()
         self.env.num_ranks = self.comm.Get_size()
+        #print(self.comm.Get_rank())
 
     def create_qureg(self, num_qubits):
         """Allocate resource.
@@ -69,7 +70,7 @@ class SimDistribute:
             num_qubits: number of qubits
         """
         self.reg = Reg()
-        self.sim_cpu = SimCpu()
+        self.sim_cpu = SimLocal()
 
         total_num_amps = 2 ** num_qubits
         num_amps_per_rank = total_num_amps // self.env.num_ranks
@@ -845,18 +846,6 @@ class SimDistribute:
                 self.reg.state_vec.imag[index_lo] = ureal[1][0] * state_imag_Up + uimag[1][0] * state_real_up + \
                                                     ureal[1][1] * state_imag_lo + uimag[1][1] * state_real_lo
 
-    def __get_rot_angle_grom_unitary_matrix(self, chunk_is_upper: int, rot1: complex, rot2: complex, ureal, uimag):
-        if chunk_is_upper:
-            rot1.real = ureal[0][0]
-            rot1.imag = uimag[0][0]
-            rot2.real = ureal[0][1]
-            rot2.imag = uimag[0][1]
-        else:
-            rot1.real = ureal[1][0]
-            rot1.imag = uimag[1][0]
-            rot2.real = ureal[1][1]
-            rot2.imag = uimag[1][1]
-
     def __controlled_unitary_distributed(self, control_qubit: int, rot1: complex, rot2: complex, state_vec_up: StateVec,
                                          state_vec_lo: StateVec):
         for this_task in range(self.reg.num_amps_per_chunk):
@@ -884,7 +873,7 @@ class SimDistribute:
         else:
             # need to get corresponding chunk of state vector from other rank
             rank_is_upper = self.__chunk_isupper(self.reg.chunk_id, self.reg.num_amps_per_chunk, target_qubit)
-            self.__get_rot_angle_grom_unitary_matrix(rank_is_upper, rot1, rot2, ureal, uimag)
+            rot1, rot2 = self.__get_rot_angle_from_unitary_matrix(rank_is_upper, ureal, uimag)
             pair_rank = self.__get_chunk_pair_id(rank_is_upper, self.reg.chunk_id, self.reg.num_amps_per_chunk,
                                                  target_qubit)
             # get corresponding values from my pair

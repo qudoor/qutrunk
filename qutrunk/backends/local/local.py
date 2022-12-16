@@ -31,10 +31,11 @@ class BackendLocal(Backend):
             res = qc.run(shots=100)
     """
 
-    def __init__(self):
+    def __init__(self, run_mode: str = "local"):
         super().__init__()
         self.circuit = None
-        self._local_impl = BackendLocalImpl()
+        self.run_mode = run_mode
+        self._local_impl = BackendLocalImpl(self.run_mode)
         self.task_id = uuid.uuid4().hex
 
     def send_circuit(self, circuit, final=False):

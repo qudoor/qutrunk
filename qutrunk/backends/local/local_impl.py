@@ -11,12 +11,12 @@ from numpy import pi
 from qutrunk.backends.result import MeasureQubit, MeasureQubits, MeasureResult
 from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
-from .sim_cpu import SimCpu
-
+from .sim_local import SimLocal
+from .sim_distribute import SimDistribute
 
 class BackendLocalPython:
-    def __init__(self):
-        self.sim = SimCpu()
+    def __init__(self, run_mode):
+        self.sim = SimDistribute() if run_mode == 'mpi' else SimLocal()
         self.gate_map = {
             "H": "h",
             "P": "p",

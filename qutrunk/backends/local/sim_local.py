@@ -40,7 +40,7 @@ class PauliOpType(Enum):
     PAULI_Z = 3
 
 
-class SimCpu:
+class SimLocal:
     """Simulator-cpu implement."""
 
     def __init__(self):
