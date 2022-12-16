@@ -261,7 +261,7 @@ class QCircuit:
         """Get all probabilities of circuit.
 
         Returns:
-            An array contains all probabilities of circuit.
+            A list contains all probabilities of circuit.
         """
         if not hasattr(self.backend, "get_probs"):
             raise NotImplementedError(f"{self.backend.name} not support get_probs method.")
@@ -271,11 +271,12 @@ class QCircuit:
         probs = self.backend.get_probs(qubits)
 
         out_probs = []
-        for i in range(len(probs)):
+        for i, value in enumerate(probs):
             prob = {}
             prob["idx"] = i
             prob["prob"] = probs[i]
             out_probs.append(prob)
+
         return out_probs
 
     def _to_complex(self, state_vector):
@@ -687,6 +688,7 @@ class Result:
             idxs = qreg.get_indexs()
         return self.measure_result.get_bitstrs(idxs)
 
+    # TODO: have some problem with this method.
     def get_values(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result of int."""
         idxs = None

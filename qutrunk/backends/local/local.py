@@ -53,6 +53,7 @@ class BackendLocal(Backend):
                 self.circuit.counter.acc_run_time(elapsed)
 
         res, elapsed = self._local_impl.send_circuit(circuit, final)
+
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
 
@@ -77,16 +78,16 @@ class BackendLocal(Backend):
             self.circuit.counter.finish()
         return res
 
-    def get_prob(self, index):
-        """Get the probability of a state-vector at an index in the full state vector.
+    def get_prob(self, value):
+        """Get probability of the possible measure result of circuit.
 
         Args:
-            index: Index in state vector of probability amplitudes.
+            value: The target value.
 
         Returns:
             float:The probability of target index.
         """
-        res, elapsed = self._local_impl.get_prob(index)
+        res, elapsed = self._local_impl.get_prob(value)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res

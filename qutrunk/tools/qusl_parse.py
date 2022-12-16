@@ -7,7 +7,7 @@ import importlib
 
 from qutrunk.exceptions import QuTrunkError
 
-
+# TODO: 明确指定生成目录，将当前目录加入搜索路径
 def _parse(file):
     """Parse QuSL file and generate quantum circuit.
 
