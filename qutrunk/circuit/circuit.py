@@ -688,10 +688,12 @@ class Result:
         idxs = None
         if qreg is not None:
             idxs = qreg.get_indexs()
+        column = -1
         for ms in self.measure_result.measures:
             measures.append(ms.simplify(idxs))
-        array_step = len(measures)
-        return np.array(measures).reshape(-1, array_step)
+            column = len(measures[0])
+        row = len(measures)
+        return np.array(measures).reshape(row, column)
 
     def get_bitstrs(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result in binary format."""
@@ -718,8 +720,8 @@ class Result:
         if qreg is not None:
             idxs = qreg.get_indexs()
         measure_counts = self.measure_result.get_measure_counts(idxs)
-        for out in measure_counts:
-            res.append({out.bitstr: out.count})
+        for key, value in measure_counts.items():
+            res.append({key: value})
         return json.dumps(res)
 
     def running_info(self):
