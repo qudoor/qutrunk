@@ -149,7 +149,9 @@ class MCX(BasicGate):
         if self.ctrl_cnt == 1:
             return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
 
-        # todo: get matrix when ctrl_cnt > 1
+        if self.ctrl_cnt > 1:
+            from ._utils import compute_control_matrix
+            return compute_control_matrix(X.matrix, self.ctrl_cnt)
 
     def inv(self):
         """Apply inverse gate."""

@@ -4,7 +4,7 @@ This module contains utility functions for circuits.
 
 import numpy as np
 
-def _compute_control_matrix(base_mat, num_ctrl_qubits):
+def compute_control_matrix(base_mat, num_ctrl_qubits):
     """
     This function computes the controlled unitary with :math:`n` control qubits
     and :math:`m` target qubits.
@@ -22,10 +22,3 @@ def _compute_control_matrix(base_mat, num_ctrl_qubits):
         + np.kron(mat, base_mat - np.identity(base_mat.shape[0]))
 
     return matrix
-
-
-from qutrunk.circuit.gates import X
-
-print(_compute_control_matrix(X.matrix, 2))
-
-    
