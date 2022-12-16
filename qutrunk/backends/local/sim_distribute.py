@@ -5,7 +5,7 @@ from typing import Union
 import numpy
 from mpi4py import MPI
 
-from .sim_cpu import SimCpu, PauliOpType
+from .sim_local import SimCpu, PauliOpType
 
 REAL_EPS = 1e-13
 
@@ -814,26 +814,6 @@ class SimDistribute:
                 state = str(real) + ", " + str(imag)
                 state_list.append(state)
         return state_list
-
-    # def get_expec_pauli_prod(self, pauli_prod_list):
-    #     work_real = [0] * self.reg.num_amps_per_chunk
-    #     work_imag = [0] * self.reg.num_amps_per_chunk
-    #     for i in range(self.reg.num_amps_per_chunk):
-    #         work_real[i] = self.reg.state_vec.real[i]
-    #         work_imag[i] = self.reg.state_vec.imag[i]
-    #     for pauli_op in pauli_prod_list:
-    #         op_type = pauli_op["oper_type"]
-    #         if op_type == PauliOpType.PAULI_X.value:
-    #             self.pauli_x(work_real, work_imag, pauli_op["target"])
-    #         elif op_type == PauliOpType.PAULI_Y.value:
-    #             self.pauli_y(work_real, work_imag, pauli_op["target"], 1)
-    #         elif op_type == PauliOpType.PAULI_Z.value:
-    #             self.pauli_z(work_real, work_imag, pauli_op["target"])
-
-    #     real, imag = self.calc_inner_product_local(
-    #         work_real, work_imag, self.real, self.imag
-    #     )
-    #     return real
 
     def __controlled_unitary_local(self, control_qubit: int, target_qubit: int, ureal, uimag):
         num_tasks = self.reg.num_amps_per_chunk >> 1
