@@ -5,7 +5,7 @@ from typing import Union
 import numpy
 from mpi4py import MPI
 
-from .sim_cpu import SimCpu
+from .sim_cpu import SimCpu, PauliOpType
 
 REAL_EPS = 1e-13
 
@@ -772,6 +772,34 @@ class SimDistribute:
     def __is_odd_parity(self, number: int, qb1: int, qb2: int):
         return self.sim_cpu.extract_bit(qb1, number) != self.sim_cpu.extract_bit(qb2, number)
 
+    def get_prob(self, index):
+        real = self.__get_real_amp(index)
+        imag = self.__get_imag_Amp(index)
+        return real * real + imag * imag
+
+    def get_probs(self, qubits):
+        outcome_probs = self.sim_cpu.get_probs(qubits)
+        outcome_probs = self.comm.allreduce(outcome_probs, MPI.SUM)
+        return outcome_probs
+
+    def __get_real_amp(self, index):
+        chunk_id = index // self.reg.num_amps_per_chunk
+        el = 0.0
+        if self.reg.chunk_id == chunk_id:
+            el = self.reg.state_vec.real[index - chunk_id * self.reg.num_amps_per_chunk]
+
+        el = self.comm.bcast(el)
+        return el
+
+    def __get_imag_Amp(self, index):
+        chunk_id = index // self.reg.num_amps_per_chunk
+        el = 0.0
+        if self.reg.chunk_id == chunk_id:
+            el = self.reg.state_vec.imag[index - chunk_id * self.reg.num_amps_per_chunk]
+
+        el = self.comm.bcast(el)
+        return el
+
     def get_statevector(self):
         state_vectors = self.comm.allgather(self.reg.state_vec)
         state_list = []
@@ -786,6 +814,26 @@ class SimDistribute:
                 state = str(real) + ", " + str(imag)
                 state_list.append(state)
         return state_list
+
+    # def get_expec_pauli_prod(self, pauli_prod_list):
+    #     work_real = [0] * self.reg.num_amps_per_chunk
+    #     work_imag = [0] * self.reg.num_amps_per_chunk
+    #     for i in range(self.reg.num_amps_per_chunk):
+    #         work_real[i] = self.reg.state_vec.real[i]
+    #         work_imag[i] = self.reg.state_vec.imag[i]
+    #     for pauli_op in pauli_prod_list:
+    #         op_type = pauli_op["oper_type"]
+    #         if op_type == PauliOpType.PAULI_X.value:
+    #             self.pauli_x(work_real, work_imag, pauli_op["target"])
+    #         elif op_type == PauliOpType.PAULI_Y.value:
+    #             self.pauli_y(work_real, work_imag, pauli_op["target"], 1)
+    #         elif op_type == PauliOpType.PAULI_Z.value:
+    #             self.pauli_z(work_real, work_imag, pauli_op["target"])
+
+    #     real, imag = self.calc_inner_product_local(
+    #         work_real, work_imag, self.real, self.imag
+    #     )
+    #     return real
 
     def __controlled_unitary_local(self, control_qubit: int, target_qubit: int, ureal, uimag):
         num_tasks = self.reg.num_amps_per_chunk >> 1

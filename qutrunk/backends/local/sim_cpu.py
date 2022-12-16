@@ -1034,7 +1034,7 @@ class SimCpu:
         for i in range(self.num_amps_per_rank):
             outcome_ind = 0
             for q in range(num_outcome_probs):
-                outcome_ind += self.extract_bit(qubits[q], i) * (2**q)
+                outcome_ind += self.extract_bit(qubits[q], i + self.chunk_id * self.num_amps_per_rank) * (2**q)
 
             real = self.real[i]
             imag = self.imag[i]
