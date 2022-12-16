@@ -1251,7 +1251,7 @@ class SimDistribute:
             if swap_targs[t] != targets[t]:
                 self.__swap_qubit_amps(targets[t], swap_targs[t])
             
-        self.__multi_controlled_multi_qubit_unitary_local(ctrl_mask, swap_targs, num_targs, ureals, uimags)
+        self.__multi_controlled_multi_qubit_unitary_local(ctrl_mask, swap_targs, ureals, uimags)
         
         for t in range(num_targs):
             self.__swap_qubit_amps(targets[t], swap_targs[t])
