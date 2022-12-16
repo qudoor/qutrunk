@@ -671,7 +671,7 @@ class SimDistribute:
         # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
         use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_bit)
         if use_local_data_only:
-            self.sim_cpu.pauli_y()
+            self.sim_cpu.pauli_y(target_bit)
         else:
             # need to get corresponding chunk of state vector from other rank
             rank_isupper = self.__exchange_state()
@@ -1195,3 +1195,91 @@ class SimDistribute:
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
         self.__apply_matrix2(target, ureal, uimag)
+        
+    def __multi_controlled_multi_qubit_unitary_local(self, ctrl_mask: int, targets, ureals, uimags):
+        num_targs = len(targets)
+        num_tasks = self.reg.num_amps_per_chunk >> num_targs
+        num_targ_amps = 1 << num_targs
+        global_ind_start = self.reg.chunk_id*self.reg.num_amps_per_chunk
+        
+        sorted_targs = [0]*num_targs
+        amp_inds = [0]*num_targ_amps
+        re_amps = [0]*num_targ_amps
+        im_amps = [0]*num_targ_amps
+        
+        for t in range(num_targs):
+            sorted_targs[t] = targets[t]
+        sorted_targs.sort()
+        
+        for this_task in range(num_tasks):
+            # find this task's start index (where all targs are 0)
+            this_ind00 = this_task
+            for t in range(num_targs):
+                this_ind00 = self.__insert_zero_bit(this_ind00, sorted_targs[t])
+                
+            # this task only modifies amplitudes if control qubits are 1 for this state
+            this_global_ind00 = this_ind00 + global_ind_start
+            if (ctrl_mask and ((ctrl_mask & this_global_ind00) != ctrl_mask)):
+                continue
+                
+            # determine the indices and record values of this tasks's target amps
+            for i in range(num_targ_amps):
+                # get statevec index of current target qubit assignment
+                ind = this_ind00
+                for t in range(num_targs):
+                    if (self.__extract_bit(t, i)):
+                        ind = self.__flip_bit(ind, targets[t])
+                
+                # update this tasks's private arrays
+                amp_inds[i] = ind
+                re_amps [i] = self.reg.state_vec.real[ind]
+                im_amps [i] = self.reg.state_vec.imag[ind]
+            
+            # modify this tasks's target amplitudes
+            for r in range(num_targ_amps):
+                ind = amp_inds[r]
+                self.reg.state_vec.real[ind] = 0
+                self.reg.state_vec.imag[ind] = 0
+                
+                for c in range(num_targ_amps):
+                    re_elem = ureals[r][c]
+                    im_elem = uimags[r][c]
+                    self.reg.state_vec.real[ind] += re_amps[c]*re_elem - im_amps[c]*im_elem
+                    self.reg.state_vec.imag[ind] += re_amps[c]*im_elem + im_amps[c]*re_elem
+        
+    def __multi_controlled_multi_qubit_unitary(self, ctrl_mask: int, targets, ureals, uimags):
+        num_targs = len(targets)
+        targ_mask = self.sim_cpu.get_qubit_bit_mask(targets, num_targs)
+        free_qb = 0
+        while self.__mask_contains_bit(targ_mask, free_qb):
+            free_qb += 1
+            
+        swap_targs = [0]*num_targs
+        for t in range(num_targs):
+            if self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, targets[t]):
+                swap_targs[t] = targets[t]
+            else:
+                swap_targs[t] = free_qb
+                if self.__mask_contains_bit(ctrl_mask, swap_targs[t]):
+                    ctrl_mask = self.__flip_bit(self.__flip_bit(ctrl_mask, swap_targs[t]), targets[t])
+                    
+                free_qb += 1
+                while self.__mask_contains_bit(targ_mask, free_qb):
+                    free_qb += 1
+                    
+        for t in range(num_targs):
+            if swap_targs[t] != targets[t]:
+                self.__swap_qubit_amps(targets[t], swap_targs[t])
+            
+        self.__multi_controlled_multi_qubit_unitary_local(ctrl_mask, swap_targs, num_targs, ureals, uimags)
+        
+        for t in range(num_targs):
+            self.__swap_qubit_amps(targets[t], swap_targs[t])
+            
+    def __apply_multi_controlled_matrix_n(self, controls, targets, ureals, uimags):
+        num_ctrls = len(controls)
+        ctrl_mask = self.sim_cpu.get_qubit_bit_mask(controls, num_ctrls)
+        self.__multi_controlled_multi_qubit_unitary(ctrl_mask, targets, ureals, uimags)
+        
+    def matrix(self, controls, targets, reals, imags):
+        self.__apply_multi_controlled_matrix_n(controls, targets, reals, imags)
