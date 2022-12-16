@@ -108,10 +108,7 @@ class SimDistribute:
 
     def __half_matrix_block_fits_in_chunk(self, chunk_size, target_qubit):
         size_half_block = (1 << target_qubit)
-        if chunk_size > size_half_block:
-            return 1
-        else:
-            return 0
+        return 1 if (chunk_size > size_half_block) else 0
 
     def __chunk_isupper(self, chunk_id, chunk_size, target_qubit):
         size_half_block = 1 << target_qubit
@@ -140,7 +137,7 @@ class SimDistribute:
         self.reg.pair_state_vec = self.comm.sendrecv(self.reg.state_vec, pair_rank, source=pair_rank)
 
     def __is_chunk_to_skip_in_find_prob_zero(self, chunk_id, chunk_size, measure_qubit):
-        size_half_block = 1 << measure_qubit
+        size_half_block = (1 << measure_qubit)
         num_chunks_to_skip = size_half_block // chunk_size
         # calculate probability by summing over numChunksToSkip, then skipping numChunksToSkip, etc
         bit_to_check = chunk_id & num_chunks_to_skip
@@ -169,8 +166,7 @@ class SimDistribute:
         if skip_values_within_rank:
             state_prob = self.sim_cpu.find_prob_of_zero(measure_qubit)
         else:
-            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk,
-                                                             measure_qubit):
+            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk, measure_qubit):
                 state_prob = self.__find_Prob_of_zero_distributed()
             else:
                 state_prob = 0
@@ -185,8 +181,7 @@ class SimDistribute:
         if skip_values_within_rank:
             self.sim_cpu.collapse_to_know_prob_outcome(measure_qubit, outcome, total_state_prob)
         else:
-            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk,
-                                                             measure_qubit):
+            if not self.__is_chunk_to_skip_in_find_prob_zero(self.reg.chunk_id, self.reg.num_amps_per_chunk, measure_qubit):
                 # chunk has amps for q=0
                 if outcome == 0:
                     self.__collapse_to_known_prob_outcome_distributed_renorm(measure_qubit, total_state_prob)
@@ -230,11 +225,11 @@ class SimDistribute:
             if rank_isupper:
                 self.__hadamard_distributed(self.reg.state_vec,  # upper
                                             self.reg.pair_state_vec,  # lower
-                                            self.reg.state_vec, rank_isupper);  # output
+                                            self.reg.state_vec, rank_isupper)  # output
             else:
                 self.__hadamard_distributed(self.reg.pair_state_vec,  # upper
                                             self.reg.state_vec,  # lower
-                                            self.reg.state_vec, rank_isupper);  # output
+                                            self.reg.state_vec, rank_isupper)  # output
 
     def __hadamard_distributed(self, state_vec_up, state_vec_lo, state_vec_out, update_upper):
         sign = 1 if update_upper else -1
@@ -722,7 +717,7 @@ class SimDistribute:
                 state_imag_lo = self.reg.state_vec.imag[index]
 
                 self.reg.state_vec.real[index] = real * state_real_lo - imag * state_imag_lo
-                self.reg.state_vec.imag[index] = imag * state_real_lo + real * state_imag_lo;
+                self.reg.state_vec.imag[index] = imag * state_real_lo + real * state_imag_lo
 
     def swap(self, qb1: int, qb2: int):
         qb_big = max(qb1, qb2)

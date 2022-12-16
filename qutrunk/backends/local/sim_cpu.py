@@ -1,12 +1,9 @@
 """Implementation of quantum compute simulator for cpu running mode."""
-
-
 import math
 import random
 from enum import Enum
 
 REAL_EPS = 1e-13
-
 
 class BitEncoding(Enum):
     """Bit Encoding"""
@@ -218,8 +215,8 @@ class SimCpu:
         sin_angle = math.sin(angle)
 
         for index in range(state_vec_size):
-            bit1 = self.extract_bit(ctrl, index)
-            bit2 = self.extract_bit(target, index)
+            bit1 = self.extract_bit(ctrl, index + self.chunk_id * self.num_amps_per_rank)
+            bit2 = self.extract_bit(target, index + self.chunk_id * self.num_amps_per_rank)
 
             if bit1 and bit2:
                 state_real_lo = self.real[index]
@@ -948,9 +945,9 @@ class SimCpu:
         elif (1 - zero_prob) < REAL_EPS:
             outcome = 0
         else:
-            outcome = 1 if random.random() > zero_prob else 0
+            outcome = 1 if (random.random() > zero_prob) else 0
 
-        outcome_prob = zero_prob if outcome == 0 else 1 - zero_prob
+        outcome_prob = zero_prob if (outcome == 0) else (1 - zero_prob)
         return outcome, outcome_prob
 
     def collapse_to_know_prob_outcome(self, target, outcome, outcome_prob):
@@ -1302,7 +1299,7 @@ class SimCpu:
         cos_angle = term_real
         sin_angle = term_imag
         for index in range(state_vec_size):
-            target_bit = self.extract_bit(target_qubit, index)
+            target_bit = self.extract_bit(target_qubit, index + self.chunk_id * self.num_amps_per_rank)
             if target_bit:
                 state_real_lo = real[index]
                 state_imag_lo = imag[index]
