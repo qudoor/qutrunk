@@ -567,7 +567,7 @@ class SimDistribute:
         self.__validate_target(target_qubit1)
         self.__validate_target(target_qubit2)
         self.__validate_matrix(ureal, uimag, 4, 4)
-        self.__validate_multi_qubit_matrix_fits_in_node(2)
+        #self.__validate_multi_qubit_matrix_fits_in_node(2)
         self.__multi_controlled_two_qubit_unitary(0, target_qubit1, target_qubit2, ureal, uimag)
 
     def apply_matrix4(self, target1, target2, ureal, uimag):
@@ -596,15 +596,8 @@ class SimDistribute:
         )
         unit_vec = [unit_axis[0] / mag, unit_axis[1] / mag, unit_axis[2] / mag]
 
-        rot1 = complex()
-        rot2 = complex()
-        alpha = complex()
-        beta = complex()
-
-        alpha.real = math.cos(angle / 2.0)
-        alpha.imag = -math.sin(angle / 2.0) * unit_vec[2]
-        beta.real = math.sin(angle / 2.0) * unit_vec[1]
-        beta.imag = -math.sin(angle / 2.0) * unit_vec[0]
+        alpha = complex(math.cos(angle / 2.0), -math.sin(angle / 2.0) * unit_vec[2])
+        beta = complex(math.sin(angle / 2.0) * unit_vec[1], -math.sin(angle / 2.0) * unit_vec[0])
 
         # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
         use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_bit)
@@ -615,8 +608,8 @@ class SimDistribute:
             self.sim_cpu.rotate_around_axis(target_bit, angle, unit_axis)
         else:
             # need to get corresponding chunk of state vector from other rank
-            rank_isupper = self.__exchange_state()
-            self.__get_rot_angle(rank_isupper, rot1, rot2, alpha, beta)
+            rank_isupper = self.__exchange_state(target_bit)
+            rot1, rot2 = self.__get_rot_angle(rank_isupper, alpha, beta)
 
             # this rank's values are either in the upper of lower half of the block.
             # send values to compactUnitaryDistributed in the correct order
@@ -627,17 +620,15 @@ class SimDistribute:
                 self.__rotate_around_axis_distributed(rot1, rot2, self.reg.pair_state_vec, self.reg.state_vec,
                                                       self.reg.state_vec)
 
-    def __get_rot_angle(rank_isupper, rot1, rot2, alpha, beta):
+    def __get_rot_angle(self, rank_isupper, alpha, beta):
         if rank_isupper:
-            rot1.real = alpha.real
-            rot1.imag = alpha.imag
-            rot2.real = -beta.real
-            rot2.imag = -beta.imag
+            rot1 = complex(alpha.real, alpha.imag)
+            rot2 = complex(-beta.real, -beta.imag)
         else:
-            rot1.real = beta.real
-            rot1.imag = beta.imag
-            rot2.real = alpha.real
-            rot2.imag = alpha.imag
+            rot1 = complex(alpha.real, alpha.imag)
+            rot2 = complex(beta.real, beta.imag)
+
+        return rot1, rot2
 
     def __rotate_around_axis_distributed(self, rot1, rot2, state_vec_up, state_vec_lo, state_vec_out):
         for this_task in range(self.reg.num_amps_per_chunk):
@@ -683,7 +674,7 @@ class SimDistribute:
             self.sim_cpu.pauli_y(target_bit)
         else:
             # need to get corresponding chunk of state vector from other rank
-            rank_isupper = self.__exchange_state()
+            rank_isupper = self.__exchange_state(target_bit)
             # this rank's values are either in the upper of lower half of the block
             self.__pauliY_distributed(self.reg.pair_state_vec, self.reg.state_vec, rank_isupper, conj_fac)
 
