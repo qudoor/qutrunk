@@ -8,13 +8,13 @@ from qutrunk.backends import BackendLocal
 
 def test_iswap_gate():
     circuit = QCircuit()
-    qr = circuit.allocate(2)
+    qr = circuit.allocate(3)
     All(H) * qr
     iSwap * (qr[0], qr[1])
     result = np.array(circuit.get_statevector()).reshape(-1, 1)
     
     circuit_mpi = QCircuit(backend=BackendLocal('mpi'))
-    qr_mpi = circuit_mpi.allocate(2)
+    qr_mpi = circuit_mpi.allocate(3)
     All(H) * qr_mpi
     iSwap * (qr_mpi[0], qr_mpi[1])
     result_mpi = np.array(circuit_mpi.get_statevector()).reshape(-1, 1)
