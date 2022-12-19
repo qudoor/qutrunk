@@ -625,8 +625,8 @@ class SimDistribute:
             rot1 = complex(alpha.real, alpha.imag)
             rot2 = complex(-beta.real, -beta.imag)
         else:
-            rot1 = complex(alpha.real, alpha.imag)
-            rot2 = complex(beta.real, beta.imag)
+            rot1 = complex(beta.real, beta.imag)
+            rot2 = complex(alpha.real, alpha.imag)
 
         return rot1, rot2
 
@@ -639,10 +639,8 @@ class SimDistribute:
             state_real_lo = state_vec_lo.real[this_task]
             state_imag_lo = state_vec_lo.imag[this_task]
 
-            state_vec_out.real[
-                this_task] = rot1.real * state_real_up - rot1.imag * state_imag_up + rot2.real * state_real_lo + rot2.imag * state_imag_lo
-            state_vec_out.imag[
-                this_task] = rot1.real * state_imag_up + rot1.imag * state_real_up + rot2.real * state_imag_lo - rot2.imag * state_real_lo
+            state_vec_out.real[this_task] = rot1.real * state_real_up - rot1.imag * state_imag_up + rot2.real * state_real_lo + rot2.imag * state_imag_lo
+            state_vec_out.imag[this_task] = rot1.real * state_imag_up + rot1.imag * state_real_up + rot2.real * state_imag_lo - rot2.imag * state_real_lo
 
     def pauli_x(self, target_bit):
         """The single-qubit Pauli-X gate."""
