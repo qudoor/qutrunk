@@ -567,7 +567,7 @@ class SimDistribute:
         self.__validate_target(target_qubit1)
         self.__validate_target(target_qubit2)
         self.__validate_matrix(ureal, uimag, 4, 4)
-        #self.__validate_multi_qubit_matrix_fits_in_node(2)
+        self.__validate_multi_qubit_matrix_fits_in_node(2)
         self.__multi_controlled_two_qubit_unitary(0, target_qubit1, target_qubit2, ureal, uimag)
 
     def apply_matrix4(self, target1, target2, ureal, uimag):
