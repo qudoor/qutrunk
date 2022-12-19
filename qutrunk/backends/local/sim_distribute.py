@@ -93,6 +93,14 @@ class SimDistribute:
         self.sim_cpu.num_amps_per_rank = self.reg.num_amps_per_chunk
         self.sim_cpu.chunk_id = self.reg.chunk_id
 
+    def create_clone_qureg(self):
+        work = SimDistribute()
+        work.create_qureg(self.reg.num_qubits_in_state_vec)
+        for i in range(self.reg.num_amps_per_chunk):
+            work.reg.state_vec.real[i] =  self.reg.state_vec.real[i]
+            work.reg.state_vec.imag[i] =  self.reg.state_vec.imag[i]
+        return work
+        
     def init_zero_state(self):
         """Init zero state"""
         self.__init_blank_state()
@@ -1252,3 +1260,46 @@ class SimDistribute:
         
     def matrix(self, controls, targets, reals, imags):
         self.__apply_multi_controlled_matrix_n(controls, targets, reals, imags)
+        
+    def __calc_inner_product(self, bra_real, bra_imag, ket_real, ket_imag):
+        local_real, local_imag = self.sim_cpu.calc_inner_product_local(bra_real, bra_imag, ket_real, ket_imag)
+        if self.reg.num_chunks == 1:
+            return (local_real, local_imag)
+        global_real = self.comm.allreduce(sendobj=local_real, op=MPI.SUM)
+        global_imag = self.comm.allreduce(sendobj=local_real, op=MPI.SUM)
+        return (global_real, global_imag)
+    
+    def get_expec_pauli_prod(self, pauli_prod_list):
+        work = self.create_clone_qureg()
+        for pauli_op in pauli_prod_list:
+            op_type = pauli_op["oper_type"]
+            if op_type == PauliOpType.PAULI_X.value:
+                work.pauli_x(pauli_op["target"])
+            elif op_type == PauliOpType.PAULI_Y.value:
+                work.pauli_y(pauli_op["target"])
+            elif op_type == PauliOpType.PAULI_Z.value:
+                work.pauli_z(pauli_op["target"])
+
+        real, imag = self.__calc_inner_product(work.reg.state_vec.real, work.reg.state_vec.imag, self.reg.state_vec.real, self.reg.state_vec.imag)
+        return real
+    
+    def get_expec_pauli_sum(self, oper_type_list, term_coeff_list):
+        num_qb = self.reg.num_qubits_in_state_vec
+        targs = []
+        for q in range(num_qb):
+            targs.append(q)
+
+        value = 0
+        idx = 0
+        num_sum_terms = len(term_coeff_list)
+        for t in range(num_sum_terms):
+            pauli_prod_list = []
+            for i in range(num_qb):
+                temp = {}
+                temp["oper_type"] = oper_type_list[idx]
+                idx += 1
+                temp["target"] = targs[i]
+                pauli_prod_list.append(temp)
+            value += term_coeff_list[t] * self.get_expec_pauli_prod(pauli_prod_list)
+
+        return value
