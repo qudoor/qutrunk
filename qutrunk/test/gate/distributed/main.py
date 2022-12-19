@@ -1,7 +1,7 @@
 import os  
 
 def test_mpi(num_rank):
-    file = 'qutrunk/test/gate/mpi/'
+    file = 'qutrunk/test/gate/distributed/'
 
     for root, dirs, files in os.walk(file):
         if root != file:
