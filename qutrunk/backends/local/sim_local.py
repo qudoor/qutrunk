@@ -352,7 +352,7 @@ class SimLocal:
         state_vec_size = self.num_amps_per_rank
         mask = self.get_qubit_bit_mask(control_bits, num_control_bits)
         for index in range(state_vec_size):
-            if mask == (mask & index):
+            if mask == (mask & (index + self.chunk_id * self.num_amps_per_rank)):
                 self.real[index] = -self.real[index]
                 self.imag[index] = -self.imag[index]
 
