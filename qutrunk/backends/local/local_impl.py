@@ -627,13 +627,9 @@ class BackendLocalPython:
     def cz(self, cmd):
         # inverse is the same
         ctrls = cmd.controls[:]
-
-        # len before extend, or will loss origin ctrl len
-        ctrl_len = len(ctrls)
-
         ctrls.extend(cmd.targets)
 
-        self.sim.cz(ctrls, ctrl_len)
+        self.sim.cz(ctrls, len(ctrls))
 
     def u3(self, cmd):
         if len(cmd.rotation) != 3 or len(cmd.targets) != 1:
