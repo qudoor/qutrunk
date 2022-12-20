@@ -1,4 +1,4 @@
-"""Phase Estimation Example: T-gate"""
+"""Phase Estimation Example: T-gate."""
 
 from math import pi
 
@@ -37,6 +37,7 @@ def run_qpe(backend=None):
 
 if __name__ == "__main__":
     circuit = run_qpe()
+
 
 
 

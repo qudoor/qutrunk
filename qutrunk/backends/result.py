@@ -1,79 +1,60 @@
 # TODO: need to improve.
-class MeasureQubit:
-    """Measure Result Single Qubit.
-
-    Save the result of single measure qubit.
-
-    Args:
-        idx: The index of qubits.
-        value: The index of qubits result.
-    """
-    
-    def __init__(self, idx=0, value=0):
-        self.idx = idx
-        self.value = value
-
-
+# TODO: need to improve.
 class MeasureQubits:
     """Measure Result of all qubits.
 
     Save the all qubits result of measure circuit running.
 
     Args:
-        measure: The measure result of MeasureQubit.
+        measure: 
+            key: The target index of qubits.
+            value: The index of qubits result.
     """
     
     def __init__(self):
-        self.measure = []
+        self.measure = {}
 
     def __getitem__(self, idx):
-        """Return a MeasureQubit instance.
+        """Return a Measure Result instance.
 
         Arg:
-            idx: The index of MeasureQubit.
+            idx: The target index of qubits.
 
         Returns:
-            MeasureQubit instance.
+            The index of qubits result.
 
         Raises:
           ValueError: expected integer index into measure.
         """
         if not isinstance(idx, int):
             raise ValueError("expected integer index into measure")
-        return self.measure[idx]
+        return self.measure.get(idx, None)
 
     def simplify(self, idxs: set = None):
         """Get the measure result in dict format."""
         meas = []
-        for m in self.measure:
-            if idxs is None or m.idx in idxs:
-                meas.append({"idx": m.idx, "val": m.value})
+        for key, value in self.measure.items():
+            if idxs is None or key in idxs:
+                meas.append({"idx": key, "val": value})
         return meas
 
     def bit_str(self, idxs: set = None):
         """Get the measure result in str format."""
-        bitstr = ""
-        for m in self.measure[::-1]:
-            if idxs is None or m.idx in idxs:
-                bitstr += str(m.value)
-        return bitstr
+        bit_str = ""
+        measures = dict(sorted(self.measure.items(), key=lambda x: x[0], reverse=True))
+        for key, value in measures.items():
+            if idxs is None or key in idxs:
+                bit_str += str(value)
+        return bit_str
 
+    def add_measure(self, idx: int, value: float):
+        """Add the measure result."""
+        self.measure[idx] = value
 
-class MeasureCount:
-    """Counts Measure Result data.
-
-    Save the Counts result of measure circuit running.
-
-    Args:
-        bitstr: The str of all qubits.
-        count: The counts of measure result.
-    """
-    
-    def __init__(self, bit_str="", count=0):
-        self.bitstr = bit_str
-        self.count = count
-
-
+    def sort(self):
+        """Add the measure result."""
+        self.measure = dict(sorted(self.measure.items(), key=lambda x: x[0]))
+        
 class MeasureResult:
     """Multi Measure Result data.
 
@@ -81,39 +62,36 @@ class MeasureResult:
 
     Args:
         measures: The measure result of MeasureQubits.
-        measure_counts: The counts measure result of measures.
+        measure_counts: 
+            key: The str of all qubits.
+            value: The counts of measure result.
     """
     
     def __init__(self):
         self.measures = []
-        self.measure_counts = []
+        self.measure_counts = {}
 
     def add_measures(self, measure_qubits: MeasureQubits):
         """add measurement results."""
         self.measures.append(measure_qubits)
 
-    def get_measure_counts(self, idxs: set = None) -> MeasureCount:
+    def get_measure_counts(self, idxs: set = None) -> dict:
         """Get the number of times the measurement results appear."""
-        if len(self.measure_counts) > 0:
+        if self.measure_counts:
             return self.measure_counts
 
-        measure_counts = {}
         for meas in self.measures:
             bitstr = "0b"
-            for mea in meas.measure:
-                if idxs is None or mea.idx in idxs:
-                    bitstr += str(mea.value)
+            for key, value in meas.measure.items():
+                if idxs is None or key in idxs:
+                    bitstr += str(value)
 
-            if bitstr in measure_counts:
-                measure_counts[bitstr] += 1
+            if bitstr in self.measure_counts:
+                self.measure_counts[bitstr] += 1
             else:
-                measure_counts[bitstr] = 1
+                self.measure_counts[bitstr] = 1
 
-        measure_counts = dict(sorted(measure_counts.items(), key=lambda x: x[0]))
-        for bitstr, count in measure_counts.items():
-            mc = MeasureCount(bitstr, count)
-            self.measure_counts.append(mc)
-
+        self.measure_counts = dict(sorted(self.measure_counts.items(), key=lambda x: x[0]))
         return self.measure_counts
 
     def get_bitstrs(self, idxs: set = None):

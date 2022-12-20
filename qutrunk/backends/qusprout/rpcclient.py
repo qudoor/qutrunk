@@ -152,3 +152,30 @@ class QuSproutApiServer:
         )
         res = self._client.getExpecPauliSum(req)
         return res.expect
+
+    def get_rand(self, length, cnt=1):
+        """
+        generate random number by QuDoor RandomCard integrated in QuSprout
+
+        Args:
+            length: length of the random number
+            cnt: amount of random number
+
+        Examples:
+            .. code-block:: python
+
+                from qutrunk.backends import BackendQuSprout
+
+                be = BackendQuSprout(ip='', port=9091)
+                rands = be.get_rand(21, 2)
+                print(rands)
+
+        Returns:
+            list of random numbers
+
+        """
+        req = qusproutdata.GetRandomReq(
+            length, cnt
+        )
+        return self._client.getRandom(req)
+

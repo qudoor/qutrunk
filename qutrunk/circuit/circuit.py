@@ -275,7 +275,7 @@ class QCircuit:
         """Get all probabilities of circuit.
 
         Returns:
-            An array contains all probabilities of circuit.
+            A list contains all probabilities of circuit.
         """
         if not hasattr(self.backend, "get_probs"):
             raise NotImplementedError(f"{self.backend.name} not support get_probs method.")
@@ -285,11 +285,12 @@ class QCircuit:
         probs = self.backend.get_probs(qubits)
 
         out_probs = []
-        for i in range(len(probs)):
+        for i, value in enumerate(probs):
             prob = {}
             prob["idx"] = i
             prob["prob"] = probs[i]
             out_probs.append(prob)
+
         return out_probs
 
     def _to_complex(self, state_vector):
@@ -687,10 +688,12 @@ class Result:
         idxs = None
         if qreg is not None:
             idxs = qreg.get_indexs()
+        column = -1
         for ms in self.measure_result.measures:
             measures.append(ms.simplify(idxs))
-        array_step = len(measures)
-        return np.array(measures).reshape(-1, array_step)
+            column = len(measures[0])
+        row = len(measures)
+        return np.array(measures).reshape(row, column)
 
     def get_bitstrs(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result in binary format."""
@@ -699,6 +702,7 @@ class Result:
             idxs = qreg.get_indexs()
         return self.measure_result.get_bitstrs(idxs)
 
+    # TODO: have some problem with this method.
     def get_values(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result of int."""
         idxs = None
@@ -716,8 +720,8 @@ class Result:
         if qreg is not None:
             idxs = qreg.get_indexs()
         measure_counts = self.measure_result.get_measure_counts(idxs)
-        for out in measure_counts:
-            res.append({out.bitstr: out.count})
+        for key, value in measure_counts.items():
+            res.append({key: value})
         return json.dumps(res)
 
     def running_info(self):

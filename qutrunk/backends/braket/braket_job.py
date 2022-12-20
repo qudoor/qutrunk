@@ -5,7 +5,7 @@ from braket.aws import AwsQuantumTask
 from braket.tasks.local_quantum_task import LocalQuantumTask
 
 from qutrunk.backends import Backend
-from qutrunk.backends.result import MeasureCount, MeasureResult
+from qutrunk.backends.result import MeasureResult
 
 
 class AWSBraketJob:
@@ -52,7 +52,7 @@ class AWSBraketJob:
         counter = self._task.result().measurement_counts
         res = MeasureResult()
         for bs, cnt in dict(counter).items():
-            res.measure_counts.append(MeasureCount(bs, cnt))
+            res.measure_counts[bs] = cnt
         return res
 
     def cancel(self):

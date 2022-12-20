@@ -4,9 +4,16 @@ include "ecode.thrift"
 
 //执行指令的方式
 enum ExecCmdType {
+    //默认值
     ExecTypeDefault = 0,
+
+    //单cpu执行
     ExecTypeCpuSingle = 1,
+
+    //多cpu的mpi执行（只支持单机）
     ExecTypeCpuMpi = 2,
+
+    //单gpu执行（暂时不支持）
     ExecTypeGpuSingle = 3
 }
 
@@ -32,7 +39,7 @@ struct Matrix {
 
     //矩阵虚部
     2: required list<list<double>> imags
-    
+
     //是否为酉矩阵
     3: required bool unitary
 }
@@ -96,7 +103,7 @@ struct MeasureResult {
     1: required list<MeasureQubits> measures
 }
 
-//任务初始化信息
+//初始化量子环境
 struct InitQubitsReq {
     //任务id
     1: required string id
@@ -110,7 +117,7 @@ struct InitQubitsReq {
     //执行指令的方式
     4: optional ExecCmdType exec_type
 
-    //mpi执行的host列表
+    //执行的host列表
     5: optional list<string> hosts
 }
 
@@ -119,7 +126,7 @@ struct InitQubitsResp {
     1: required ecode.BaseCode base
 }
 
-//发送任务
+//添加量子指令
 struct SendCircuitCmdReq {
     //任务id
     1: required string id
@@ -136,7 +143,7 @@ struct SendCircuitCmdResp {
     1: required ecode.BaseCode base
 }
 
-//取消任务
+//释放量子环境
 struct CancelCmdReq {
     //任务id
     1: required string id
@@ -164,7 +171,7 @@ struct GetProbAmpResp {
     2: optional double amp
 }
 
-//获取所有qubit的概率
+//获取组合概率
 struct GetProbOfAllOutcomReq {
     //任务id
     1: required string id
@@ -254,7 +261,7 @@ struct GetExpecPauliSumReq {
     2: required list<PauliOperType> oper_type_list
 
     //回归系数
-    3: optional list<double> term_coeff_list
+    3: required list<double> term_coeff_list
 }
 
 struct GetExpecPauliSumResp {
@@ -263,4 +270,111 @@ struct GetExpecPauliSumResp {
 
     //期望值
     2: optional double expect
+}
+
+//获取随机数卡的信息
+struct GetRandomCardInfoReq {
+
+}
+
+struct GetRandomCardInfoResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //设备数量
+    2: required i32 count
+
+    //驱动版本号
+    3: required i32 driver_version
+
+    //接口库版本号
+    4: required i32 library_version
+
+    //板卡信息
+    5: required list<RandomCardInfo> cards
+}
+
+//板上状态类型
+enum RandomCardStateType {
+    //重复计数状态
+    RANDOM_MC_S0 = 0,
+
+    //适配比例状态
+    RANDOM_MC_S1 = 1,
+
+    //eeprom参数状态
+    RANDOM_EEPROM_S = 2,
+
+    //参数值状态
+    RANDOM_PAR_VALUE_S = 3,
+
+    //校验状态
+    RANDOM_EEPROM_CHECK_S = 4,
+
+    //EEPROM读写状态
+    RANDOM_EEPROM_RW_S = 5,
+
+    //激光器温度状态
+    RANDOM_LD_TEMP_S = 6,
+
+    //板上温度状态
+    RANDOM_BD_TEMP_S = 7,
+
+    //链路状态
+    RANDOM_LINK_S = 8
+}
+
+//板卡信息
+struct RandomCardInfo {
+    //随机数卡编号
+    1: required i32 device_index
+
+    //随机数卡输出方式，0:NONE, 1:NET, 2:USB, 3:PCIE
+    2: required i32 mode
+
+    //激光器温度
+    3: required double ld_temp
+
+    //电路板温度
+    4: required double bd_temp
+
+    //状态,key:RandomCardStateType，value: 0：正常，1：异常
+    5: required map<RandomCardStateType, i32> states 
+}
+
+//设置随机数卡
+struct SetRandomCardReq {
+    //随机数卡编号
+    1: required i32 device_index
+
+    //随机数卡输出方式，0:NONE, 1:NET, 2:USB, 3:PCIE
+    2: optional i32 mode
+
+    //是否复位
+    3: optional bool reset
+}
+
+struct SetRandomCardResp {
+    //返回码
+    1: required ecode.BaseCode base
+}
+
+//获取随机数
+struct GetRandomReq {
+    //随机数的长度
+    1: required i32 random_length
+
+    //随机数的数量
+    2: required i32 random_num
+
+    //指定随机数卡编号
+    3: optional i32 device_index
+}
+
+struct GetRandomResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //随机数，二进制字符串
+    2: required list<binary> randoms
 }
