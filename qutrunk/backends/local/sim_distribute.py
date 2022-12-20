@@ -786,7 +786,7 @@ class SimDistribute:
         if self.reg.chunk_id == chunk_id:
             el = self.reg.state_vec.real[index - chunk_id * self.reg.num_amps_per_chunk]
 
-        el = self.comm.bcast(el)
+        el = self.comm.bcast(el, root=chunk_id)
         return el
 
     def __get_imag_Amp(self, index):
@@ -795,7 +795,7 @@ class SimDistribute:
         if self.reg.chunk_id == chunk_id:
             el = self.reg.state_vec.imag[index - chunk_id * self.reg.num_amps_per_chunk]
 
-        el = self.comm.bcast(el)
+        el = self.comm.bcast(el, root=chunk_id)
         return el
 
     def get_statevector(self):
