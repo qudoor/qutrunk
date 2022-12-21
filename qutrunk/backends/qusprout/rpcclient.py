@@ -19,17 +19,23 @@ class QuSproutApiServer:
     """
 
     def __init__(self, ip="localhost", port=9090):
-        socket = TSocket.TSocket(ip, port)
-        self._transport = TTransport.TBufferedTransport(socket)
-        protocol = TBinaryProtocol.TBinaryProtocol(self._transport)
-        quest = TMultiplexedProtocol.TMultiplexedProtocol(protocol, "QuSproutServer")
-        self._client = QuSproutServer.Client(quest)
+        self._ip = ip
+        self._port = port
+        self._client, self._transport = self.open("QuSproutServer")
         self._taskid = uuid.uuid4().hex
+
+    def open(self, name):
+        socket = TSocket.TSocket(self._ip, self._port)
+        transport = TTransport.TBufferedTransport(socket)
+        protocol = TBinaryProtocol.TBinaryProtocol(transport)
+        protocol = TMultiplexedProtocol.TMultiplexedProtocol(protocol, name)
+        client = QuSproutServer.Client(protocol)
         try:
-            self._transport.open()
+            transport.open()
         except Exception:
             print("QuSprout is not available!")
             os._exit(1)
+        return client, transport
 
     def close(self):
         self._transport.close()
@@ -174,8 +180,11 @@ class QuSproutApiServer:
             list of random numbers
 
         """
+        cl, trs = self.open("QuSproutServerRand")
         req = qusproutdata.GetRandomReq(
             length, cnt
         )
-        return self._client.getRandom(req)
+        res = cl.getRandom(req)
+        trs.close()
+        return res
 
