@@ -25,7 +25,8 @@ QuTrunk 是启科量子自主研发的一款免费、开源、跨平台的量子
 * 修复QuSaas, IBM, Braket后端未实现task_id导致的报错问题;
 * QuSprout后端增加量子随机数接口: get_rand;
 * 新增手写数字识别(QuTrunk+PyTorch)的示例;
-* 新增在aws的hpc集群环境并行计算;
+* 增加多节点并行计算功能，支持量子线路在aws的hpc集群环境并行计算;
+* 增加通用多控制位量子门矩阵计算功能，支持MCX, MCZ矩阵计算;
 
 [Back to Top](#0)
 
