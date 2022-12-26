@@ -496,17 +496,17 @@ class TextDrawing:
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
 
-            gates = self.set_ctrl_state(
-                node, conditional, ctrl_text, bool(controlled_bot)
-            )
+            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+
+            target_qubits = node.qargs[len(node.op.controls):]
+            if len(target_qubits) == 1:
+                gates.append(BoxOnQuWire(node.op.gate.name, conditional=conditional))
+            else:
+                layer.set_qu_multibox(target_qubits, node.op.gate.name, conditional=conditional)
 
             add_connected_gate(node, gates, layer, current_cons)
 
-            target_qubits = node.qargs[len(node.op.controls):]
-            gate_text = "Mat"
-            layer.set_qu_multibox(target_qubits, gate_text, conditional=conditional)
-
-            if gates:
+            if gates and len(target_qubits) > 1:
                 current_cons.append((len(gates), layer.qubit_layer[len(gates)]))
         else:
             raise ValueError(
