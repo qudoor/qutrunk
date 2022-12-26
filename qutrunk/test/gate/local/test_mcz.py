@@ -3,10 +3,10 @@ import numpy as np
 
 from qiskit import QuantumCircuit, BasicAer, transpile
 
-from qutrunk.circuit.gates import Toffoli, MCX, All, H
+from qutrunk.circuit.gates import MCZ, All, H
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Matrix
-from qutrunk.test.gate.backend_fixture import backend, backend_type
+from qutrunk.test.gate.local.backend_fixture import backend, backend_type
 
 class TestCXGate:
     @pytest.fixture
@@ -14,7 +14,7 @@ class TestCXGate:
         circuit = QCircuit(backend=backend)
         qr = circuit.allocate(3)
         All(H) * qr
-        Toffoli * (qr[0], qr[1], qr[2])
+        MCZ(2) * (qr[0], qr[1], qr[2])
         result_gate = np.array(circuit.get_statevector()).reshape(-1, 1)
         return result_gate
 
@@ -22,7 +22,7 @@ class TestCXGate:
         circuit = QCircuit()
         qr = circuit.allocate(3)
         All(Matrix(H.matrix.tolist())) * qr
-        Matrix(MCX(2).matrix.tolist()) * (qr[0], qr[1], qr[2])
+        Matrix(MCZ(2).matrix.tolist()) * (qr[0], qr[1], qr[2])
         result_matrix = np.array(circuit.get_statevector()).reshape(-1, 1)
         assert np.allclose(result_gate, result_matrix)
 
@@ -32,7 +32,7 @@ class TestCXGate:
         qc.h(0)
         qc.h(1)
         qc.h(2)
-        qc.ccx(0, 1, 2)
+        qc.ccz(0, 1, 2)
         job = backend.run(transpile(qc, backend))
         result_qiskit = np.array(job.result().get_statevector(qc)).reshape(-1, 1)
         assert np.allclose(result_gate, result_qiskit)
@@ -42,8 +42,8 @@ class TestCXGate:
         qr = circuit.allocate(3)
         All(H) * qr
         result_src = np.array(circuit.get_statevector()).reshape(-1, 1)
-        Toffoli * (qr[0], qr[1], qr[2])
-        Toffoli.inv() * (qr[0], qr[1], qr[2])
+        MCZ(2) * (qr[0], qr[1], qr[2])
+        MCZ(2).inv() * (qr[0], qr[1], qr[2])
         result_des = np.array(circuit.get_statevector()).reshape(-1, 1)
         assert np.allclose(result_src, result_des)
 
@@ -52,7 +52,7 @@ class TestCXGate:
         qr = circuit.allocate(3)
         All(Matrix(H.matrix.tolist())) * qr
         result_src = np.array(circuit.get_statevector()).reshape(-1, 1)
-        Matrix(MCX(2).matrix.tolist()) * (qr[0], qr[1], qr[2])
-        Matrix(MCX(2).matrix.tolist()).inv() * (qr[0], qr[1], qr[2])
+        Matrix(MCZ(2).matrix.tolist()) * (qr[0], qr[1], qr[2])
+        Matrix(MCZ(2).matrix.tolist()).inv() * (qr[0], qr[1], qr[2])
         result_des = np.array(circuit.get_statevector()).reshape(-1, 1)
         assert np.allclose(result_src, result_des)
