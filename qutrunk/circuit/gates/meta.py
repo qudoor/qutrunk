@@ -90,10 +90,11 @@ class Matrix(BasicGate):
                 Matrix([[0.5, 0.5], [0.5, -0.5]]).ctrl(2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
     """
 
-    def __init__(self, matrix):
+    def __init__(self, matrix, name = None):
         super().__init__()
         self.matrix = matrix
         self.ctrl_cnt = 0
+        self.name = "Mat" if name is None else name
 
     def __str__(self):
         return "Matrix"
@@ -156,7 +157,7 @@ class Matrix(BasicGate):
 
     def inv(self):
         """Apply inverse gate."""
-        gate = Matrix(self.matrix)
+        gate = Matrix(self.matrix, self.name)
         gate.ctrl_cnt = self.ctrl_cnt
         gate.is_inverse = not self.is_inverse
         return gate
@@ -167,7 +168,7 @@ class Matrix(BasicGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
-        gate = Matrix(self.matrix)
+        gate = Matrix(self.matrix, self.name)
         gate.ctrl_cnt = ctrl_cnt
         gate.is_inverse = self.is_inverse
         return gate
