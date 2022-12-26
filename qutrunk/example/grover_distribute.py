@@ -9,6 +9,7 @@ from numpy import pi
 from qutrunk.circuit import QCircuit
 from qutrunk.circuit.gates import Measure, All
 from qutrunk.circuit.ops import PLUS, QAA
+from qutrunk.backends import BackendLocal
 
 
 def run_grover(qubits=10, backend=None):
@@ -61,4 +62,4 @@ def run_grover(qubits=10, backend=None):
 
 if __name__ == "__main__":
     # Run locally
-    circuit = run_grover()
+    circuit = run_grover(backend=BackendLocal(run_mode='mpi'))

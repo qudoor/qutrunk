@@ -1,9 +1,10 @@
-"""Python implementation of a quantum computer simulator."""
+"""Interface of quantum compute simulator."""
+
 import uuid
 
 from qutrunk.backends.backend import Backend
 # TODO:need to improve.
-from .local_python import BackendLocalPython as BackendLocalImpl
+from .local_impl import BackendLocalPython as BackendLocalImpl
 
 
 class BackendLocal(Backend):
@@ -30,10 +31,11 @@ class BackendLocal(Backend):
             res = qc.run(shots=100)
     """
 
-    def __init__(self):
+    def __init__(self, run_mode: str = "local"):
         super().__init__()
         self.circuit = None
-        self._local_impl = BackendLocalImpl()
+        self.run_mode = run_mode
+        self._local_impl = BackendLocalImpl(self.run_mode)
         self.task_id = uuid.uuid4().hex
 
     def send_circuit(self, circuit, final=False):
