@@ -17,8 +17,6 @@ class QCircuit:
 
     Args:
         backend: Used to run quantum circuits.
-        density: Creates a density matrix Qureg object representing a set of \
-            qubits which can enter noisy and mixed states.
         name: The circuit name.
         resource: Whether enable the resource statistics function, default: False.
 
@@ -43,7 +41,6 @@ class QCircuit:
     def __init__(
         self,
         backend=None,
-        density=False,
         name: Optional[str] = None,
         resource: Optional[bool] = False,
     ):
@@ -69,10 +66,8 @@ class QCircuit:
                 raise TypeError("You supplied a backend which is not supported.\n")
             self.backend = backend
 
-        # local backend is no support noisy pattern.
-        if density and isinstance(backend, BackendLocal):
-            raise TypeError("You supplied a backend which is not supported density.\n")
-        self.density = density
+        # density not supported
+        self.density = False
 
         self.backend.circuit = self
 
