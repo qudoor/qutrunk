@@ -99,10 +99,10 @@ class QCircuit:
 
         qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
         if qubit_size <= 0:
-            raise TypeError("Number of qubits should be larger than 0.")
+            raise ValueError("Number of qubits should be larger than 0.")
 
-        if qubit_size > 25:
-            raise ValueError("Number of qubits should be less than 25.")
+        # if qubit_size > 25:
+        #     raise ValueError("Number of qubits should be less than 25.")
 
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)

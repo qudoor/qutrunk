@@ -74,12 +74,19 @@ class SimDistribute:
 
         total_num_amps = 2 ** num_qubits
         num_amps_per_rank = total_num_amps // self.env.num_ranks
-        self.reg.state_vec.real = [0] * num_amps_per_rank
-        self.reg.state_vec.imag = [0] * num_amps_per_rank
+
+        try:
+            self.reg.state_vec.real = [0.0] * num_amps_per_rank
+            self.reg.state_vec.imag = [0.0] * num_amps_per_rank
+        except:
+            raise ValueError("Memory exceed, the number of qubits is too large.")
 
         if self.env.num_ranks > 1:
-            self.reg.pair_state_vec.real = [0] * num_amps_per_rank
-            self.reg.pair_state_vec.imag = [0] * num_amps_per_rank
+            try:
+                self.reg.pair_state_vec.real = [0.0] * num_amps_per_rank
+                self.reg.pair_state_vec.imag = [0.0] * num_amps_per_rank
+            except:
+                raise ValueError("Memory exceed, the number of qubits is too large.")
 
         self.reg.num_amps_total = total_num_amps
         self.reg.num_amps_per_chunk = num_amps_per_rank
