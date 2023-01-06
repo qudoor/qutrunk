@@ -10,6 +10,7 @@ from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 from qutrunk.exceptions import QuTrunkError
+from qutrunk.tools.env_reader import backend_from_env
 
 
 class QCircuit:
@@ -17,8 +18,6 @@ class QCircuit:
 
     Args:
         backend: Used to run quantum circuits.
-        density: Creates a density matrix Qureg object representing a set of \
-            qubits which can enter noisy and mixed states.
         name: The circuit name.
         resource: Whether enable the resource statistics function, default: False.
 
@@ -43,7 +42,6 @@ class QCircuit:
     def __init__(
         self,
         backend=None,
-        density=False,
         name: Optional[str] = None,
         resource: Optional[bool] = False,
     ):
@@ -63,16 +61,14 @@ class QCircuit:
 
         # use local backend(default)
         if backend is None:
-            self.backend = BackendLocal()
+            self.backend = backend_from_env()
         else:
             if not isinstance(backend, Backend):
                 raise TypeError("You supplied a backend which is not supported.\n")
             self.backend = backend
 
-        # local backend is no support noisy pattern.
-        if density and isinstance(backend, BackendLocal):
-            raise TypeError("You supplied a backend which is not supported density.\n")
-        self.density = density
+        # density not supported
+        self.density = False
 
         self.backend.circuit = self
 
@@ -104,10 +100,10 @@ class QCircuit:
 
         qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
         if qubit_size <= 0:
-            raise TypeError("Number of qubits should be larger than 0.")
+            raise ValueError("Number of qubits should be larger than 0.")
 
-        if qubit_size > 25:
-            raise ValueError("Number of qubits should be less than 25.")
+        # if qubit_size > 25:
+        #     raise ValueError("Number of qubits should be less than 25.")
 
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)
@@ -181,20 +177,6 @@ class QCircuit:
             The length of the self.cmds.
         """
         return len(self.cmds)
-
-    def set_measure(self, qubit, value):
-        """Store the measure result for target qubit.
-
-        Args:
-            qubit: The index of qubit in qureg.
-            value: The qubit measure value(0 or 1).
-
-        Raises:
-            IndexError: Qubit index must be less than then length of qreg.
-        """
-        if qubit >= len(self.qreg) or qubit < 0:
-            raise IndexError("qubit index out of range.")
-        self.creg[qubit].value = value
 
     def run(self, shots=1):
         """Run quantum circuit through the specified backend and shots.
@@ -275,7 +257,7 @@ class QCircuit:
         """Get all probabilities of circuit.
 
         Returns:
-            An array contains all probabilities of circuit.
+            A list contains all probabilities of circuit.
         """
         if not hasattr(self.backend, "get_probs"):
             raise NotImplementedError(f"{self.backend.name} not support get_probs method.")
@@ -285,11 +267,12 @@ class QCircuit:
         probs = self.backend.get_probs(qubits)
 
         out_probs = []
-        for i in range(len(probs)):
+        for i, value in enumerate(probs):
             prob = {}
             prob["idx"] = i
             prob["prob"] = probs[i]
             out_probs.append(prob)
+
         return out_probs
 
     def _to_complex(self, state_vector):
@@ -701,6 +684,7 @@ class Result:
             idxs = qreg.get_indexs()
         return self.measure_result.get_bitstrs(idxs)
 
+    # TODO: have some problem with this method.
     def get_values(self, qreg: Union[Qureg, SubQureg] = None):
         """Get the measure result of int."""
         idxs = None

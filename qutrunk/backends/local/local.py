@@ -1,9 +1,10 @@
-"""Python implementation of a quantum computer simulator."""
+"""Interface of quantum compute simulator."""
+
 import uuid
 
 from qutrunk.backends.backend import Backend
 # TODO:need to improve.
-from .local_python import BackendLocalPython as BackendLocalImpl
+from .local_impl import BackendLocalPython as BackendLocalImpl
 
 
 class BackendLocal(Backend):
@@ -30,10 +31,11 @@ class BackendLocal(Backend):
             res = qc.run(shots=100)
     """
 
-    def __init__(self):
+    def __init__(self, run_mode: str = "local"):
         super().__init__()
         self.circuit = None
-        self._local_impl = BackendLocalImpl()
+        self.run_mode = run_mode
+        self._local_impl = BackendLocalImpl(self.run_mode)
         self.task_id = uuid.uuid4().hex
 
     def send_circuit(self, circuit, final=False):
@@ -53,6 +55,7 @@ class BackendLocal(Backend):
                 self.circuit.counter.acc_run_time(elapsed)
 
         res, elapsed = self._local_impl.send_circuit(circuit, final)
+
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
 
@@ -77,16 +80,16 @@ class BackendLocal(Backend):
             self.circuit.counter.finish()
         return res
 
-    def get_prob(self, index):
-        """Get the probability of a state-vector at an index in the full state vector.
+    def get_prob(self, value):
+        """Get probability of the possible measure result of circuit.
 
         Args:
-            index: Index in state vector of probability amplitudes.
+            value: The target value.
 
         Returns:
             float:The probability of target index.
         """
-        res, elapsed = self._local_impl.get_prob(index)
+        res, elapsed = self._local_impl.get_prob(value)
         if self.circuit.counter:
             self.circuit.counter.acc_run_time(elapsed)
         return res

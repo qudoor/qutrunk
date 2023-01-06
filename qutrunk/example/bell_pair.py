@@ -24,7 +24,7 @@ def run_bell_pair(backend=None):
     res = qc.run(shots=100)
     print(res.get_counts())
 
-    # Print quantum circuit exection information
+    # Print quantum circuit execution information
     print(res.running_info())
 
     return qc
