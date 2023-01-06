@@ -15,6 +15,7 @@ Subpackages
    qutrunk.dagcircuit
    qutrunk.example
    qutrunk.qasm
+   qutrunk.qml
    qutrunk.test
    qutrunk.thrift
    qutrunk.tools

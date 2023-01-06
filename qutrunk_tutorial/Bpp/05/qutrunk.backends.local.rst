@@ -20,18 +20,26 @@ qutrunk.backends.local.local module
    :undoc-members:
    :show-inheritance:
 
-qutrunk.backends.local.local\_python module
--------------------------------------------
+qutrunk.backends.local.local\_impl module
+-----------------------------------------
 
-.. automodule:: qutrunk.backends.local.local_python
+.. automodule:: qutrunk.backends.local.local_impl
    :members:
    :undoc-members:
    :show-inheritance:
 
-qutrunk.backends.local.pysim module
------------------------------------
+qutrunk.backends.local.sim\_distribute module
+---------------------------------------------
 
-.. automodule:: qutrunk.backends.local.pysim
+.. automodule:: qutrunk.backends.local.sim_distribute
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+qutrunk.backends.local.sim\_local module
+----------------------------------------
+
+.. automodule:: qutrunk.backends.local.sim_local
    :members:
    :undoc-members:
    :show-inheritance:
