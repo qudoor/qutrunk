@@ -3,10 +3,12 @@ import math
 from typing import Union
 
 import numpy
-from mpi4py import MPI
-
 from .sim_local import SimLocal, PauliOpType
-
+try:
+    from mpi4py import MPI
+except ImportError:
+    raise ImportError("Couldn't import mpi4py. Please verify the dependency has been installed.")
+                
 REAL_EPS = 1e-13
 
 
