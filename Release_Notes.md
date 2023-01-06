@@ -21,7 +21,7 @@ QuTrunk 是启科量子自主研发的一款免费、开源、跨平台的量子
 ---
 <p id="2"></p >
 
-## 最新版本 v0.1.16
+## 最新版本 v0.2.0
 * 修复QuSaas, IBM, Braket后端未实现task_id导致的报错问题;
 * QuSprout后端增加量子随机数接口: get_rand;
 * 新增手写数字识别(QuTrunk+PyTorch)的示例;
