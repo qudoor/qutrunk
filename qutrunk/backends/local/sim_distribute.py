@@ -3,10 +3,12 @@ import math
 from typing import Union
 
 import numpy
-from mpi4py import MPI
-
 from .sim_local import SimLocal, PauliOpType
-
+try:
+    from mpi4py import MPI
+except ImportError:
+    raise ImportError("Couldn't import mpi4py. Please verify the dependency has been installed.")
+                
 REAL_EPS = 1e-13
 
 
@@ -74,12 +76,19 @@ class SimDistribute:
 
         total_num_amps = 2 ** num_qubits
         num_amps_per_rank = total_num_amps // self.env.num_ranks
-        self.reg.state_vec.real = [0] * num_amps_per_rank
-        self.reg.state_vec.imag = [0] * num_amps_per_rank
+
+        try:
+            self.reg.state_vec.real = [0.0] * num_amps_per_rank
+            self.reg.state_vec.imag = [0.0] * num_amps_per_rank
+        except:
+            raise ValueError("Memory exceed, the number of qubits is too large.")
 
         if self.env.num_ranks > 1:
-            self.reg.pair_state_vec.real = [0] * num_amps_per_rank
-            self.reg.pair_state_vec.imag = [0] * num_amps_per_rank
+            try:
+                self.reg.pair_state_vec.real = [0.0] * num_amps_per_rank
+                self.reg.pair_state_vec.imag = [0.0] * num_amps_per_rank
+            except:
+                raise ValueError("Memory exceed, the number of qubits is too large.")
 
         self.reg.num_amps_total = total_num_amps
         self.reg.num_amps_per_chunk = num_amps_per_rank
@@ -818,7 +827,7 @@ class SimDistribute:
         size_half_block = 1 << target_qubit
         size_block = 2 * size_half_block
         for this_task in range(num_tasks):
-            this_block = this_task / size_half_block
+            this_block = this_task // size_half_block
             index_up = this_block * size_block + this_task % size_half_block
             index_lo = index_up + size_half_block
 
@@ -994,7 +1003,7 @@ class SimDistribute:
             return
 
         pair_idx = first_idx ^ targ_mask
-        pair_rank = pair_idx / self.reg.num_amps_per_chunk
+        pair_rank = pair_idx // self.reg.num_amps_per_chunk
 
         use_local_data_only = (pair_rank == self.reg.chunk_id)
 

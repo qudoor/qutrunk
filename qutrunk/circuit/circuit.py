@@ -10,6 +10,7 @@ from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 from qutrunk.exceptions import QuTrunkError
+from qutrunk.tools.env_reader import backend_from_env
 
 
 class QCircuit:
@@ -60,7 +61,7 @@ class QCircuit:
 
         # use local backend(default)
         if backend is None:
-            self.backend = BackendLocal()
+            self.backend = backend_from_env()
         else:
             if not isinstance(backend, Backend):
                 raise TypeError("You supplied a backend which is not supported.\n")
@@ -99,10 +100,10 @@ class QCircuit:
 
         qubit_size = qubits if isinstance(qubits, int) else sum(qubits)
         if qubit_size <= 0:
-            raise TypeError("Number of qubits should be larger than 0.")
+            raise ValueError("Number of qubits should be larger than 0.")
 
-        if qubit_size > 25:
-            raise ValueError("Number of qubits should be less than 25.")
+        # if qubit_size > 25:
+        #     raise ValueError("Number of qubits should be less than 25.")
 
         self.qreg = Qureg(circuit=self, size=qubit_size)
         self.creg = CReg(circuit=self, size=qubit_size)

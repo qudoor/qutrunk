@@ -60,8 +60,11 @@ class SimLocal:
         num_amps = 2**num_qubits
         self.num_amps_per_rank = num_amps
         # TODO: need to improve.
-        self.real = [0] * num_amps
-        self.imag = [0] * num_amps
+        try:
+            self.real = [0.0] * num_amps
+            self.imag = [0.0] * num_amps
+        except:
+            raise ValueError("Memory exceed, the number of qubits is too large.")
 
     def init_blank_state(self):
         """Init blank state"""
