@@ -827,7 +827,7 @@ class SimDistribute:
         size_half_block = 1 << target_qubit
         size_block = 2 * size_half_block
         for this_task in range(num_tasks):
-            this_block = this_task / size_half_block
+            this_block = this_task // size_half_block
             index_up = this_block * size_block + this_task % size_half_block
             index_lo = index_up + size_half_block
 
@@ -1003,7 +1003,7 @@ class SimDistribute:
             return
 
         pair_idx = first_idx ^ targ_mask
-        pair_rank = pair_idx / self.reg.num_amps_per_chunk
+        pair_rank = pair_idx // self.reg.num_amps_per_chunk
 
         use_local_data_only = (pair_rank == self.reg.chunk_id)
 
