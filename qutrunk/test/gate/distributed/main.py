@@ -11,7 +11,7 @@ def test_mpi(num_rank):
             if file == 'main.py':
                 continue
             path = os.path.join(root, file)
-            cmd = "mpiexec -n {} python {}".format(num_rank, path)
+            cmd = "mpiexec -n {} python3 {}".format(num_rank, path)
             os.system(cmd)
 
 if __name__ == "__main__":
