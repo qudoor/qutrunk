@@ -50,6 +50,32 @@ def amp_kernel(num_amps_per_rank, real, imag, orgreal, orgimag, startindex):
         imag[endindex] = orgimag[index]
     cuda.syncthreads()
 
+@cuda.jit
+def hadamard_kernel(num_amps_per_rank, real, imag, target_qubit):
+    size_half_block = 2**target_qubit
+    size_block = size_half_block * 2
+    num_task = num_amps_per_rank // 2
+    rec_root = 1.0 / math.sqrt(2)
+        
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if this_task>=num_task:
+        return
+
+    this_block = this_task // size_half_block
+    index_up = this_block*size_block + this_task%size_half_block
+    index_lo = index_up + size_half_block
+
+    state_real_up = real[index_up]
+    state_imag_up = imag[index_up]
+    state_real_lo = real[index_lo]
+    state_imag_lo = imag[index_lo]
+
+    real[index_up] = rec_root*(state_real_up + state_real_lo)
+    imag[index_up] = rec_root*(state_imag_up + state_imag_lo)
+    real[index_lo] = rec_root*(state_real_up - state_real_lo)
+    imag[index_lo] = rec_root*(state_imag_up - state_imag_lo)
+
+
 class GpuLocal:
     """Simulator-gpu implement."""
 
@@ -88,3 +114,13 @@ class GpuLocal:
         threads_per_block = 128
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         amp_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, orgreal, orgimag, startindex)
+        
+    def hadamard(target_qubit):
+        """Apply hadamard gate.
+
+        Args:
+            target: target qubit.
+        """
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        hadamard_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit)
