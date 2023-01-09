@@ -44,6 +44,14 @@ qutrunk.example.grover module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.example.grover\_distribute module
+-----------------------------------------
+
+.. automodule:: qutrunk.example.grover_distribute
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qutrunk.example.phase\_estimation module
 ----------------------------------------
 

@@ -22,7 +22,7 @@ sys.path.insert(0, qutrunk_path)
 project = 'QuTrunk'
 copyright = '2022, qudoor'
 author = 'qudoor'
-release = 'v0.1.15'
+release = 'v0.2.0'
 
 
 # -- General configuration ---------------------------------------------------
