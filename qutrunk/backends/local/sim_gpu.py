@@ -6,6 +6,7 @@ import numpy
 from numba import cuda, float32
 from .sim_local import SimLocal, PauliOpType
 
+@cuda.jit
 def extract_bit(ctrl, index):
     return (index & (2**ctrl)) // (2**ctrl)
     
@@ -149,3 +150,9 @@ class GpuLocal:
         threads_per_block = 128
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         hadamard_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit)
+        
+    def control_not(self, control_qubit, target_qubit):
+        """Control not gate"""
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        controlled_not_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit)
