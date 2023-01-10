@@ -320,18 +320,8 @@ class GpuLocal:
         reals[1] =   math.sin(angle/2.0)*unit_axis[1]
         imags[1] = - math.sin(angle/2.0)*unit_axis[0]
         return reals, imags
-        
-    def crx(self, control_qubit, target_qubit, angle):
-        unit_axis = [1, 0, 0]
-        reals, imags = self.get_complex_pair_from_rotation(angle, unit_axis)
-        orgreal = cuda.to_device(reals, stream=0)
-        orgimag = cuda.to_device(imags, stream=0)
-        threads_per_block = 128
-        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
-        controlled_compact_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
-    
-    def cry(self, control_qubit, target_qubit, angle):
-        unit_axis = [0, 1, 0]
+
+    def controlled_compact_unitary(self, control_qubit, target_qubit, angle, unit_axis):
         reals, imags = self.get_complex_pair_from_rotation(angle, unit_axis)
         orgreal = cuda.to_device(reals, stream=0)
         orgimag = cuda.to_device(imags, stream=0)
@@ -339,14 +329,17 @@ class GpuLocal:
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         controlled_compact_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
 
+    def crx(self, control_qubit, target_qubit, angle):
+        unit_axis = [1, 0, 0]
+        self.controlled_compact_unitary(control_qubit, target_qubit, angle, unit_axis)
+    
+    def cry(self, control_qubit, target_qubit, angle):
+        unit_axis = [0, 1, 0]
+        self.controlled_compact_unitary(control_qubit, target_qubit, angle, unit_axis)
+
     def crz(self, control_qubit, target_qubit, angle):
         unit_axis = [0, 0, 1]
-        reals, imags = self.get_complex_pair_from_rotation(angle, unit_axis)
-        orgreal = cuda.to_device(reals, stream=0)
-        orgimag = cuda.to_device(imags, stream=0)
-        threads_per_block = 128
-        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
-        controlled_compact_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
+        self.controlled_compact_unitary(control_qubit, target_qubit, angle, unit_axis)
 
     def apply_matrix2(self, target_qubit, ureal, uimag):
         orgreal = cuda.to_device(ureal, stream=0)
@@ -383,22 +376,22 @@ class GpuLocal:
         orgimag = cuda.to_device(uimag, stream=0)
         threads_per_block = 128
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
-        multi_controlled_two_qubit_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, ctrl_mask, target_qubit0, target_qubit1, ureal, uimag)
+        multi_controlled_two_qubit_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, ctrl_mask, target_qubit0, target_qubit1, orgreal, orgimag)
         
     def cu1(self, target_qubit0, target_qubit1, ureal, uimag):
         self.apply_matrix4(target_qubit0, target_qubit1, ureal, uimag)
 
-    def cu3(self, target_bit0, target_bit1, ureal, uimag):
-        self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+    def cu3(self, target_qubit0, target_qubit1, ureal, uimag):
+        self.apply_matrix4(target_qubit0, target_qubit1, ureal, uimag)
 
-    def cu(self, target_bit0, target_bit1, ureal, uimag):
-        self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+    def cu(self, target_qubit0, target_qubit1, ureal, uimag):
+        self.apply_matrix4(target_qubit0, target_qubit1, ureal, uimag)
 
-    def cr(self, target_bit0, target_bit1, ureal, uimag):
-        self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+    def cr(self, target_qubit0, target_qubit1, ureal, uimag):
+        self.apply_matrix4(target_qubit0, target_qubit1, ureal, uimag)
 
-    def iswap(self, target_bit0, target_bit1, ureal, uimag):
-        self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+    def iswap(self, target_qubit0, target_qubit1, ureal, uimag):
+        self.apply_matrix4(target_qubit0, target_qubit1, ureal, uimag)
 
-    def reset(self, target, ureal, uimag):
-        self.apply_matrix2(target, ureal, uimag)
+    def reset(self, target_qubit, ureal, uimag):
+        self.apply_matrix2(target_qubit, ureal, uimag)
