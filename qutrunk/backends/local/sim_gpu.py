@@ -4,7 +4,7 @@ from typing import Union
 
 import numpy
 from numba import cuda, float32
-from .sim_local import SimLocal, PauliOpType
+from qutrunk.backends.local.sim_local import SimLocal, PauliOpType
 
 @cuda.jit
 def extract_bit(ctrl, index):
@@ -94,6 +94,27 @@ def hadamard_kernel(num_amps_per_rank, real, imag, target_qubit):
     imag[index_up] = rec_root*(state_imag_up + state_imag_lo)
     real[index_lo] = rec_root*(state_real_up - state_real_lo)
     imag[index_lo] = rec_root*(state_imag_up - state_imag_lo)
+
+@cuda.jit
+def phase_shift_kernel(num_amps_per_rank, real, imag, target_qubit, cos_angle, sin_angle):
+    num_tasks = num_amps_per_rank >> 1
+
+    size_half_block = 1 << target_qubit
+    size_block      = 2 * size_half_block
+
+    this_task = cuda.grid(1)
+    if (this_task >= num_tasks):
+        return
+
+    this_block = this_task // size_half_block
+    index_up   = this_block * size_block + this_task % size_half_block
+    index_lo   = index_up + size_half_block
+
+    state_real_lo = real[index_lo]
+    state_imag_lo = imag[index_lo]
+
+    real[index_lo] = cos_angle*state_real_lo - sin_angle*state_imag_lo
+    imag[index_lo] = sin_angle*state_real_lo + cos_angle*state_imag_lo
 
 @cuda.jit
 def controlled_not_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit):
@@ -279,7 +300,21 @@ class GpuLocal:
         threads_per_block = 128
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         hadamard_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit)
-        
+    
+    def phase_shift(self, target_qubit, angle):
+        """Shift the phase between |0> and |1> of a single qubit by a given angle.
+
+        Args:
+            target: qubit to undergo a phase shift.
+            angle:  amount by which to shift the phase in radians.
+        """
+        cos_angle = math.cos(angle)
+        sin_angle = math.sin(angle)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        phase_shift_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, cos_angle, sin_angle)
+
+
     def control_not(self, control_qubit, target_qubit):
         """Control not gate"""
         threads_per_block = 128
@@ -395,3 +430,15 @@ class GpuLocal:
 
     def reset(self, target_qubit, ureal, uimag):
         self.apply_matrix2(target_qubit, ureal, uimag)
+
+if __name__ == "__main__":
+    backend = GpuLocal()
+    backend.create_qureg(2)
+    backend.init_zero_state()
+
+    backend.hadamard(0)
+    backend.phase_shift(0, numpy.pi)
+    print(backend.real.copy_to_host())
+    print(backend.imag.copy_to_host())
+    
+
