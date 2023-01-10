@@ -6,6 +6,9 @@ import numpy
 from numba import cuda, float32
 from .sim_local import SimLocal, PauliOpType
 
+def extract_bit(ctrl, index):
+    return (index & (2**ctrl)) // (2**ctrl)
+    
 @cuda.jit
 def init_classical_state_kernel(num_amps_per_rank, real, imag, state_ind):
     """Init classical state kernel"""
@@ -75,7 +78,29 @@ def hadamard_kernel(num_amps_per_rank, real, imag, target_qubit):
     real[index_lo] = rec_root*(state_real_up - state_real_lo)
     imag[index_lo] = rec_root*(state_imag_up - state_imag_lo)
 
-
+@cuda.jit
+def controlled_not_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit):
+    size_half_block = 2**target_qubit
+    size_block = size_half_block * 2
+    num_task = num_amps_per_rank // 2
+    
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if this_task>=num_task:
+        return
+    
+    this_block = this_task // size_half_block
+    index_up = this_block*size_block + this_task%size_half_block
+    index_lo = index_up + size_half_block
+    
+    control_bit = extract_bit(control_qubit, index_up)
+    if control_bit:
+        state_real_up = real[index_up]
+        state_imag_up = imag[index_up]
+        real[index_up] = real[index_lo]
+        imag[index_up] = imag[index_lo]
+        real[index_lo] = state_real_up
+        imag[index_lo] = state_imag_up
+    
 class GpuLocal:
     """Simulator-gpu implement."""
 
@@ -115,7 +140,7 @@ class GpuLocal:
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         amp_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, orgreal, orgimag, startindex)
         
-    def hadamard(target_qubit):
+    def hadamard(self, target_qubit):
         """Apply hadamard gate.
 
         Args:
