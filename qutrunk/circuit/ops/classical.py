@@ -48,8 +48,6 @@ class Classical(Operator):
             raise ValueError(f"Invalid state: {self.state}")
 
         self._process_state(qureg)
-        # record init state
-        qureg.circuit._init_state = self._state()
 
     def _check_state(self, qureg: Qureg):
         if isinstance(self.state, str):

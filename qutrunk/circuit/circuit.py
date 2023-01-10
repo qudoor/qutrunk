@@ -50,8 +50,6 @@ class QCircuit:
         self.cmds = []
         self.cmd_cursor = 0
         self.counter = None
-        # mark circuit in Operator Context
-        self._in_op = False
 
         self.qubit_indices = {}
         self.cbit_indices = {}
@@ -72,16 +70,12 @@ class QCircuit:
 
         self.backend.circuit = self
 
-        self.outcome = None
-
         if name is None:
             name = self._generate_circuit_name()
         self.name = name
 
         if resource:
             self.counter = Counter(self)
-        # circuit init state
-        self._init_state = 0
 
     def allocate(self, qubits: Union[int, list]):
         """Allocate qubit in quantum circuit.
