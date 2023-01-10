@@ -9,6 +9,22 @@ from .sim_local import SimLocal, PauliOpType
 @cuda.jit
 def extract_bit(ctrl, index):
     return (index & (2**ctrl)) // (2**ctrl)
+
+@cuda.jit
+def flip_bit(number, bit_ind):
+    return (number ^ (2**bit_ind))
+
+@cuda.jit
+def insert_zero_bit(number, index):
+    left = (number >> index) << index
+    right = number - left
+    return (left << 1) ^ right
+
+@cuda.jit
+def insert_two_zero_bits(number, bit1, bit2):
+    small = bit1 if bit1 < bit2 else bit2
+    big = bit2 if bit1 < bit2 else bit1
+    return insert_zero_bit(insert_zero_bit(number, small), big)
     
 @cuda.jit
 def init_classical_state_kernel(num_amps_per_rank, real, imag, state_ind):
@@ -101,7 +117,120 @@ def controlled_not_kernel(num_amps_per_rank, real, imag, control_qubit, target_q
         imag[index_up] = imag[index_lo]
         real[index_lo] = state_real_up
         imag[index_lo] = state_imag_up
+
+@cuda.jit
+def unitary_kernel(num_amps_per_rank, real, imag, target_qubit, ureal, uimag):
+    size_half_block = 2**target_qubit
+    size_block = size_half_block * 2
+    num_task = num_amps_per_rank // 2
     
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if this_task>=num_task:
+        return
+    
+    this_block = this_task // size_half_block
+    index_up = this_block*size_block + this_task%size_half_block
+    index_lo = index_up + size_half_block
+
+    state_real_up = real[index_up]
+    state_imag_up = imag[index_up]
+    state_real_lo = real[index_lo]
+    state_imag_lo = imag[index_lo]
+
+    real[index_up] = ureal[0][0]*state_real_up - uimag[0][0]*state_imag_up + ureal[0][1]*state_real_lo - uimag[0][1]*state_imag_lo
+    imag[index_up] = ureal[0][0]*state_imag_up + uimag[0][0]*state_real_up + ureal[0][1]*state_imag_lo + uimag[0][1]*state_real_lo
+    real[index_lo] = ureal[1][0]*state_real_up - uimag[1][0]*state_imag_up + ureal[1][1]*state_real_lo - uimag[1][1]*state_imag_lo
+    imag[index_lo] = ureal[1][0]*state_imag_up + uimag[1][0]*state_real_up + ureal[1][1]*state_imag_lo + uimag[1][1]*state_real_lo
+
+@cuda.jit
+def controlled_compact_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, reals, imags):
+    size_half_block = 2**target_qubit
+    size_block = size_half_block * 2
+    num_task = num_amps_per_rank // 2
+    
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if this_task>=num_task:
+        return
+    
+    this_block = this_task // size_half_block
+    index_up = this_block*size_block + this_task%size_half_block
+    index_lo = index_up + size_half_block
+    
+    control_bit = extract_bit(control_qubit, index_up)
+    if control_bit:
+        state_real_up = real[index_up]
+        state_imag_up = imag[index_up]
+        state_real_lo = real[index_lo]
+        state_imag_lo = imag[index_lo]
+
+        real[index_up] = reals[0]*state_real_up - imags[0]*state_imag_up - reals[1]*state_real_lo - imags[1]*state_imag_lo
+        imag[index_up] = reals[0]*state_imag_up + imags[0]*state_real_up - reals[1]*state_imag_lo + imags[1]*state_real_lo
+        real[index_lo] = reals[1]*state_real_up - imags[1]*state_imag_up + reals[0]*state_real_lo + imags[0]*state_imag_lo
+        imag[index_lo] = reals[1]*state_imag_up + imags[1]*state_real_up + reals[0]*state_imag_lo - imags[0]*state_real_lo
+
+@cuda.jit
+def controlled_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, ureal, uimag):
+    size_half_block = 2**target_qubit
+    size_block = size_half_block * 2
+    num_task = num_amps_per_rank // 2
+    
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if this_task>=num_task:
+        return
+    
+    this_block = this_task // size_half_block
+    index_up = this_block*size_block + this_task%size_half_block
+    index_lo = index_up + size_half_block
+
+    state_real_up = real[index_up]
+    state_imag_up = imag[index_up]
+    state_real_lo = real[index_lo]
+    state_imag_lo = imag[index_lo]
+    
+    control_bit = extract_bit(control_qubit, index_up)
+    if control_bit:
+        real[index_up] = ureal[0][0]*state_real_up - uimag[0][0]*state_imag_up + ureal[0][1]*state_real_lo - uimag[0][1]*state_imag_lo
+        imag[index_up] = ureal[0][0]*state_imag_up + uimag[0][0]*state_real_up + ureal[0][1]*state_imag_lo + uimag[0][1]*state_real_lo
+        real[index_lo] = ureal[1][0]*state_real_up - uimag[1][0]*state_imag_up + ureal[1][1]*state_real_lo - uimag[1][1]*state_imag_lo
+        imag[index_lo] = ureal[1][0]*state_imag_up + uimag[1][0]*state_real_up + ureal[1][1]*state_imag_lo + uimag[1][1]*state_real_lo
+
+@cuda.jit
+def multi_controlled_two_qubit_unitary_kernel(num_amps_per_rank, real, imag, ctrl_mask, q1, q2, ureal, uimag):
+    num_task = num_amps_per_rank // 2
+    
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if this_task>=num_task:
+        return
+  
+    ind00 = insert_two_zero_bits(this_task, q1, q2)
+    if (ctrl_mask and (ctrl_mask&ind00) != ctrl_mask):
+        return
+    
+    ind01 = flip_bit(ind00, q1)
+    ind10 = flip_bit(ind00, q2)
+    ind11 = flip_bit(ind01, q2)
+    
+    re00 = real[ind00]
+    im00 = imag[ind00]
+    re01 = real[ind01] 
+    im01 = imag[ind01]
+    re10 = real[ind10]
+    im10 = imag[ind10]
+    re11 = real[ind11] 
+    im11 = imag[ind11]
+    
+    real[ind00] = ureal[0][0]*re00 - uimag[0][0]*im00 + ureal[0][1]*re01 - uimag[0][1]*im01 + ureal[0][2]*re10 - uimag[0][2]*im10 + ureal[0][3]*re11 - uimag[0][3]*im11
+    imag[ind00] = uimag[0][0]*re00 + ureal[0][0]*im00 + uimag[0][1]*re01 + ureal[0][1]*im01 + uimag[0][2]*re10 + ureal[0][2]*im10 + uimag[0][3]*re11 + ureal[0][3]*im11
+        
+    real[ind01] = ureal[1][0]*re00 - uimag[1][0]*im00 + ureal[1][1]*re01 - uimag[1][1]*im01 + ureal[1][2]*re10 - uimag[1][2]*im10 + ureal[1][3]*re11 - uimag[1][3]*im11
+    imag[ind01] = uimag[1][0]*re00 + ureal[1][0]*im00 + uimag[1][1]*re01 + ureal[1][1]*im01 + uimag[1][2]*re10 + ureal[1][2]*im10 + uimag[1][3]*re11 + ureal[1][3]*im11
+        
+    real[ind10] = ureal[2][0]*re00 - uimag[2][0]*im00 + ureal[2][1]*re01 - uimag[2][1]*im01 + ureal[2][2]*re10 - uimag[2][2]*im10 + ureal[2][3]*re11 - uimag[2][3]*im11
+    imag[ind10] = uimag[2][0]*re00 + ureal[2][0]*im00 + uimag[2][1]*re01 + ureal[2][1]*im01 + uimag[2][2]*re10 + ureal[2][2]*im10 + uimag[2][3]*re11 + ureal[2][3]*im11   
+        
+    real[ind11] = ureal[3][0]*re00 - uimag[3][0]*im00 + ureal[3][1]*re01 - uimag[3][1]*im01 + ureal[3][2]*re10 - uimag[3][2]*im10 + ureal[3][3]*re11 - uimag[3][3]*im11
+    imag[ind11] = uimag[3][0]*re00 + ureal[3][0]*im00 + uimag[3][1]*re01 + ureal[3][1]*im01 + uimag[3][2]*re10 + ureal[3][2]*im10 + uimag[3][3]*re11 + ureal[3][3]*im11  
+        
 class GpuLocal:
     """Simulator-gpu implement."""
 
@@ -133,13 +262,13 @@ class GpuLocal:
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         init_zero_state_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag)
 
-    def amp(self, reals, imags, startindex):
+    def amp(self, reals, imags, startindex, numamps):
         """Init amplitudes state"""
         orgreal = cuda.to_device(reals, stream=0)
         orgimag = cuda.to_device(imags, stream=0)
         threads_per_block = 128
-        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
-        amp_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, orgreal, orgimag, startindex)
+        blocks_per_grid = math.ceil(numamps / threads_per_block)
+        amp_kernel[blocks_per_grid, threads_per_block](numamps, self.real, self.imag, orgreal, orgimag, startindex)
         
     def hadamard(self, target_qubit):
         """Apply hadamard gate.
@@ -156,3 +285,120 @@ class GpuLocal:
         threads_per_block = 128
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         controlled_not_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit)
+
+    def u3(self, target_qubit, ureal, uimag):
+        orgreal = cuda.to_device(ureal, stream=0)
+        orgimag = cuda.to_device(uimag, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, orgreal, orgimag)
+
+    def u2(self, target_qubit, ureal, uimag):
+        orgreal = cuda.to_device(ureal, stream=0)
+        orgimag = cuda.to_device(uimag, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, orgreal, orgimag)
+
+    def u1(self, target_qubit, ureal, uimag):
+        orgreal = cuda.to_device(ureal, stream=0)
+        orgimag = cuda.to_device(uimag, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, orgreal, orgimag)
+      
+    def get_complex_pair_from_rotation(self, angle, axis):
+        mag = math.sqrt(axis[0]*axis[0] + axis[1]*axis[1] + axis[2]*axis[2])  
+        unit_axis = [0] * 3
+        unit_axis[0] = axis[0]/mag
+        unit_axis[1] = axis[1]/mag
+        unit_axis[2] = axis[2]/mag
+        reals = [0] * 2
+        imags = [0] * 2
+        reals[0] =   math.cos(angle/2.0)
+        imags[0] = - math.sin(angle/2.0)*unit_axis[2]
+        reals[1] =   math.sin(angle/2.0)*unit_axis[1]
+        imags[1] = - math.sin(angle/2.0)*unit_axis[0]
+        return reals, imags
+        
+    def crx(self, control_qubit, target_qubit, angle):
+        unit_axis = [1, 0, 0]
+        reals, imags = self.get_complex_pair_from_rotation(angle, unit_axis)
+        orgreal = cuda.to_device(reals, stream=0)
+        orgimag = cuda.to_device(imags, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        controlled_compact_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
+    
+    def cry(self, control_qubit, target_qubit, angle):
+        unit_axis = [0, 1, 0]
+        reals, imags = self.get_complex_pair_from_rotation(angle, unit_axis)
+        orgreal = cuda.to_device(reals, stream=0)
+        orgimag = cuda.to_device(imags, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        controlled_compact_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
+
+    def crz(self, control_qubit, target_qubit, angle):
+        unit_axis = [0, 0, 1]
+        reals, imags = self.get_complex_pair_from_rotation(angle, unit_axis)
+        orgreal = cuda.to_device(reals, stream=0)
+        orgimag = cuda.to_device(imags, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        controlled_compact_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
+
+    def apply_matrix2(self, target_qubit, ureal, uimag):
+        orgreal = cuda.to_device(ureal, stream=0)
+        orgimag = cuda.to_device(uimag, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, orgreal, orgimag)
+        
+    def x1(self, target_qubit, ureal, uimag):
+        self.apply_matrix2(target_qubit, ureal, uimag)
+
+    def y1(self, target_qubit, ureal, uimag):
+        self.apply_matrix2(target_qubit, ureal, uimag)
+
+    def z1(self, target_qubit, ureal, uimag):
+        self.apply_matrix2(target_qubit, ureal, uimag)
+
+    def sqrtx(self, target_qubit, ureal, uimag):
+        self.apply_matrix2(target_qubit, ureal, uimag)
+
+    def sqrtxdg(self, target_qubit, ureal, uimag):
+        self.apply_matrix2(target_qubit, ureal, uimag)
+       
+    def csqrtx(self, control_qubit, target_qubit, ureal, uimag):
+        orgreal = cuda.to_device(ureal, stream=0)
+        orgimag = cuda.to_device(uimag, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        controlled_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
+
+    def apply_matrix4(self, target_qubit0, target_qubit1, ureal, uimag):
+        ctrl_mask = 0
+        orgreal = cuda.to_device(ureal, stream=0)
+        orgimag = cuda.to_device(uimag, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        multi_controlled_two_qubit_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, ctrl_mask, target_qubit0, target_qubit1, ureal, uimag)
+        
+    def cu1(self, target_qubit0, target_qubit1, ureal, uimag):
+        self.apply_matrix4(target_qubit0, target_qubit1, ureal, uimag)
+
+    def cu3(self, target_bit0, target_bit1, ureal, uimag):
+        self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+
+    def cu(self, target_bit0, target_bit1, ureal, uimag):
+        self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+
+    def cr(self, target_bit0, target_bit1, ureal, uimag):
+        self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+
+    def iswap(self, target_bit0, target_bit1, ureal, uimag):
+        self.apply_matrix4(target_bit0, target_bit1, ureal, uimag)
+
+    def reset(self, target, ureal, uimag):
+        self.apply_matrix2(target, ureal, uimag)
