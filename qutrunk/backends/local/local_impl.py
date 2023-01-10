@@ -1056,8 +1056,8 @@ class BackendLocalPython:
 
         self.sim.matrix(cmd.controls, cmd.targets, cmd.cmdex.mat.reals, cmd.cmdex.mat.imags)
 
-    def reset_qubits(self, qubits):
-        for q in qubits:
+    def reset_qubits(self, cmd):
+        for q in cmd.targets:
             prob = self.sim.calc_prob_of_outcome(q, 0)
             ureal = np.array([[1.0 / math.sqrt(prob), 0], [0, 0]])
             uimag = np.array([[0, 0], [0, 0]])

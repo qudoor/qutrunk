@@ -49,6 +49,7 @@ from qutrunk.circuit.gates import (
     SqrtXdgGate,
     CSqrtXGate,
     Matrix,
+    ResetGate
 )
 from .text_draw_element import InputWire
 from .layer import Layer
@@ -491,7 +492,7 @@ class TextDrawing:
             gates = [iEx(conditional=conditional) for _ in range(len(node.qargs))]
             add_connected_gate(node, gates, layer, current_cons)
         # Matrix
-        elif isinstance(op.gate, Matrix):
+        elif isinstance(op.gate, (Matrix, ResetGate)):
             ctrl_text = None
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
