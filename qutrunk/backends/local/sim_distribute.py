@@ -179,7 +179,7 @@ class SimDistribute:
             self.reg.state_vec.real[this_task] = 0
             self.reg.state_vec.imag[this_task] = 0
 
-    def __calc_prob_of_outcome(self, measure_qubit, outcome):
+    def calc_prob_of_outcome(self, measure_qubit, outcome):
         skip_values_within_rank = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, measure_qubit)
         if skip_values_within_rank:
             state_prob = self.sim_cpu.find_prob_of_zero(measure_qubit)
@@ -213,7 +213,7 @@ class SimDistribute:
                     self.__collapse_to_outcome_distributed_set_zero()
 
     def measure(self, target):
-        zero_prob = self.__calc_prob_of_outcome(target, 0)
+        zero_prob = self.calc_prob_of_outcome(target, 0)
         if self.reg.chunk_id == 0:
             outcome, outcome_prob = self.sim_cpu.generate_measure_outcome(zero_prob)
         else:

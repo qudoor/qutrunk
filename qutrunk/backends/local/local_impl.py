@@ -13,6 +13,57 @@ from qutrunk.tools.function_time import timefn
 from .exceptions import LocalBackendError
 from .sim_local import SimLocal
 
+GATE_MAP = {
+    "H": "h",
+    "P": "p",
+    "CP": "cp",
+    "R": "r",
+    "Rx": "rx",
+    "Rxx": "rxx",
+    "Ry": "ry",
+    "Ryy": "ryy",
+    "Rz": "rz",
+    "Rzz": "rzz",
+    "NOT": "x",
+    "X": "x",
+    "Y": "y",
+    "Z": "z",
+    "S": "s",
+    "T": "t",
+    "Sdg": "sdg",
+    "Tdg": "tdg",
+    "SqrtSwap": "sqrtswap",
+    "Swap": "swap",
+    "CNOT": "cnot",
+    "MCX": "cnot",
+    "CY": "cy",
+    "MCZ": "cz",
+    "U3": "u3",
+    "U2": "u2",
+    "U1": "u1",
+    "CRx": "crx",
+    "CRy": "cry",
+    "CRz": "crz",
+    "X1": "x1",
+    "Y1": "y1",
+    "Z1": "z1",
+    "CU1": "cu1",
+    "CU3": "cu3",
+    "U": "u",
+    "CU": "cu",
+    "CR": "cr",
+    "iSwap": "iswap",
+    "Barrier": "barrier",
+    "SqrtX": "sprtx",
+    "Id": "id",
+    "CH": "ch",
+    "SqrtXdg": "sqrtxdg",
+    "CSqrtX": "csqrtx",
+    "CSwap": "cswap",
+    "AMP": "amp",
+    "Matrix": "matrix",
+    "Reset": "reset_qubits",
+}
 
 class BackendLocalPython:
     def __init__(self, run_mode):
@@ -20,56 +71,6 @@ class BackendLocalPython:
         if run_mode == 'mpi':
             from .sim_distribute import SimDistribute
             self.sim = SimDistribute()
-        self.gate_map = {
-            "H": "h",
-            "P": "p",
-            "CP": "cp",
-            "R": "r",
-            "Rx": "rx",
-            "Rxx": "rxx",
-            "Ry": "ry",
-            "Ryy": "ryy",
-            "Rz": "rz",
-            "Rzz": "rzz",
-            "NOT": "x",
-            "X": "x",
-            "Y": "y",
-            "Z": "z",
-            "S": "s",
-            "T": "t",
-            "Sdg": "sdg",
-            "Tdg": "tdg",
-            "SqrtSwap": "sqrtswap",
-            "Swap": "swap",
-            "CNOT": "cnot",
-            "MCX": "cnot",
-            "CY": "cy",
-            "MCZ": "cz",
-            "U3": "u3",
-            "U2": "u2",
-            "U1": "u1",
-            "CRx": "crx",
-            "CRy": "cry",
-            "CRz": "crz",
-            "X1": "x1",
-            "Y1": "y1",
-            "Z1": "z1",
-            "CU1": "cu1",
-            "CU3": "cu3",
-            "U": "u",
-            "CU": "cu",
-            "CR": "cr",
-            "iSwap": "iswap",
-            "Barrier": "barrier",
-            "SqrtX": "sprtx",
-            "Id": "id",
-            "CH": "ch",
-            "SqrtXdg": "sqrtxdg",
-            "CSqrtX": "csqrtx",
-            "CSwap": "cswap",
-            "AMP": "amp",
-            "Matrix": "matrix"
-        }
         self.cmds = []
         self.result = MeasureResult()
         self.run_times = 0
@@ -191,7 +192,7 @@ class BackendLocalPython:
                 self.result.measures[index].add_measure(cmd.targets[0], res)
             return
 
-        return getattr(self, self.gate_map[str(cmd.gate)])(cmd)
+        return getattr(self, GATE_MAP[str(cmd.gate)])(cmd)
 
     def pack_result(self):
         index = self.run_times
@@ -1054,3 +1055,10 @@ class BackendLocalPython:
         """
 
         self.sim.matrix(cmd.controls, cmd.targets, cmd.cmdex.mat.reals, cmd.cmdex.mat.imags)
+
+    def reset_qubits(self, qubits):
+        for q in qubits:
+            prob = self.sim.calc_prob_of_outcome(q, 0)
+            ureal = np.array([[1.0 / math.sqrt(prob), 0], [0, 0]])
+            uimag = np.array([[0, 0], [0, 0]])
+            self.sim.apply_matrix2(q, ureal, uimag)
