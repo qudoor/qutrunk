@@ -39,11 +39,10 @@ class ADD(Operator):
             raise TypeError("The operand must be Qureg.")
 
         num_qubits = len(qr)
-        init_state = qr.circuit._init_state
-        max_value = 2 ** num_qubits - init_state - 1
+        max_value = 2 ** num_qubits - 1
 
         if self.number > max_value:
-            raise IndexError(f"{self.number + init_state} out of range.")
+            raise IndexError(f"{self.number} out of range.")
 
         for _ in range(self.number):
             ctrl = []
