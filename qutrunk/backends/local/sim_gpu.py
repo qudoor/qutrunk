@@ -791,14 +791,24 @@ class GpuLocal:
             outcome_prob = 1.0 - outcome_prob
         return outcome_prob
              
-if __name__ == "__main__":
-    backend = GpuLocal()
-    backend.create_qureg(2)
-    backend.init_zero_state()
-
-    backend.hadamard(0)
-    backend.controlled_phase_shift(0, 1, numpy.pi)
-    print(backend.real.copy_to_host())
-    print(backend.imag.copy_to_host())
+    def get_statevector(self):
+        """
+        Get the current state vector of probability amplitudes for a set of qubits
+        """
+        # todo better in float or ndarray
+        real = self.real.copy_to_host()
+        imag = self.imag.copy_to_host()
+        state_list = []
+        for i in range(self.sim_cpu.num_amps_per_rank):
+            real = real[i]
+            imag = imag[i]
+            # TODO: need to improve.
+            if real[i] > -1e-15 and real[i] < 1e-15:
+                real = 0
+            if imag[i] > -1e-15 and imag[i] < 1e-15:
+                imag = 0
+            state = str(real) + ", " + str(imag)
+            state_list.append(state)
+        return state_list
     
 
