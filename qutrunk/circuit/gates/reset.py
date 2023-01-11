@@ -8,6 +8,8 @@ from .basicgate import BasicGate
 class ResetGate(BasicGate):
     """Reset qubits gate.
 
+    Reset qubit to zero state.
+
     Example:
         .. code-block:: python
 
@@ -39,7 +41,7 @@ class ResetGate(BasicGate):
         qubits = [qubit] if isinstance(qubit, QuBit) else qubit
         targets = [q.index for q in qubits]
         cmd = Command(self, targets)
-        self.commit(qubit.circuit, cmd)
+        self.commit(qubits[0].circuit, cmd)
 
     def __mul__(self, qubit):
         """Overwrite * operator to achieve quantum logic gate operation, \

@@ -492,7 +492,7 @@ class TextDrawing:
             gates = [iEx(conditional=conditional) for _ in range(len(node.qargs))]
             add_connected_gate(node, gates, layer, current_cons)
         # Matrix
-        elif isinstance(op.gate, (Matrix, ResetGate)):
+        elif isinstance(op.gate, Matrix):
             ctrl_text = None
             params_array = TextDrawing.controlled_wires(node, layer)
             controlled_top, controlled_bot, controlled_edge, rest = params_array
@@ -509,6 +509,11 @@ class TextDrawing:
 
             if gates and len(target_qubits) > 1:
                 current_cons.append((len(gates), layer.qubit_layer[len(gates)]))
+        # Reset Gate
+        elif isinstance(op.gate, ResetGate):
+            target_qubits = node.qargs[len(node.op.controls):]
+            for q in target_qubits:
+                layer.set_qubit(q, BoxOnQuWire(node.op.gate.name, conditional=conditional))
         else:
             raise ValueError(
                 "Text visualizer does not know how to handle this node: ", op.name
