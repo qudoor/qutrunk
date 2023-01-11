@@ -6,7 +6,7 @@ import uuid
 
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, SubQureg, Qureg
-from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs
+from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs, ResetGate
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 from qutrunk.exceptions import QuTrunkError
@@ -50,8 +50,6 @@ class QCircuit:
         self.cmds = []
         self.cmd_cursor = 0
         self.counter = None
-        # mark circuit in Operator Context
-        self._in_op = False
 
         self.qubit_indices = {}
         self.cbit_indices = {}
@@ -72,16 +70,12 @@ class QCircuit:
 
         self.backend.circuit = self
 
-        self.outcome = None
-
         if name is None:
             name = self._generate_circuit_name()
         self.name = name
 
         if resource:
             self.counter = Counter(self)
-        # circuit init state
-        self._init_state = 0
 
     def allocate(self, qubits: Union[int, list]):
         """Allocate qubit in quantum circuit.
@@ -404,7 +398,7 @@ class QCircuit:
         # inverse cmd and gate
         cmds = self.cmds
         for cmd in reversed(cmds):
-            if isinstance(cmd.gate, (MeasureGate, AMP)):
+            if isinstance(cmd.gate, (MeasureGate, ResetGate, AMP)):
                 raise ValueError("The circuit cannot be inverted.")
             cmd.inverse = not cmd.inverse
             inverse_circuit.append_cmd(cmd)
