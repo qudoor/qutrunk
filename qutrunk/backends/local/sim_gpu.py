@@ -392,7 +392,8 @@ def controlled_compact_unitary_kernel(num_amps_per_rank, real, imag, control_qub
         imag[index_up] = reals[0]*state_imag_up + imags[0]*state_real_up - reals[1]*state_imag_lo + imags[1]*state_real_lo
         real[index_lo] = reals[1]*state_real_up - imags[1]*state_imag_up + reals[0]*state_real_lo + imags[0]*state_imag_lo
         imag[index_lo] = reals[1]*state_imag_up + imags[1]*state_real_up + reals[0]*state_imag_lo - imags[0]*state_real_lo
-
+    cuda.syncthreads()
+    
 @cuda.jit
 def controlled_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, ureal, uimag):
     size_half_block = 2**target_qubit
@@ -418,7 +419,8 @@ def controlled_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, targ
         imag[index_up] = ureal[0][0]*state_imag_up + uimag[0][0]*state_real_up + ureal[0][1]*state_imag_lo + uimag[0][1]*state_real_lo
         real[index_lo] = ureal[1][0]*state_real_up - uimag[1][0]*state_imag_up + ureal[1][1]*state_real_lo - uimag[1][1]*state_imag_lo
         imag[index_lo] = ureal[1][0]*state_imag_up + uimag[1][0]*state_real_up + ureal[1][1]*state_imag_lo + uimag[1][1]*state_real_lo
-
+    cuda.syncthreads()
+    
 @cuda.jit
 def multi_controlled_two_qubit_unitary_kernel(num_amps_per_rank, real, imag, ctrl_mask, q1, q2, ureal, uimag):
     num_task = num_amps_per_rank // 2
@@ -455,7 +457,24 @@ def multi_controlled_two_qubit_unitary_kernel(num_amps_per_rank, real, imag, ctr
         
     real[ind11] = ureal[3][0]*re00 - uimag[3][0]*im00 + ureal[3][1]*re01 - uimag[3][1]*im01 + ureal[3][2]*re10 - uimag[3][2]*im10 + ureal[3][3]*re11 - uimag[3][3]*im11
     imag[ind11] = uimag[3][0]*re00 + ureal[3][0]*im00 + uimag[3][1]*re01 + ureal[3][1]*im01 + uimag[3][2]*re10 + ureal[3][2]*im10 + uimag[3][3]*re11 + ureal[3][3]*im11  
-        
+    cuda.syncthreads()
+
+@cuda.jit
+def find_prob_of_zero_kernel(num_amps_per_rank, real, imag, target, total_prob):
+    num_task = num_amps_per_rank // 2
+    size_half_block = 2**target
+    size_block = size_half_block * 2
+
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if this_task>=num_task:
+        return
+    
+    this_block = this_task // size_half_block
+    index = this_block*size_block + this_task%size_half_block
+    
+    total_prob[this_task] = real[index] * real[index] + imag[index] * imag[index]
+    cuda.syncthreads()
+    
 class GpuLocal:
     """Simulator-gpu implement."""
 
@@ -762,7 +781,16 @@ class GpuLocal:
 
     def reset(self, target_qubit, ureal, uimag):
         self.apply_matrix2(target_qubit, ureal, uimag)
-
+    
+    def calc_prob_of_outcome(self, target, outcome):
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        outcome_prob = cuda.device_array(self.sim_cpu.num_amps_per_rank, numpy.float_)
+        find_prob_of_zero_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, outcome_prob)
+        if outcome == 1:
+            outcome_prob = 1.0 - outcome_prob
+        return outcome_prob
+             
 if __name__ == "__main__":
     backend = GpuLocal()
     backend.create_qureg(2)
