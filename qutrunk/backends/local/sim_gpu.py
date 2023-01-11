@@ -96,10 +96,10 @@ def hadamard_kernel(num_amps_per_rank, real, imag, target_qubit):
     imag[index_lo] = rec_root*(state_imag_up - state_imag_lo)
 
 @cuda.jit
-def phase_shift_kernel(num_amps_per_rank, real, imag, target_qubit, cos_angle, sin_angle):
+def phase_shift_kernel(num_amps_per_rank, real, imag, target, cos_angle, sin_angle):
     num_tasks = num_amps_per_rank >> 1
 
-    size_half_block = 1 << target_qubit
+    size_half_block = 1 << target
     size_block      = 2 * size_half_block
 
     this_task = cuda.grid(1)
@@ -115,6 +115,77 @@ def phase_shift_kernel(num_amps_per_rank, real, imag, target_qubit, cos_angle, s
 
     real[index_lo] = cos_angle*state_real_lo - sin_angle*state_imag_lo
     imag[index_lo] = sin_angle*state_real_lo + cos_angle*state_imag_lo
+
+@cuda.jit
+def controlled_phase_shift_kernel(num_amps_per_rank, real, imag, control, target, cos_angle, sin_angle):
+    index = cuda.grid(1)
+    if (index >= num_amps_per_rank):
+        return
+
+    bit1 = extract_bit(control, index)
+    bit2 = extract_bit (target, index)
+    if (bit1 and bit2):
+        state_real_lo = real[index]
+        state_imag_lo = imag[index]
+        
+        real[index] = cos_angle*state_real_lo - sin_angle*state_imag_lo
+        imag[index] = sin_angle*state_real_lo + cos_angle*state_imag_lo
+
+@cuda.jit
+def rotate_around_axis_kernel(num_amps_per_rank, real, imag, target, alpha_real, alpha_imag, beta_real, beta_imag):
+    num_tasks = num_amps_per_rank >> 1
+
+    size_half_block = 1 << target
+    size_block      = 2 * size_half_block
+
+    this_task = cuda.grid(1)
+    if (this_task >= num_tasks):
+        return
+
+    this_block = this_task // size_half_block
+    index_up   = this_block * size_block + this_task % size_half_block
+    index_lo    = index_up + size_half_block
+
+    # store current state vector values in temp variables
+    state_real_up = real[index_up]
+    state_imag_up = imag[index_up]
+
+    state_real_lo = real[index_lo]
+    state_imag_lo = imag[index_lo]
+
+    real[index_up] = alpha_real * state_real_up - alpha_imag * state_imag_up - beta_real * state_real_lo - beta_imag * state_imag_lo
+    imag[index_up] = alpha_real * state_imag_up + alpha_imag * state_real_up - beta_real * state_imag_lo + beta_imag * state_real_lo
+
+    real[index_lo] = beta_real * state_real_up - beta_imag * state_imag_up + alpha_real * state_real_lo + alpha_imag * state_imag_lo
+    imag[index_lo] = beta_real * state_imag_up + beta_imag * state_real_up + alpha_real * state_imag_lo - alpha_imag * state_real_lo
+
+@cuda.jit
+def rotate_around_axis_kernel(num_amps_per_rank, real, imag, target, alpha_real, alpha_imag, beta_real, beta_imag):
+    num_tasks = num_amps_per_rank >> 1
+
+    size_half_block = 1 << target
+    size_block      = 2 * size_half_block
+
+    this_task = cuda.grid(1)
+    if (this_task >= num_tasks):
+        return
+
+    this_block = this_task // size_half_block
+    index_up   = this_block * size_block + this_task % size_half_block
+    index_lo    = index_up + size_half_block
+
+    # store current state vector values in temp variables
+    state_real_up = real[index_up]
+    state_imag_up = imag[index_up]
+
+    state_real_lo = real[index_lo]
+    state_imag_lo = imag[index_lo]
+
+    real[index_up] = alpha_real * state_real_up - alpha_imag * state_imag_up - beta_real * state_real_lo - beta_imag * state_imag_lo
+    imag[index_up] = alpha_real * state_imag_up + alpha_imag * state_real_up - beta_real * state_imag_lo + beta_imag * state_real_lo
+
+    real[index_lo] = beta_real * state_real_up - beta_imag * state_imag_up + alpha_real * state_real_lo + alpha_imag * state_imag_lo
+    imag[index_lo] = beta_real * state_imag_up + beta_imag * state_real_up + alpha_real * state_imag_lo - alpha_imag * state_real_lo
 
 @cuda.jit
 def controlled_not_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit):
@@ -164,30 +235,51 @@ def unitary_kernel(num_amps_per_rank, real, imag, target_qubit, ureal, uimag):
     imag[index_lo] = ureal[1][0]*state_imag_up + uimag[1][0]*state_real_up + ureal[1][1]*state_imag_lo + uimag[1][1]*state_real_lo
 
 @cuda.jit
-def controlled_compact_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, reals, imags):
-    size_half_block = 2**target_qubit
-    size_block = size_half_block * 2
-    num_task = num_amps_per_rank // 2
-    
-    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
-    if this_task>=num_task:
+def pauli_x_kernel(num_amps_per_rank, real, imag, target):
+    num_tasks = num_amps_per_rank >>1
+
+    size_half_block = 1 << target
+    size_block     = 2 * size_half_block
+
+    this_task = cuda.grid(1)
+    if (this_task >= num_tasks):
+        return
+
+    this_block   = this_task // size_half_block
+    index_up     = this_block * size_block + this_task % size_half_block
+    index_lo     = index_up + size_half_block
+
+    # store current state vector values in temp variables
+    state_real_up = real[index_up]
+    state_imag_up = imag[index_up]
+
+    real[index_up] = real[index_lo]
+    imag[index_up] = imag[index_lo]
+
+    real[index_lo] = state_real_up
+    imag[index_lo] = state_imag_up
+
+@cuda.jit
+def pauli_y_kernel(num_amps_per_rank, real, imag, target, conjFac):
+    size_half_block = 1 << target
+    size_block      = 2 * size_half_block
+    num_tasks       = num_amps_per_rank >> 1
+    this_task = cuda.grid(1)
+    if (this_task >= num_tasks):
         return
     
     this_block = this_task // size_half_block
-    index_up = this_block*size_block + this_task%size_half_block
-    index_lo = index_up + size_half_block
-    
-    control_bit = extract_bit(control_qubit, index_up)
-    if control_bit:
-        state_real_up = real[index_up]
-        state_imag_up = imag[index_up]
-        state_real_lo = real[index_lo]
-        state_imag_lo = imag[index_lo]
+    index_up   = this_block * size_block + this_task % size_half_block
+    index_lo   = index_up + size_half_block
 
-        real[index_up] = reals[0]*state_real_up - imags[0]*state_imag_up - reals[1]*state_real_lo - imags[1]*state_imag_lo
-        imag[index_up] = reals[0]*state_imag_up + imags[0]*state_real_up - reals[1]*state_imag_lo + imags[1]*state_real_lo
-        real[index_lo] = reals[1]*state_real_up - imags[1]*state_imag_up + reals[0]*state_real_lo + imags[0]*state_imag_lo
-        imag[index_lo] = reals[1]*state_imag_up + imags[1]*state_real_up + reals[0]*state_imag_lo - imags[0]*state_real_lo
+    state_real_up = real[index_up]
+    state_imag_up = imag[index_up]
+
+    # update under +-{{0, -i}, {i, 0}}
+    real[index_up] = conjFac * imag[index_lo]
+    imag[index_up] = conjFac * -real[index_lo]
+    real[index_lo] = conjFac * -state_imag_up
+    imag[index_lo] = conjFac * state_real_up
 
 @cuda.jit
 def controlled_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, ureal, uimag):
@@ -301,7 +393,7 @@ class GpuLocal:
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         hadamard_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit)
     
-    def phase_shift(self, target_qubit, angle):
+    def phase_shift(self, target, angle):
         """Shift the phase between |0> and |1> of a single qubit by a given angle.
 
         Args:
@@ -311,9 +403,77 @@ class GpuLocal:
         cos_angle = math.cos(angle)
         sin_angle = math.sin(angle)
         threads_per_block = 128
-        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
-        phase_shift_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, cos_angle, sin_angle)
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        phase_shift_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, cos_angle, sin_angle)
 
+    def controlled_phase_shift(self, control, target, angle):
+        """
+        Controlled-Phase gate.
+
+        Args:
+            control: control qubit
+            target: target qubit
+            angle: amount by which to shift the phase in radians.
+        """
+        cos_angle = math.cos(angle)
+        sin_angle = math.sin(angle)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        controlled_phase_shift_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control, target, cos_angle, sin_angle)
+
+    def rotate(self, target, ureal, uimag):
+        """Rotate gate."""
+        self.apply_matrix2(target, ureal, uimag)
+    
+    def rotate_x(self, target, angle):
+        """rx gate."""
+        unit_axis = [1, 0, 0]
+        self.rotate_around_axis(target, angle, unit_axis)
+
+    def rotate_y(self, target, angle):
+        """ry gate."""
+        unit_axis = [0, 1, 0]
+        self.rotate_around_axis(target, angle, unit_axis)
+
+    def rotate_z(self, target, angle):
+        """rz gate."""
+        unit_axis = [0, 0, 1]
+        self.rotate_around_axis(target, angle, unit_axis)
+    
+    def rotate_around_axis(self, target, angle, unit_axis):
+        mag = math.sqrt(
+            unit_axis[0] * unit_axis[0]
+            + unit_axis[1] * unit_axis[1]
+            + unit_axis[2] * unit_axis[2]
+        )
+        unit_vec = [unit_axis[0] / mag, unit_axis[1] / mag, unit_axis[2] / mag]
+
+        alpha_real = math.cos(angle / 2.0)
+        alpha_imag = -math.sin(angle / 2.0) * unit_vec[2]
+        beta_real = math.sin(angle / 2.0) * unit_vec[1]
+        beta_imag = -math.sin(angle / 2.0) * unit_vec[0]
+
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        rotate_around_axis_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, alpha_real, alpha_imag, beta_real, beta_imag)
+
+    def pauli_x(self, target):
+        """The single-qubit Pauli-X gate."""
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        pauli_x_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target)
+
+    def pauli_y(self, target):
+        """The single-qubit Pauli-Y gate."""
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        pauli_y_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, 1)
+
+    def pauli_z(self, target):
+        """The single-qubit Pauli-Z gate."""
+        real = -1
+        imag = 0
+        self.phase_shift_by_term(self.real, self.imag, target, real, imag)
 
     def control_not(self, control_qubit, target_qubit):
         """Control not gate"""
@@ -437,7 +597,7 @@ if __name__ == "__main__":
     backend.init_zero_state()
 
     backend.hadamard(0)
-    backend.phase_shift(0, numpy.pi)
+    backend.controlled_phase_shift(0, 1, numpy.pi)
     print(backend.real.copy_to_host())
     print(backend.imag.copy_to_host())
     
