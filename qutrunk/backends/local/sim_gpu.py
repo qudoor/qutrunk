@@ -785,8 +785,11 @@ class GpuLocal:
     def calc_prob_of_outcome(self, target, outcome):
         threads_per_block = 128
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
-        outcome_prob = cuda.device_array(self.sim_cpu.num_amps_per_rank, numpy.float_)
-        find_prob_of_zero_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, outcome_prob)
+        outcome_prob_list = cuda.device_array(self.sim_cpu.num_amps_per_rank, numpy.float_)
+        find_prob_of_zero_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, outcome_prob_list)
+        outcome_prob = 0.0
+        for temp in outcome_prob_list: 
+            outcome_prob += temp
         if outcome == 1:
             outcome_prob = 1.0 - outcome_prob
         return outcome_prob
