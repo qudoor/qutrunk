@@ -211,6 +211,73 @@ def controlled_not_kernel(num_amps_per_rank, real, imag, control_qubit, target_q
         imag[index_lo] = state_imag_up
 
 @cuda.jit
+def multi_controlled_multi_qubit_not_kernel(num_amps_per_rank, real, imag, ctrl_mask, targ_mask):
+    # althouugh each thread swaps/updates two amplitudes, we still invoke one thread per amp
+    amp_ind = cuda.grid(1)
+    if (amp_ind >= num_amps_per_rank):
+        return
+
+    # modify amplitudes only if control qubits are 1 for this state
+    if (ctrl_mask and ((ctrl_mask & amp_ind) != ctrl_mask)):
+        return
+    
+    mate_ind = amp_ind ^ targ_mask
+    
+    # if the mate is lower index, another thread is handling it
+    if (mate_ind < amp_ind):
+        return
+        
+    # /* it may seem wasteful to spawn more threads than are needed, and abort 
+    #  * half of them due to the amp pairing above (and potentially abort
+    #  * an exponential number due to ctrlMask). however, since we are moving 
+    #  * global memory directly in a potentially non-contiguous fashoin, this 
+    #  * method is likely to be memory bandwidth bottlenecked anyway 
+    #  */
+    
+    mate_re = real[mate_ind]
+    mate_im = imag[mate_ind]
+    
+    # swap amp with mate
+    real[mate_ind] = real[amp_ind]
+    imag[mate_ind] = imag[amp_ind]
+    real[amp_ind] = mate_re
+    imag[amp_ind] = mate_im
+
+@cuda.jit
+def cy_kernel(num_amps_per_rank, real, imag, control, target, conj_factor):                                 
+    size_half_block = 1 << target
+    sizeBlock       = 2 * size_half_block
+
+    index = cuda.grid(1)
+    if (index >= (num_amps_per_rank >> 1)):
+        return
+
+    this_block   = index / size_half_block
+    index_up     = this_block * sizeBlock + index % size_half_block
+    index_lo     = index_up + size_half_block
+
+    control_bit = extract_bit(control, index_up)
+    if (control_bit):
+        state_real_up = real[index_up]
+        state_imag_up = imag[index_up]
+
+        # update under +-{{0, -i}, {i, 0}}
+        real[index_up] = conj_factor * imag[index_lo]
+        imag[index_up] = conj_factor * -real[index_lo]
+        real[index_lo] = conj_factor * -state_imag_up
+        imag[index_lo] = conj_factor * state_real_up
+
+@cuda.jit
+def cz_kernel(num_amps_per_rank, real, imag, mask):
+    index = cuda.grid(1)
+    if (index >= num_amps_per_rank):
+        return
+
+    if (mask == (mask & index)):
+        real [index] = - real[index]
+        imag [index] = - imag[index]
+
+@cuda.jit
 def unitary_kernel(num_amps_per_rank, real, imag, target_qubit, ureal, uimag):
     size_half_block = 2**target_qubit
     size_block = size_half_block * 2
@@ -281,6 +348,25 @@ def pauli_y_kernel(num_amps_per_rank, real, imag, target, conjFac):
     real[index_lo] = conjFac * -state_imag_up
     imag[index_lo] = conjFac * state_real_up
 
+@cuda.jit
+def swap_kernel(num_amps_per_rank, real, imag, target_0, target_1):
+    num_tasks = num_amps_per_rank >> 2
+    this_task = cuda.grid(1)
+    if (this_task >= num_tasks):
+        return
+    
+    ind00 = insert_two_zero_bits(this_task, target_0, target_1)
+    ind01 = flip_bit(ind00, target_0)
+    ind10 = flip_bit(ind00, target_1)
+
+    # extract statevec amplitudes 
+    re01 = real[ind01]; im01 = imag[ind01]
+    re10 = real[ind10]; im10 = imag[ind10]
+
+    # swap 01 and 10 amps
+    real[ind01] = re10; real[ind10] = re01
+    imag[ind01] = im10; imag[ind10] = im01
+    
 @cuda.jit
 def controlled_compact_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, reals, imags):
     size_half_block = 2**target_qubit
@@ -497,15 +583,75 @@ class GpuLocal:
 
     def pauli_z(self, target):
         """The single-qubit Pauli-Z gate."""
-        real = -1
-        imag = 0
-        self.phase_shift_by_term(self.real, self.imag, target, real, imag)
+        cos_angle = -1
+        sin_angle = 0
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        phase_shift_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, cos_angle, sin_angle)
+
+    def s_gate(self, target):
+        """The single-qubit S gate."""
+        cos_angle = 0
+        sin_angle = 1
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        phase_shift_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, cos_angle, sin_angle)
+
+    def t_gate(self, target):
+        """The single-qubit T gate."""
+        cos_angle = 1 / math.sqrt(2)
+        sin_angle = 1 / math.sqrt(2)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        phase_shift_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, cos_angle, sin_angle)
+
+    def sdg(self, target, ureal, uimag):
+        self.apply_matrix2(target, ureal, uimag)
+
+    def tdg(self, target, ureal, uimag):
+        self.apply_matrix2(target, ureal, uimag)
+
+    def sqrtx(self, target, ureal, uimag):
+        self.apply_matrix2(target, ureal, uimag)
+
+    def sqrtswap(self, target_0, target_1, ureal, uimag):
+        self.apply_matrix4(target_0, target_1, ureal, uimag)
+
+    def swap(self, target_0, target_1):
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 2) / threads_per_block)
+        swap_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_0, target_1)
 
     def control_not(self, control_qubit, target_qubit):
         """Control not gate"""
         threads_per_block = 128
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         controlled_not_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit)
+
+    def multi_controlled_multi_qubit_not(self, control_bits, num_control_bits, target_bits, num_target_bits):
+        ctrl_mask = self.get_qubit_bit_mask(control_bits, num_control_bits)
+        targ_mask = self.get_qubit_bit_mask(target_bits, num_target_bits)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        multi_controlled_multi_qubit_not_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, ctrl_mask, targ_mask)
+
+    def get_qubit_bit_mask(self, qubits, numqubit):
+        mask = 0
+        for index in range(numqubit):
+            mask = mask | (1 << qubits[index])
+        return mask
+
+    def cy(self, control, target):
+        conj_factor = 1
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        cy_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control, target, conj_factor)
+
+    def cz(self, control_bits, num_control_bits):
+        mask = self.get_qubit_bit_mask(control_bits, num_control_bits)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        cz_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, mask)
 
     def u3(self, target_qubit, ureal, uimag):
         orgreal = cuda.to_device(ureal, stream=0)
@@ -566,7 +712,7 @@ class GpuLocal:
         orgreal = cuda.to_device(ureal, stream=0)
         orgimag = cuda.to_device(uimag, stream=0)
         threads_per_block = 128
-        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
         unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, orgreal, orgimag)
         
     def x1(self, target_qubit, ureal, uimag):
@@ -596,7 +742,7 @@ class GpuLocal:
         orgreal = cuda.to_device(ureal, stream=0)
         orgimag = cuda.to_device(uimag, stream=0)
         threads_per_block = 128
-        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 2) / threads_per_block)
         multi_controlled_two_qubit_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, ctrl_mask, target_qubit0, target_qubit1, orgreal, orgimag)
         
     def cu1(self, target_qubit0, target_qubit1, ureal, uimag):
