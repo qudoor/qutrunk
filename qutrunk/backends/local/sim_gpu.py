@@ -282,6 +282,32 @@ def pauli_y_kernel(num_amps_per_rank, real, imag, target, conjFac):
     imag[index_lo] = conjFac * state_real_up
 
 @cuda.jit
+def controlled_compact_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, reals, imags):
+    size_half_block = 2**target_qubit
+    size_block = size_half_block * 2
+    num_task = num_amps_per_rank // 2
+    
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if this_task>=num_task:
+        return
+    
+    this_block = this_task // size_half_block
+    index_up = this_block*size_block + this_task%size_half_block
+    index_lo = index_up + size_half_block
+    
+    control_bit = extract_bit(control_qubit, index_up)
+    if control_bit:
+        state_real_up = real[index_up]
+        state_imag_up = imag[index_up]
+        state_real_lo = real[index_lo]
+        state_imag_lo = imag[index_lo]
+
+        real[index_up] = reals[0]*state_real_up - imags[0]*state_imag_up - reals[1]*state_real_lo - imags[1]*state_imag_lo
+        imag[index_up] = reals[0]*state_imag_up + imags[0]*state_real_up - reals[1]*state_imag_lo + imags[1]*state_real_lo
+        real[index_lo] = reals[1]*state_real_up - imags[1]*state_imag_up + reals[0]*state_real_lo + imags[0]*state_imag_lo
+        imag[index_lo] = reals[1]*state_imag_up + imags[1]*state_real_up + reals[0]*state_imag_lo - imags[0]*state_real_lo
+
+@cuda.jit
 def controlled_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, ureal, uimag):
     size_half_block = 2**target_qubit
     size_block = size_half_block * 2
