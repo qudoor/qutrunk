@@ -49,6 +49,7 @@ from qutrunk.circuit.gates import (
     SqrtXdgGate,
     CSqrtXGate,
     Matrix,
+    ResetGate
 )
 from .text_draw_element import InputWire
 from .layer import Layer
@@ -508,6 +509,11 @@ class TextDrawing:
 
             if gates and len(target_qubits) > 1:
                 current_cons.append((len(gates), layer.qubit_layer[len(gates)]))
+        # Reset Gate
+        elif isinstance(op.gate, ResetGate):
+            target_qubits = node.qargs[len(node.op.controls):]
+            for q in target_qubits:
+                layer.set_qubit(q, BoxOnQuWire(node.op.gate.name, conditional=conditional))
         else:
             raise ValueError(
                 "Text visualizer does not know how to handle this node: ", op.name
