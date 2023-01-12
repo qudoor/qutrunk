@@ -8,10 +8,7 @@ from .basicgate import BasicGate, BasicRotateGate
 
 
 class U1(BasicGate):
-    """U1 gate.
-
-    Args:
-        alpha: Rotation angle.
+    """U1 gate, single-qubit rotation about the Z axis.
 
     Example:
         .. code-block:: python
@@ -19,15 +16,15 @@ class U1(BasicGate):
             U1(pi/2) * qr[0]
     """
 
-    def __init__(self, alpha):
+    def __init__(self, lam):
         """
         Args:
             alpha: Rotation angle.
         """
-        if alpha is None:
+        if lam is None:
             raise NotImplementedError("The argument cannot be empty.")
         super().__init__()
-        self.rotation = alpha
+        self.lam = lam
 
     def __str__(self):
         return "U1"
@@ -50,7 +47,7 @@ class U1(BasicGate):
             raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
-        cmd = Command(self, targets, rotation=[self.rotation], inverse=self.is_inverse)
+        cmd = Command(self, targets, rotation=[self.lam], inverse=self.is_inverse)
         self.commit(qubit.circuit, cmd)
 
     def __mul__(self, qubit):
@@ -61,12 +58,12 @@ class U1(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        lam = float(self.rotation)
+        lam = float(self.lam)
         return np.array([[1, 0], [0, np.exp(1j * lam)]])
 
     def inv(self):
         """Apply inverse gate."""
-        gate = U1(self.rotation)
+        gate = U1(self.lam)
         gate.is_inverse = not self.is_inverse
         return gate
 
@@ -78,7 +75,7 @@ class U1(BasicGate):
         """
         if ctrl_cnt > 1:
             raise ValueError("U1 gate do not support multiple control bits.")
-        gate = CU1(self.rotation)
+        gate = CU1(self.lam)
         gate.is_inverse = self.is_inverse
         return gate
 
@@ -86,24 +83,21 @@ class U1(BasicGate):
 class CU1(BasicRotateGate):
     """Control U1 gate.
 
-    Args:
-        alpha: Rotation angle.
-
     Example:
         .. code-block:: python
 
            CU1(pi/2) * (qr[0], qr[1])
     """
 
-    def __init__(self, alpha):
+    def __init__(self, lam):
         """Create new CU1 gate.
         Args:
-            alpha: Rotation angle.
+            lam: Rotation angle.
         """
-        if alpha is None:
+        if lam is None:
             raise TypeError("The argument cannot be empty.")
         super().__init__()
-        self.rotation = alpha
+        self.lam = lam
 
     def __str__(self):
         return "CU1"
@@ -132,7 +126,7 @@ class CU1(BasicRotateGate):
         controls = [qubits[0].index]
         targets = [qubits[1].index]
         cmd = Command(
-            self, targets, controls, inverse=self.is_inverse, rotation=[self.rotation]
+            self, targets, controls, inverse=self.is_inverse, rotation=[self.lam]
         )
         self.commit(qubits[0].circuit, cmd)
 
@@ -144,13 +138,13 @@ class CU1(BasicRotateGate):
     def matrix(self):
         """Access to the matrix property of this gate."""
         # TODO: definition have problem.
-        half_alpha = float(self.rotation)
+        half_alpha = float(self.lam)
         return np.matrix(
             [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, np.exp(1j * half_alpha)]]
         )
 
     def inv(self):
         """Apply inverse gate."""
-        gate = CU1(self.rotation)
+        gate = CU1(self.lam)
         gate.is_inverse = not self.is_inverse
         return gate

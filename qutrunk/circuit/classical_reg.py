@@ -39,10 +39,6 @@ class CReg:
         """
         self.cbits.append(cbit)
 
-    def qasm(self):
-        """Return OPENQASM string for this register."""
-        return f"creg {self.name}[{self.size}];"
-
     def __getitem__(self, idx):
         """Return a CBit instance.
 

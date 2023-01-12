@@ -19,7 +19,7 @@ QuTrunk
    :caption: API
 
    Cpp2/circuit  
-   Cpp3/gates
+   Cpp3/gates 
    Cpp4/ops
    Bpp/backends
    Epp1/example   

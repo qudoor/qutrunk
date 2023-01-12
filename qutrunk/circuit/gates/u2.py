@@ -8,12 +8,8 @@ from qutrunk.circuit.qubit import QuBit
 
 
 class U2(BasicGate):
-    """U2 gate.
-
-    Args:
-        theta: U2 gate parameter1.
-        phi: U2 gate parameter2.
-
+    """U2 gate, single-qubit rotation about the X+Z axis.
+    
     Example:
         .. code-block:: python
 
@@ -21,16 +17,12 @@ class U2(BasicGate):
     """
 
     def __init__(self, phi, lam):
-        """
-        Args:
-            theta: U2 gate parameter1.
-            phi: U2 gate parameter2.
-        """
         if lam is None or phi is None:
             raise ValueError("The argument cannot be empty.")
         super().__init__()
         self.lam = lam
         self.phi = phi
+        self.lam = lam
 
     def __str__(self):
         return "U2"
