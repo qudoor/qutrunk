@@ -10,3 +10,5 @@ backends
    01/qutrunk.backends
    02/qutrunk.backends.ibm
    03/qutrunk.backends.qusprout
+   04/qutrunk.backends.braket
+   05/qutrunk.backends.local

@@ -51,8 +51,7 @@ class TdgGate(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
-        # TODO: ??
-        return np.matrix([[1, 0], [0, cmath.exp(1j * cmath.pi / 4)]]).getH()
+        return np.array([[1, 0], [0, (1 - 1j) / np.sqrt(2)]])
 
     def inv(self):
         """Apply inverse gate."""

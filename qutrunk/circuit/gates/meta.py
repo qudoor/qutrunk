@@ -11,6 +11,8 @@ from qutrunk.circuit.command import Command, CmdEx, Mat
 class All(BasicGate):
     """Meta operator, provides unified operation of multiple qubits.
 
+    .. note: Only support single qubit gate.
+
     Args:
         gate: The gate will apply to all qubits.
 
@@ -78,20 +80,21 @@ class Power(BasicGate):
 
 
 class Matrix(BasicGate):
-    """Custom matrix gate.
+    """Customized matrix gate.
 
     Example:
             .. code-block:: python
 
                 Matrix([[0.5, 0.5], [0.5, -0.5]]) * qr[0]  -- No controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 1) * (qr[0], qr[1])  -- qr[0] is controlled bit
-                Matrix([[0.5, 0.5], [0.5, -0.5]], 2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
+                Matrix([[0.5, 0.5], [0.5, -0.5]]).ctrl(1) * (qr[0], qr[1])  -- qr[0] is controlled bit
+                Matrix([[0.5, 0.5], [0.5, -0.5]]).ctrl(2) * (qr[0], qr[1], qr[2])  -- qr[0], qr[1] are controlled bits
     """
 
-    def __init__(self, matrix, ctrl_cnt=0):
+    def __init__(self, matrix, name = None):
         super().__init__()
         self.matrix = matrix
-        self.ctrl_cnt = ctrl_cnt
+        self.ctrl_cnt = 0
+        self.name = "Mat" if name is None else name
 
     def __str__(self):
         return "Matrix"
@@ -100,7 +103,7 @@ class Matrix(BasicGate):
         """Quantum logic gate operation.
 
         Args:
-            qubit: The quantum bit to apply X gate.
+            qubits: The quantum bit to apply X gate.
 
         Raises:
             NotImplementedError: If the argument is not a Qubit object.
@@ -110,6 +113,7 @@ class Matrix(BasicGate):
         ):
             raise TypeError("The argument must be Qubit object.")
 
+        # TODO: need to improve.
         if (isinstance(qubits, QuBit) and self.ctrl_cnt > 0) or (
             not isinstance(qubits, QuBit) and (len(qubits) <= self.ctrl_cnt)
         ):
@@ -153,7 +157,8 @@ class Matrix(BasicGate):
 
     def inv(self):
         """Apply inverse gate."""
-        gate = Matrix(self.matrix, self.ctrl_cnt)
+        gate = Matrix(self.matrix, self.name)
+        gate.ctrl_cnt = self.ctrl_cnt
         gate.is_inverse = not self.is_inverse
         return gate
 
@@ -163,7 +168,8 @@ class Matrix(BasicGate):
         Args:
             ctrl_cnt: The number of control qubits, default: 1.
         """
-        gate = Matrix(self.matrix, ctrl_cnt)
+        gate = Matrix(self.matrix, self.name)
+        gate.ctrl_cnt = ctrl_cnt
         gate.is_inverse = self.is_inverse
         return gate
 
@@ -190,7 +196,10 @@ class Matrix(BasicGate):
                 m = np.matrix(m)
                 print(is_unitary(m))
         """
-        return np.allclose(np.eye(mat.shape[0]), mat.H * mat)
+        mat_dagger = np.conj(mat.T)
+        m = np.allclose(mat_dagger.dot(mat), np.identity(mat.shape[0]))
+        n = np.allclose(mat.dot(mat_dagger), np.identity(mat.shape[0]))
+        return m and n
 
 
 class Gate(BasicGate):
@@ -203,8 +212,8 @@ class Gate(BasicGate):
 
             @Gate
             def my_gate(a, b, c, d):
-                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]], 2).inv(), (a, b, c)) \
-                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl().inv(), (a, c)) \
+                return Gate() << (Matrix([[-0.5, 0.5], [0.5, 0.5]]).ctrl(2).inv(), (a, b, c)) \
+                    << (Matrix([[0.5, -0.5], [0.5, 0.5]]).ctrl(1).inv(), (a, c)) \
                     << (Matrix([[0.5, 0.5], [-0.5, 0.5]]), b)
 
             my_gate * (q[3], q[1], q[0], q[2])

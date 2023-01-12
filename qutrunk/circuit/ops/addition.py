@@ -25,7 +25,7 @@ class ADD(Operator):
             ADD(3) * qr
             All(Measure) * qr
             res = circuit.run()
-            print(res.get_outcome())
+            print(res.get_bitstrs())
     """
 
     def __init__(self, number: int):
@@ -39,7 +39,10 @@ class ADD(Operator):
             raise TypeError("The operand must be Qureg.")
 
         num_qubits = len(qr)
+        max_value = 2 ** num_qubits - 1
 
+        if self.number > max_value:
+            raise IndexError(f"{self.number} out of range.")
 
         for _ in range(self.number):
             ctrl = []

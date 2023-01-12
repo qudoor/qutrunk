@@ -4,7 +4,7 @@ charset-normalizer==2.1.1
 colorama==0.4.5
 idna==3.4
 iniconfig==1.1.1
-numpy==1.23.3
+numpy==1.21.6
 packaging==21.3
 pluggy==1.0.0
 ply==3.11
@@ -19,3 +19,4 @@ six==1.16.0
 thrift==0.16.0
 tomli==2.0.1
 urllib3==1.26.12
+amazon-braket-sdk==1.33.0

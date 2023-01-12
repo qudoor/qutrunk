@@ -7,13 +7,17 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   qutrunk.algorithm
    qutrunk.backends
    qutrunk.circuit
+   qutrunk.config
    qutrunk.converters
    qutrunk.dagcircuit
    qutrunk.example
    qutrunk.qasm
-   qutrunk.sim
+   qutrunk.qml
+   qutrunk.test
+   qutrunk.thrift
    qutrunk.tools
    qutrunk.visualizations
 

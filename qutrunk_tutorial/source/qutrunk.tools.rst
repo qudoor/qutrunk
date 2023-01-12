@@ -28,6 +28,14 @@ qutrunk.tools.check\_sprout module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.tools.env\_reader module
+--------------------------------
+
+.. automodule:: qutrunk.tools.env_reader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qutrunk.tools.function\_time module
 -----------------------------------
 
@@ -40,14 +48,6 @@ qutrunk.tools.get\_config module
 --------------------------------
 
 .. automodule:: qutrunk.tools.get_config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-qutrunk.tools.platform module
------------------------------
-
-.. automodule:: qutrunk.tools.platform
    :members:
    :undoc-members:
    :show-inheritance:

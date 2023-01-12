@@ -11,7 +11,6 @@ from qutrunk.circuit.gates import (
     MCZ,
     MCX,
     P,
-    U3,
     ZGate,
     R,
     Rx,
@@ -49,6 +48,8 @@ from qutrunk.circuit.gates import (
     CSwapGate,
     SqrtXdgGate,
     CSqrtXGate,
+    Matrix,
+    ResetGate
 )
 from .text_draw_element import InputWire
 from .layer import Layer
@@ -298,8 +299,6 @@ class TextDrawing:
             add_connected_gate(node, gates, layer, current_cons)
         elif isinstance(op.gate, P):
             layer.set_qubit(node.qargs[0], BoxOnQuWire("P", conditional=conditional))
-        elif isinstance(op.gate, U3):
-            layer.set_qubit(node.qargs[0], BoxOnQuWire("U3", conditional=conditional))
         elif isinstance(op.gate, ZGate):
             layer.set_qubit(node.qargs[0], BoxOnQuWire("Z", conditional=conditional))
         elif isinstance(op.gate, R):
@@ -492,6 +491,29 @@ class TextDrawing:
         elif isinstance(op.gate, iSwapGate):
             gates = [iEx(conditional=conditional) for _ in range(len(node.qargs))]
             add_connected_gate(node, gates, layer, current_cons)
+        # Matrix
+        elif isinstance(op.gate, Matrix):
+            ctrl_text = None
+            params_array = TextDrawing.controlled_wires(node, layer)
+            controlled_top, controlled_bot, controlled_edge, rest = params_array
+
+            gates = self.set_ctrl_state(node, conditional, ctrl_text, bool(controlled_bot))
+
+            target_qubits = node.qargs[len(node.op.controls):]
+            if len(target_qubits) == 1:
+                gates.append(BoxOnQuWire(node.op.gate.name, conditional=conditional))
+            else:
+                layer.set_qu_multibox(target_qubits, node.op.gate.name, conditional=conditional)
+
+            add_connected_gate(node, gates, layer, current_cons)
+
+            if gates and len(target_qubits) > 1:
+                current_cons.append((len(gates), layer.qubit_layer[len(gates)]))
+        # Reset Gate
+        elif isinstance(op.gate, ResetGate):
+            target_qubits = node.qargs[len(node.op.controls):]
+            for q in target_qubits:
+                layer.set_qubit(q, BoxOnQuWire(node.op.gate.name, conditional=conditional))
         else:
             raise ValueError(
                 "Text visualizer does not know how to handle this node: ", op.name

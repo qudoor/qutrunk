@@ -6,24 +6,22 @@
 QuTrunk
 =============
    
+..
+ .. toctree::
+    :maxdepth: 1
+   :caption: 量子门
 
-.. toctree::
-   :maxdepth: 1
-   :caption: 使用教程
-
-   circuit 
-   gate
-   operator
-   backend
+   Gate/gate1
+   Gate/gate2
 
 .. toctree::
    :maxdepth: 1
    :caption: API
 
-   Cpp2/circuit
+   Cpp2/circuit  
    Cpp3/gates 
    Cpp4/ops
-   Bpp/backends 
+   Bpp/backends
    Epp1/example   
 
   

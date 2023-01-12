@@ -6,7 +6,14 @@ from qutrunk.circuit.qubit import QuBit
 
 
 class XGate(BasicGate, Observable):
-    """Apply the single-qubit Pauli-X (also known as the X, sigma-X, NOT or bit-flip) gate.
+    r"""Apply the single-qubit Pauli-X (also known as the X, sigma-X, NOT or bit-flip) gate.
+
+    .. math::
+
+    X = \begin{pmatrix}
+            0 & 1 \\
+            1 & 0
+        \end{pmatrix}
 
     Example:
         .. code-block:: python
@@ -138,8 +145,13 @@ class MCX(BasicGate):
     @property
     def matrix(self):
         """Access to the matrix property of this gate."""
+        # TODO: have problem.
         if self.ctrl_cnt == 1:
             return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
+
+        if self.ctrl_cnt > 1:
+            from ._utils import compute_control_matrix
+            return compute_control_matrix(X.matrix, self.ctrl_cnt)
 
     def inv(self):
         """Apply inverse gate."""

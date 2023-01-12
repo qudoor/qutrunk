@@ -4,8 +4,8 @@ import uuid
 from thrift.protocol import TBinaryProtocol, TMultiplexedProtocol
 from thrift.transport import TSocket, TTransport
 
-from qutrunk.sim.qusprout.qusprout import QuSproutServer
-from qutrunk.sim.qusprout.qusproutdata import ttypes as qusproutdata
+from qutrunk.thrift.qusprout import QuSproutServer
+from qutrunk.thrift.qusproutdata import ttypes as qusproutdata
 from qutrunk.tools.function_time import timefn
 
 
@@ -19,17 +19,23 @@ class QuSproutApiServer:
     """
 
     def __init__(self, ip="localhost", port=9090):
-        socket = TSocket.TSocket(ip, port)
-        self._transport = TTransport.TBufferedTransport(socket)
-        protocol = TBinaryProtocol.TBinaryProtocol(self._transport)
-        quest = TMultiplexedProtocol.TMultiplexedProtocol(protocol, "QuSproutServer")
-        self._client = QuSproutServer.Client(quest)
+        self._ip = ip
+        self._port = port
+        self._client, self._transport = self.open("QuSproutServer")
         self._taskid = uuid.uuid4().hex
+
+    def open(self, name):
+        socket = TSocket.TSocket(self._ip, self._port)
+        transport = TTransport.TBufferedTransport(socket)
+        protocol = TBinaryProtocol.TBinaryProtocol(transport)
+        protocol = TMultiplexedProtocol.TMultiplexedProtocol(protocol, name)
+        client = QuSproutServer.Client(protocol)
         try:
-            self._transport.open()
+            transport.open()
         except Exception:
             print("QuSprout is not available!")
             os._exit(1)
+        return client, transport
 
     def close(self):
         self._transport.close()
@@ -74,7 +80,7 @@ class QuSproutApiServer:
         """
         req = qusproutdata.RunCircuitReq(self._taskid, shots)
         res = self._client.run(req)
-        return res.result
+        return res
 
     @timefn
     def get_prob(self, index):
@@ -152,3 +158,33 @@ class QuSproutApiServer:
         )
         res = self._client.getExpecPauliSum(req)
         return res.expect
+
+    def get_rand(self, length, cnt=1):
+        """
+        generate random number by QuDoor RandomCard integrated in QuSprout
+
+        Args:
+            length: length of the random number
+            cnt: amount of random number
+
+        Examples:
+            .. code-block:: python
+
+                from qutrunk.backends import BackendQuSprout
+
+                be = BackendQuSprout(ip='', port=9091)
+                rands = be.get_rand(21, 2)
+                print(rands)
+
+        Returns:
+            list of random numbers
+
+        """
+        cl, trs = self.open("QuSproutServerRand")
+        req = qusproutdata.GetRandomReq(
+            length, cnt
+        )
+        res = cl.getRandom(req)
+        trs.close()
+        return res
+

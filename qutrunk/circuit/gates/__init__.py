@@ -16,7 +16,7 @@ from .u3 import U3, CU3, CU
 from .u3 import U3 as U
 from .barrier import Barrier, BarrierGate
 from .basicgate import BasicGate, Observable, PauliType, PauliCoeff, PauliCoeffs
-from .meta import All, Power, Gate
+from .meta import All, Power, Gate, Matrix
 from .cr import CR
 from .iswap import iSwap, iSwapGate
 from .measure import Measure, MeasureGate
@@ -32,5 +32,6 @@ from .y1 import Y1, Y1Gate
 from .z1 import Z1, Z1Gate
 from .i import I, IGate, PauliI
 from .sxdg import SqrtXdg, SqrtXdgGate
+from .reset import Reset, ResetGate
 
 CTRL_CNT_PARAM = "ctrl_cnt"

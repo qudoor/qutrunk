@@ -15,7 +15,7 @@
 QuTrunk内部模块划分及层次结构如下：  
 
 <div align=center>
-<img src="./resource/qutrunk.png"/>
+<img src="http://developer.queco.cn/media/images/qutrunkTuPian.original.png"/>
 </div>
 
 
@@ -29,7 +29,7 @@ QuTrunk内部模块划分及层次结构如下：
 * command: 对量子线路中所有门级操作做参数化处理，对接目标后端模块，用于运行整个量子线路。
 * qasm: 兼容OpenQASM 2.0标准，实现量子线路到OpenQASM指令的序列化和反序列化。
 * qusl: QuTrunk量子汇编标准，实现与qasm类似功能。
-* backend: 量子计算后端模块，用于执行量子线路，支持Python本地后端，qusprout和qusaas两种远程后端以及第三方后端(目前支持IBM)。
+* backend: 量子计算后端模块，用于执行量子线路，支持Python本地后端，qusprout和qusaas两种远程后端以及第三方后端(目前支持IBM和AWS Braket)。
 * qusprout: 对接启科研制的qubox设备，使用经典计算资源并针对量子计算特点做优化，提供高性能量子模拟计算服务。
 * qusaas: 对接启科量子计算云平台，接入多种量子计算资源，包括经典计算资源，离子阱量子计算机（研发中）。
 
@@ -51,8 +51,14 @@ QuTrunk内部模块划分及层次结构如下：
 QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
 注意在正式使用 QuTurnk 之前，您需要先安装 Python（版本 3.8+）。
 
-  ```python
+  ```shell
   pip install qutrunk
+  
+  # 可选安装：AWS Braket后端，支持Braket后端计算模式
+  pip install 'qutrunk[braket]'
+
+  # 可选安装：parallel，支持多节点并行计算
+  pip install 'qutrunk[parallel]'
   ```
 
 验证QuTrunk是否安装成功，打开终端进入python交互模式，执行如下语句：
@@ -94,7 +100,7 @@ qutrunk.run_check()
 
 运行结果：
 <div>
-<img src="./resource/bell_pair.png"/>
+<img src="http://developer.queco.cn/media/images/bell_pairYunXingJieGuo.original.png"/>
 </div>
 
 ### **量子可视化编程**  

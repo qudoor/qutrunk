@@ -22,7 +22,7 @@ class Increment(Operator):
             INC * qr
             All(Measure) * qr
             res = circuit.run()
-            print(res.get_outcome())
+            print(res.get_bitstrs())
 
     """
 

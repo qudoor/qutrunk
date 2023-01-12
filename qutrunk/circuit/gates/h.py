@@ -10,7 +10,10 @@ from qutrunk.circuit.qubit import QuBit
 
 
 class HGate(BasicGate):
-    """Apply the single-qubit Hadamard gate.
+    r"""Apply the single-qubit Hadamard gate.
+
+    .. math::
+        {\rm H}=\frac{1}{\sqrt{2}}\begin{pmatrix}1&1\\1&-1\end{pmatrix}
 
     Example:
         .. code-block:: python
@@ -133,10 +136,10 @@ class CHGate(BasicGate):
         _sqrt2o2 = 1 / cmath.sqrt(2)
         return np.array(
             [
-                [_sqrt2o2, 0, _sqrt2o2, 0],
-                [0, 1, 0, 0],
-                [_sqrt2o2, 0, -_sqrt2o2, 0],
-                [0, 0, 0, 1],
+                [1, 0, 0, 0],
+                [0, _sqrt2o2, 0, _sqrt2o2],
+                [0, 0, 1, 0],
+                [0, _sqrt2o2, 0, -_sqrt2o2],
             ]
         )
 

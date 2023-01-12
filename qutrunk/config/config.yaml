@@ -1,0 +1,21 @@
+QuSprout:
+  schema: http
+  host: 192.168.170.195
+  port: 9093
+  api:
+    common: /request
+
+QuSaas: # http://developer.queco.cn for prod
+  schema: http
+  host: developer.queco.cn
+  port: 80
+  api:
+    token: /oauth2/token/
+    # gateway: /gateway/qusprout/
+
+QuPot: # http://qusprout.queco.cn/ for prod
+  schema: http
+  host: qusprout.queco.cn
+  port: 80
+  api:
+    common: /request

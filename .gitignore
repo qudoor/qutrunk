@@ -9,9 +9,11 @@
 **/qutrunk/sim/local/Release
 **/qutrunk_tutorial/_build
 **/poetry.lock
-**/qutrunk/qml/data/
+**/qutrunk/qml/
 **/example/*.csv
 **/*.out
 **/data
 **/venv
 **/qutrunk.egg-info
+**/doc/
+**/qml/

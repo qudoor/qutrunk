@@ -84,14 +84,6 @@ qutrunk.circuit.ops.qpe module
    :undoc-members:
    :show-inheritance:
 
-qutrunk.circuit.ops.qsp module
-------------------------------
-
-.. automodule:: qutrunk.circuit.ops.qsp
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

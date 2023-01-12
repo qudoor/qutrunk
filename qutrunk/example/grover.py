@@ -2,6 +2,7 @@
 
 import math
 import random
+import time
 
 from numpy import pi
 
@@ -22,6 +23,7 @@ def run_grover(qubits=10, backend=None):
     print("num_qubits:", num_qubits, "num_elems:", num_elems, "num_reps:", num_reps)
 
     # Choose target state randomly
+    random.seed(int(time.time()))
     sol_elem = random.randint(0, num_elems - 1)
     print(f"target state: |{str(sol_elem)}>")
 
@@ -44,14 +46,15 @@ def run_grover(qubits=10, backend=None):
     res = circuit.run()
 
     # Get measure result and print as int
-    out = res.get_outcome()
-    print("measure result: " + str(int(out, base=2)))
+    outlist = res.get_bitstrs()
+    for out in outlist:
+        print("measure result: " + str(int(out, base=2)))
 
     # Print quantum circuit resource information
-    circuit.show_resource()
+    # circuit.show_resource()
 
     # Print quantum circuit execution information
-    print(res.excute_info())
+    # print(res.running_info())
 
     return circuit
 

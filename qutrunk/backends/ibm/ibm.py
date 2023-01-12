@@ -1,9 +1,11 @@
 """IBM Backend"""
 
 import math
+import uuid
 
 from qutrunk.backends import Backend
 from qutrunk.circuit.gates import CNOT, H, Measure, Rx, Ry, Rz
+from qutrunk.backends.result import MeasureResult, MeasureQubits
 from .ibm_client import send
 
 
@@ -53,6 +55,7 @@ class BackendIBM(Backend):
         self._json = []
         # measured qubit id
         self._measured_ids = []
+        self.task_id = uuid.uuid4().hex
 
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to IBM backend.
@@ -129,13 +132,23 @@ class BackendIBM(Backend):
         info["maxCredits"] = 10
         info["backend"] = {"name": self.device}
 
-        result = send(
+        res = send(
             info,
             device=self.device,
             token=self._token,
             num_retries=shots,
             verbose=True,
         )
+        return self._to_result(res)
+
+    def _to_result(self, res):
+        result = MeasureResult()
+        # exception
+        # counts = res.get["data"]["counts"]
+        counts = res["data"]["counts"]
+
+        for bit_str, count in counts:
+            result.measure_counts[bit_str] = count
         return result
 
     @property
