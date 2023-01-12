@@ -69,7 +69,7 @@ class QPE(Operator):
         for counting_qubit in range(num_qubits):
             for i in range(repetitions):
                 # apply cu gate
-                self.unitary.ctrl() * (qreg_first[counting_qubit], qreg_second[0])
+                self.unitary.ctrl() * (qreg_first[counting_qubit], *qreg_second)
             repetitions *= 2
         # 3 inverse QFT
         Barrier * qreg_first
