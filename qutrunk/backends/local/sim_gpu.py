@@ -889,14 +889,14 @@ class GpuLocal:
         imag = self.imag.copy_to_host()
         state_list = []
         for i in range(self.sim_cpu.num_amps_per_rank):
-            real = real[i]
-            imag = imag[i]
+            _real = real[i]
+            _imag = imag[i]
             # TODO: need to improve.
-            if real[i] > -1e-15 and real[i] < 1e-15:
-                real = 0
-            if imag[i] > -1e-15 and imag[i] < 1e-15:
-                imag = 0
-            state = str(real) + ", " + str(imag)
+            if _real > -1e-15 and _real < 1e-15:
+                _real = 0
+            if _imag > -1e-15 and _imag < 1e-15:
+                _imag = 0
+            state = str(_real) + ", " + str(_imag)
             state_list.append(state)
         return state_list
 
