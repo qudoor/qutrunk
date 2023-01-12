@@ -1,10 +1,13 @@
 """Implementation of quantum compute simulator for gpu running mode."""
 import math
+import random
 from typing import Union
 
 import numpy
 from numba import cuda, float32
 from qutrunk.backends.local.sim_local import SimLocal, PauliOpType
+
+REAL_EPS = 1e-13
 
 @cuda.jit
 def extract_bit(ctrl, index):
@@ -529,7 +532,35 @@ def multi_controlled_multi_qubit_unitary_kernel(num_amps_per_rank, real, imag, c
             u_imag_elem = d_uimag[c + r*unum_rows]
             real[ind] += d_real_amps[c*stride+offset]*u_real_elem - d_imag_amps[c*stride+offset]*u_imag_elem
             imag[ind] += d_real_amps[c*stride+offset]*u_imag_elem + d_imag_amps[c*stride+offset]*u_real_elem
-    
+
+@cuda.jit
+def collapse_to_know_prob_outcome_kernel(num_amps_per_rank, real, imag, target, outcome, outcome_prob):
+    num_task = num_amps_per_rank >> 1
+    size_half_block = 2**target
+    size_block = size_half_block * 2
+
+    renorm=1/math.sqrt(outcome_prob)
+   
+    this_task = cuda.grid(1)
+    if (this_task >= num_task):
+        return
+
+    this_block = this_task / size_half_block
+    index      = this_block * size_block + this_task % size_half_block
+
+    if (outcome == 0):
+        real[index] = real[index] * renorm
+        imag[index] = imag[index] * renorm
+
+        real[index+size_half_block] = 0
+        imag[index+size_half_block] = 0
+    elif (outcome == 1):
+        real[index] = 0
+        imag[index] = 0
+
+        real[index+size_half_block] = real[index+size_half_block] * renorm
+        imag[index+size_half_block] = imag[index+size_half_block] * renorm
+
 class GpuLocal:
     """Simulator-gpu implement."""
 
@@ -902,3 +933,26 @@ class GpuLocal:
     
     def matrix(self, controls, targets, ureal, uimag):
         self.apply_multi_controlled_matrix_n(controls, targets, ureal, uimag)
+
+    def measure(self, target):
+        zero_prob = self.calc_prob_of_outcome(target, 0)
+        outcome, outcome_prob = self.generate_measure_outcome(zero_prob)
+        self.collapse_to_know_prob_outcome(target, outcome, outcome_prob)
+        return outcome
+
+    def generate_measure_outcome(self, zero_prob):
+        outcome = 0
+        if zero_prob < REAL_EPS:
+            outcome = 1
+        elif (1 - zero_prob) < REAL_EPS:
+            outcome = 0
+        else:
+            outcome = 1 if (random.random() > zero_prob) else 0
+
+        outcome_prob = zero_prob if (outcome == 0) else (1 - zero_prob)
+        return outcome, outcome_prob
+
+    def collapse_to_know_prob_outcome(self, target, outcome, outcome_prob):
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        collapse_to_know_prob_outcome_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, outcome, outcome_prob)
