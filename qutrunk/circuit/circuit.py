@@ -130,6 +130,21 @@ class QCircuit:
         """
         self.cmds.append(cmd)
 
+    def append_circuit(self, circuit):
+        """Append target circuit to current circuit.
+
+        Note: The target circuit must have the same qubits as current circuit.
+
+        Args:
+            circuit: The target circuit append to current circuit.
+        """
+        if circuit.num_qubits != self.num_qubits:
+            raise QuTrunkError(
+                "The target circuit must have the same qubits as current circuit."
+            )
+        for cmd in circuit.cmds:
+            self.append_cmd(cmd)
+
     def forward(self, num):
         """Update the cmd_cursor when a bunch of quantum operations have been run.
 
