@@ -83,10 +83,6 @@ class Qureg:
     def __len__(self):
         return len(self.qubits)
 
-    def qasm(self):
-        """Return OPENQASM string for this register."""
-        return f"qreg q[{len(self)}];"
-
     def __repr__(self):
         return f"{self.__class__.__qualname__}({self.size})"
 
