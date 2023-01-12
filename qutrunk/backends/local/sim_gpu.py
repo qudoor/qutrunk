@@ -474,6 +474,61 @@ def find_prob_of_zero_kernel(num_amps_per_rank, real, imag, target, total_prob):
     
     total_prob[this_task] = real[index] * real[index] + imag[index] * imag[index]
     cuda.syncthreads()
+
+@cuda.jit
+def insert_zero_bits(number, targets, targets_num):
+    cur_min = targets[0]
+    prev_min = -1
+    for n in range(targets_num):
+        for t in range(targets_num):
+            if targets[t]>prev_min and targets[t]<cur_min:
+                cur_min = targets[t]
+    
+        number = insert_zero_bit(number, cur_min)
+        
+        prev_min = cur_min
+        for t in range(targets_num):
+            if targets[t] > cur_min:
+                cur_min = targets[t]
+                break
+        
+    return number
+     
+@cuda.jit
+def multi_controlled_multi_qubit_unitary_kernel(num_amps_per_rank, real, imag, ctrl_mask, targets, d_ureal, d_uimag, d_amp_inds, d_real_amps, d_imag_amps, unum_rows):
+    targets_num = len(targets)
+    this_task = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    num_task = num_amps_per_rank >> targets_num
+    if this_task>=num_task:
+        return
+
+    ind00 = insert_zero_bits(this_task, targets, targets_num)
+    if ctrl_mask and (ctrl_mask&ind00) != ctrl_mask:
+        return
+    
+    stride = cuda.gridDim.x*cuda.blockDim.x
+    offset = cuda.blockIdx.x*cuda.blockDim.x + cuda.threadIdx.x
+    
+    ind = 0
+    for i in range(unum_rows):
+        ind = ind00
+        for t in range(targets_num):
+            if extract_bit(t, i):
+                ind = flip_bit(ind, targets[t])
+        
+        d_amp_inds[i*stride+offset] = ind
+        d_real_amps [i*stride+offset] = real[ind]
+        d_imag_amps [i*stride+offset] = imag[ind]
+    
+    for r in range(unum_rows):
+        ind = d_amp_inds[r*stride+offset]
+        real[ind] = 0
+        imag[ind] = 0
+        for c in range(unum_rows):
+            u_real_elem = d_ureal[c + r*unum_rows]
+            u_imag_elem = d_uimag[c + r*unum_rows]
+            real[ind] += d_real_amps[c*stride+offset]*u_real_elem - d_imag_amps[c*stride+offset]*u_imag_elem
+            imag[ind] += d_real_amps[c*stride+offset]*u_imag_elem + d_imag_amps[c*stride+offset]*u_real_elem
     
 class GpuLocal:
     """Simulator-gpu implement."""
@@ -813,5 +868,37 @@ class GpuLocal:
             state = str(real) + ", " + str(imag)
             state_list.append(state)
         return state_list
-    
 
+    def multi_controlled_multi_qubit_unitary(self, ctrl_mask, targets, ureal, uimag):        
+        targets_num = len(targets)
+        threads_per_cuda_block = 128
+        cuda_blocks = math.ceil((self.sim_cpu.num_amps_per_rank>>targets_num)/threads_per_cuda_block)
+        
+        unum_rows = 1 << targets_num
+        d_ureal = cuda.device_array(unum_rows*unum_rows, numpy.float_)
+        d_uimag = cuda.device_array(unum_rows*unum_rows, numpy.float_)
+        i = 0
+        for r in range(unum_rows):
+            for c in range(unum_rows):
+                d_ureal[i] = ureal[r][c]
+                d_uimag[i] = uimag[r][c]
+                i += 1
+        
+        grid_size = threads_per_cuda_block * cuda_blocks
+        d_amp_inds = cuda.device_array(unum_rows*grid_size, numpy.int64)
+        d_real_amps = cuda.device_array(unum_rows*grid_size, numpy.float_)
+        d_imag_amps = cuda.device_array(unum_rows*grid_size, numpy.float_)
+        d_targets = cuda.to_device(targets, stream=0)
+        multi_controlled_multi_qubit_unitary_kernel[cuda_blocks, threads_per_cuda_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, ctrl_mask, d_targets, d_ureal, d_uimag, d_amp_inds, d_real_amps, d_imag_amps, unum_rows)
+
+    def apply_multi_controlled_matrix_n(self, controls, targets, ureal, uimag):
+        controls_num = len(controls)
+        ctrl_mask = self.get_qubit_bit_mask(controls, controls_num)
+        self.multi_controlled_multi_qubit_unitary(ctrl_mask, targets, ureal, uimag)
+    
+    def apply_matrix_n(self, targets, ureal, uimag):
+        ctrl_mask = 0
+        self.multi_controlled_multi_qubit_unitary(ctrl_mask, targets, ureal, uimag)
+    
+    def matrix(self, controls, targets, ureal, uimag):
+        self.apply_multi_controlled_matrix_n(controls, targets, ureal, uimag)
