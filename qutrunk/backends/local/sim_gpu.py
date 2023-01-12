@@ -560,7 +560,20 @@ def collapse_to_know_prob_outcome_kernel(num_amps_per_rank, real, imag, target, 
 
         real[index+size_half_block] = real[index+size_half_block] * renorm
         imag[index+size_half_block] = imag[index+size_half_block] * renorm
-
+  
+@cuda.jit
+def calc_inner_product_local_kernel(self, num_amps_per_rank, bra_real, bra_imag, ket_real, ket_imag, prod_reals, prod_imags):
+    index = cuda.threadIdx.x + cuda.blockDim.x * cuda.blockIdx.x
+    if index>=num_amps_per_rank:
+        return
+    
+    bra_re = bra_real[index]
+    bra_im = bra_imag[index]
+    ket_re = ket_real[index]
+    ket_im = ket_imag[index]
+    prod_reals[index] += bra_re * ket_re + bra_im * ket_im
+    prod_imags[index] += bra_re * ket_im - bra_im * ket_re
+      
 class GpuLocal:
     """Simulator-gpu implement."""
 
@@ -819,7 +832,14 @@ class GpuLocal:
         threads_per_block = 128
         blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
         unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, orgreal, orgimag)
-        
+    
+    def ch(self, control_bit, target_bit, ureal, uimag):
+        orgreal = cuda.to_device(ureal, stream=0)
+        orgimag = cuda.to_device(uimag, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        controlled_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
+            
     def x1(self, target_qubit, ureal, uimag):
         self.apply_matrix2(target_qubit, ureal, uimag)
 
@@ -842,6 +862,14 @@ class GpuLocal:
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
         controlled_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
 
+    def cswap(self, control_qubit, target_qubit0, target_qubit1, ureal, uimag):
+        ctrl_mask = 1 << control_qubit
+        orgreal = cuda.to_device(ureal, stream=0)
+        orgimag = cuda.to_device(uimag, stream=0)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 2) / threads_per_block)
+        multi_controlled_two_qubit_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, ctrl_mask, target_qubit0, target_qubit1, orgreal, orgimag)
+        
     def apply_matrix4(self, target_qubit0, target_qubit1, ureal, uimag):
         ctrl_mask = 0
         orgreal = cuda.to_device(ureal, stream=0)
@@ -956,3 +984,93 @@ class GpuLocal:
         threads_per_block = 128
         blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
         collapse_to_know_prob_outcome_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, outcome, outcome_prob)
+    def paulix_local(self, reals, imags, target):
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        pauli_x_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, reals, imags, target)
+
+    def pauliy_local(self, reals, imags, target):
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        pauli_y_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, reals, imags, target, 1)
+
+    def pauliz_local(self, reals, imags, target):
+        cos_angle = -1
+        sin_angle = 0
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
+        phase_shift_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, reals, imags, target, cos_angle, sin_angle)
+
+    def calc_inner_product_local(self, bra_real, bra_imag, ket_real, ket_imag):
+        prod_reals = cuda.device_array(self.sim_cpu.num_amps_per_rank, numpy.float_)
+        prod_imags = cuda.device_array(self.sim_cpu.num_amps_per_rank, numpy.float_)
+        threads_per_block = 128
+        blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
+        calc_inner_product_local_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, bra_real, bra_imag, ket_real, ket_imag, prod_reals, prod_imags)
+        inner_prod_real = 0
+        inner_prod_imag = 0
+        for index in range(self.sim_cpu.num_amps_per_rank):
+            inner_prod_real += prod_reals[index]
+            inner_prod_imag += prod_imags[index]
+        return (inner_prod_real, inner_prod_imag)
+    
+    def get_expec_pauli_prod(self, pauli_prod_list):
+        """
+        Computes the expected value of a product of Pauli operators.
+
+        Args:
+            pauli_prod_list: a list contains the indices of the target qubits,\
+                the Pauli codes (0=PAULI_I, 1=PAULI_X, 2=PAULI_Y, 3=PAULI_Z) to apply to the corresponding qubits.
+
+        Returns:
+            the expected value of a product of Pauli operators.
+        """
+        work_real = cuda.to_device(self.real, stream=0)
+        work_imag = cuda.to_device(self.imag, stream=0)
+        for pauli_op in pauli_prod_list:
+            op_type = pauli_op["oper_type"]
+            if op_type == PauliOpType.PAULI_X.value:
+                self.paulix_local(work_real, work_imag, pauli_op["target"])
+            elif op_type == PauliOpType.PAULI_Y.value:
+                self.pauliy_local(work_real, work_imag, pauli_op["target"])
+            elif op_type == PauliOpType.PAULI_Z.value:
+                self.pauliz_local(work_real, work_imag, pauli_op["target"])
+
+        real, imag = self.calc_inner_product_local(
+            work_real, work_imag, self.real, self.imag
+        )
+        return real
+
+    def get_expec_pauli_sum(self, oper_type_list, term_coeff_list):
+        """
+        Computes the expected value of a sum of products of Pauli operators.
+
+        Args:
+            oper_type_list: a list of the Pauli codes (0=PAULI_I, 1=PAULI_X, 2=PAULI_Y, 3=PAULI_Z) \
+                of all Paulis involved in the products of terms. A Pauli must be specified \
+                for each qubit in the register, in every term of the sum.
+            term_coeff_list: the coefficients of each term in the sum of Pauli products.
+
+        Returns:
+            the expected value of a sum of products of Pauli operators. 
+        """
+        """Computes the expected value of a sum of products of Pauli operators."""
+        num_qb = self.sim_cpu.qubits
+        targs = []
+        for q in range(num_qb):
+            targs.append(q)
+
+        value = 0
+        idx = 0
+        num_sum_terms = len(term_coeff_list)
+        for t in range(num_sum_terms):
+            pauli_prod_list = []
+            for i in range(num_qb):
+                temp = {}
+                temp["oper_type"] = oper_type_list[idx]
+                idx += 1
+                temp["target"] = targs[i]
+                pauli_prod_list.append(temp)
+            value += term_coeff_list[t] * self.get_expec_pauli_prod(pauli_prod_list)
+
+        return value
