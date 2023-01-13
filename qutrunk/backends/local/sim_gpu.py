@@ -573,7 +573,24 @@ def calc_inner_product_local_kernel(self, num_amps_per_rank, bra_real, bra_imag,
     ket_im = ket_imag[index]
     prod_reals[index] += bra_re * ket_re + bra_im * ket_im
     prod_imags[index] += bra_re * ket_im - bra_im * ket_re
-      
+
+@cuda.jit
+def get_probs_kernel(num_amps_per_rank, real, imag, outcome_probs, dev_qubits, num_outcome_probs):
+    # each thread handles one amplitude (all amplitudes are involved)
+    amp_ind = cuda.grid(1)
+    if (amp_ind >= num_amps_per_rank):
+        return
+    
+    prob = real[amp_ind] * real[amp_ind] + imag[amp_ind] * imag[amp_ind]
+    
+    # each amplitude contributes to one outcome
+    outcomeInd = 0
+    for q in range(num_outcome_probs):
+        outcomeInd += extract_bit(dev_qubits[q], amp_ind) * (1 << q)
+    
+    outcome_probs[amp_ind] += prob
+
+
 class GpuLocal:
     """Simulator-gpu implement."""
 
@@ -984,6 +1001,7 @@ class GpuLocal:
         threads_per_block = 128
         blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
         collapse_to_know_prob_outcome_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, outcome, outcome_prob)
+    
     def paulix_local(self, reals, imags, target):
         threads_per_block = 128
         blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
@@ -1074,3 +1092,40 @@ class GpuLocal:
             value += term_coeff_list[t] * self.get_expec_pauli_prod(pauli_prod_list)
 
         return value
+
+    def get_prob(self, index):
+        """Get the probability of a state-vector at an index in the full state vector.
+
+        Args:
+            index: index in state vector of probability amplitudes
+
+        Returns:
+            the probability of target index
+        """
+        if index < 0 or index >= self.sim_cpu.num_amps_per_rank:
+            raise ValueError(f"{index} is illegal parameter.")
+
+        real = self.real.copy_to_host()
+        imag = self.imag.copy_to_host()
+
+        _real = real[index]
+        _imag = imag[index]
+
+        return _real * _real + _imag * _imag
+
+    def get_probs(self, qubits):
+        """Get all probabilities of circuit.
+
+        Returns:
+            An array contains all probabilities of circuit.
+        """
+        num_outcome_probs = len(qubits)
+        dev_outcome_probs = cuda.device_array(2**num_outcome_probs, numpy.float_)
+        dev_qubits = cuda.to_device(numpy.array(qubits))
+
+        threads_per_block = 128
+        blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank) / threads_per_block)
+        get_probs_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, dev_outcome_probs, dev_qubits, num_outcome_probs)
+
+        outcome_probs = dev_outcome_probs.copy_to_host()
+        return outcome_probs
