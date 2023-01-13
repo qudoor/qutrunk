@@ -255,7 +255,7 @@ def cy_kernel(num_amps_per_rank, real, imag, control, target, conj_factor):
     if (index >= (num_amps_per_rank >> 1)):
         return
 
-    this_block   = index / size_half_block
+    this_block   = index // size_half_block
     index_up     = this_block * sizeBlock + index % size_half_block
     index_lo     = index_up + size_half_block
 
@@ -545,7 +545,7 @@ def collapse_to_know_prob_outcome_kernel(num_amps_per_rank, real, imag, target, 
     if (this_task >= num_task):
         return
 
-    this_block = this_task / size_half_block
+    this_block = this_task // size_half_block
     index      = this_block * size_block + this_task % size_half_block
 
     if (outcome == 0):

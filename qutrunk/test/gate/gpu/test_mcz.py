@@ -15,7 +15,7 @@ def test_mcz_gate():
     circuit_gpu = QCircuit(backend=BackendLocal("gpu"))
     qr_gpu = circuit_gpu.allocate(3)
     All(H) * qr_gpu
-    MCZ(2) * (qr[0], qr_gpu[1], qr_gpu[2])
+    MCZ(2) * (qr_gpu[0], qr_gpu[1], qr_gpu[2])
     result_gpu = np.array(circuit_gpu.get_statevector()).reshape(-1, 1)
 
     assert np.allclose(result, result_gpu)
