@@ -21,6 +21,9 @@ def _apply_oracle(qr, num_qubits, secret):
 
 
 def apply_bernstein_vazirani(num_qubits, secret):
+    """
+    Result: The result will always be like "success probability:  1"
+    """
     # create circuit and qureg
     circuit = QCircuit()
     qr = circuit.allocate(num_qubits)
