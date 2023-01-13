@@ -833,12 +833,12 @@ class GpuLocal:
         blocks_per_grid = math.ceil((self.sim_cpu.num_amps_per_rank >> 1) / threads_per_block)
         unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target_qubit, orgreal, orgimag)
     
-    def ch(self, control_bit, target_bit, ureal, uimag):
+    def ch(self, control, target, ureal, uimag):
         orgreal = cuda.to_device(ureal, stream=0)
         orgimag = cuda.to_device(uimag, stream=0)
         threads_per_block = 128
         blocks_per_grid = math.ceil(self.sim_cpu.num_amps_per_rank / threads_per_block)
-        controlled_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control_qubit, target_qubit, orgreal, orgimag)
+        controlled_unitary_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, control, target, orgreal, orgimag)
             
     def x1(self, target_qubit, ureal, uimag):
         self.apply_matrix2(target_qubit, ureal, uimag)
