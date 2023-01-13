@@ -5,7 +5,7 @@ from typing import Union
 
 import numpy
 from numba import cuda, float32
-from qutrunk.backends.local.sim_local import SimLocal, PauliOpType
+from .sim_local import SimLocal, PauliOpType
 
 REAL_EPS = 1e-13
 
@@ -39,7 +39,6 @@ def init_classical_state_kernel(num_amps_per_rank, real, imag, state_ind):
     if index == state_ind:
         real[state_ind] = 1.0
         imag[state_ind] = 0.0
-    cuda.syncthreads()
     
 @cuda.jit
 def init_plus_state_kernel(num_amps_per_rank, real, imag):
@@ -49,7 +48,6 @@ def init_plus_state_kernel(num_amps_per_rank, real, imag):
     if index < num_amps_per_rank:
         real[index] = norm_factor
         imag[index] = 0.0
-    cuda.syncthreads()
     
 @cuda.jit  
 def init_zero_state_kernel(num_amps_per_rank, real, imag):
@@ -61,7 +59,6 @@ def init_zero_state_kernel(num_amps_per_rank, real, imag):
     if index == 0:
         real[0] = 1.0
         imag[0] = 0.0
-    cuda.syncthreads()
 
 @cuda.jit  
 def amp_kernel(num_amps_per_rank, real, imag, orgreal, orgimag, startindex):
@@ -71,7 +68,6 @@ def amp_kernel(num_amps_per_rank, real, imag, orgreal, orgimag, startindex):
         endindex = startindex+index
         real[endindex] = orgreal[index]
         imag[endindex] = orgimag[index]
-    cuda.syncthreads()
 
 @cuda.jit
 def hadamard_kernel(num_amps_per_rank, real, imag, target_qubit):
@@ -395,7 +391,6 @@ def controlled_compact_unitary_kernel(num_amps_per_rank, real, imag, control_qub
         imag[index_up] = reals[0]*state_imag_up + imags[0]*state_real_up - reals[1]*state_imag_lo + imags[1]*state_real_lo
         real[index_lo] = reals[1]*state_real_up - imags[1]*state_imag_up + reals[0]*state_real_lo + imags[0]*state_imag_lo
         imag[index_lo] = reals[1]*state_imag_up + imags[1]*state_real_up + reals[0]*state_imag_lo - imags[0]*state_real_lo
-    cuda.syncthreads()
     
 @cuda.jit
 def controlled_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, target_qubit, ureal, uimag):
@@ -422,7 +417,6 @@ def controlled_unitary_kernel(num_amps_per_rank, real, imag, control_qubit, targ
         imag[index_up] = ureal[0][0]*state_imag_up + uimag[0][0]*state_real_up + ureal[0][1]*state_imag_lo + uimag[0][1]*state_real_lo
         real[index_lo] = ureal[1][0]*state_real_up - uimag[1][0]*state_imag_up + ureal[1][1]*state_real_lo - uimag[1][1]*state_imag_lo
         imag[index_lo] = ureal[1][0]*state_imag_up + uimag[1][0]*state_real_up + ureal[1][1]*state_imag_lo + uimag[1][1]*state_real_lo
-    cuda.syncthreads()
     
 @cuda.jit
 def multi_controlled_two_qubit_unitary_kernel(num_amps_per_rank, real, imag, ctrl_mask, q1, q2, ureal, uimag):
@@ -460,7 +454,6 @@ def multi_controlled_two_qubit_unitary_kernel(num_amps_per_rank, real, imag, ctr
         
     real[ind11] = ureal[3][0]*re00 - uimag[3][0]*im00 + ureal[3][1]*re01 - uimag[3][1]*im01 + ureal[3][2]*re10 - uimag[3][2]*im10 + ureal[3][3]*re11 - uimag[3][3]*im11
     imag[ind11] = uimag[3][0]*re00 + ureal[3][0]*im00 + uimag[3][1]*re01 + ureal[3][1]*im01 + uimag[3][2]*re10 + ureal[3][2]*im10 + uimag[3][3]*re11 + ureal[3][3]*im11  
-    cuda.syncthreads()
 
 @cuda.jit
 def find_prob_of_zero_kernel(num_amps_per_rank, real, imag, target, total_prob):
@@ -476,7 +469,6 @@ def find_prob_of_zero_kernel(num_amps_per_rank, real, imag, target, total_prob):
     index = this_block*size_block + this_task%size_half_block
     
     total_prob[this_task] = real[index] * real[index] + imag[index] * imag[index]
-    cuda.syncthreads()
 
 @cuda.jit
 def insert_zero_bits(number, targets, targets_num):
@@ -919,7 +911,8 @@ class GpuLocal:
         outcome_prob_list = cuda.device_array(self.sim_cpu.num_amps_per_rank, numpy.float_)
         find_prob_of_zero_kernel[blocks_per_grid, threads_per_block](self.sim_cpu.num_amps_per_rank, self.real, self.imag, target, outcome_prob_list)
         outcome_prob = 0.0
-        for temp in outcome_prob_list: 
+        prob_list = outcome_prob_list.copy_to_host()
+        for temp in prob_list:  
             outcome_prob += temp
         if outcome == 1:
             outcome_prob = 1.0 - outcome_prob
