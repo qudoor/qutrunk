@@ -9,26 +9,21 @@ from qutrunk.circuit.qubit import QuBit
 
 
 class U3(BasicGate):
-    """U3 gate.
-
-    Args:
-        theta: U3 gate parameter1.
-        phi: U3 gate parameter2.
-        lam: U3 gate parameter3.
+    """U3 gate, single-qubit rotation gate with 3 Euler angles.
 
     Example:
         .. code-block:: python
 
-            U3(pi/2,pi/2,pi/2) * qr[0]
+            U3(pi/2, pi/2, pi/2) * qr[0]
     """
 
     def __init__(self, theta, phi, lam):
         """Create new U3 gate.
 
         Args:
-            theta: U3 gate parameter1.
-            phi: U3 gate parameter2.
-            lam: U3 gate parameter3.
+            theta: Rotation angle about the Y axis.
+            phi: Rotation angle about the X axis.
+            lam: Rotation angle about the Z axis.
         """
         super().__init__()
 
@@ -50,7 +45,7 @@ class U3(BasicGate):
         Example:
             .. code-block:: python
 
-                U3(pi/2,pi/2,pi/2) * qr[0]
+                U3(pi/2, pi/2, pi/2) * qr[0]
 
         Raises:
             TypeError: If the argument is not a Qubit object.
@@ -109,25 +104,14 @@ class U3(BasicGate):
 class CU3(BasicRotateGate):
     """Control U3 gate.
 
-    Args:
-            theta: U3 gate parameter 1.
-            phi: U3 gate parameter 2.
-            lam: U3 gate parameter 3.
-
     Example:
         .. code-block:: python
 
-            CU3(pi/2,pi/2,pi/2) * (qr[0], qr[1])
+            CU3(pi/2, pi/2, pi/2) * (qr[0], qr[1])
     """
 
     def __init__(self, theta, phi, lam):
-        """Create new CU3 gate.
-
-        Args:
-            theta: U3 gate parameter 1.
-            phi: U3 gate parameter 2.
-            lam: U3 gate parameter 3.
-        """
+        """Create new CU3 gate."""
         if theta is None or phi is None or lam is None:
             raise ValueError("The argument cannot be empty.")
         super().__init__()
@@ -207,12 +191,6 @@ class CU3(BasicRotateGate):
 class CU(BasicRotateGate):
     """Control U gate.
 
-    Args:
-        theta: U gate parameter 1.
-        phi: U gate parameter 2.
-        lam:U gate parameter 3.
-        gamma: U gate parameter 4.
-
     Example:
         .. code-block:: python
 
@@ -220,13 +198,6 @@ class CU(BasicRotateGate):
     """
 
     def __init__(self, theta, phi, lam, gamma):
-        """
-        Args:
-            theta: U gate parameter 1.
-            phi: U gate parameter 2.
-            lam:U gate parameter 3.
-            gamma: U gate parameter 4.
-        """
         if theta is None or phi is None or lam is None or gamma is None:
             raise ValueError("The argument cannot be empty.")
         super().__init__()
@@ -247,7 +218,7 @@ class CU(BasicRotateGate):
         Example:
             .. code-block:: python
 
-                CU(pi/2,pi/2,pi/2,pi/2) * (qr[0], qr[1])
+                CU(pi/2, pi/2, pi/2, pi/2) * (qr[0], qr[1])
         """
         if not all(isinstance(qubit, QuBit) for qubit in qubits):
             raise TypeError("The argument must be Qubit object.")
