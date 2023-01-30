@@ -583,7 +583,7 @@ def get_probs_kernel(num_amps_per_rank, real, imag, outcome_probs, dev_qubits, n
     outcome_probs[amp_ind] += prob
 
 
-class GpuLocal:
+class SimGpu:
     """Simulator-gpu implement."""
 
     def __init__(self):

@@ -72,8 +72,8 @@ class BackendLocalPython:
             from .sim_distribute import SimDistribute
             self.sim = SimDistribute()
         if run_mode == 'gpu':
-            from .sim_gpu import GpuLocal
-            self.sim = GpuLocal()
+            from .sim_gpu import SimGpu
+            self.sim = SimGpu()
         self.cmds = []
         self.result = MeasureResult()
         self.run_times = 0
