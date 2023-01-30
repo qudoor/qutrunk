@@ -24,7 +24,8 @@ QuTrunk 是启科量子自主研发的一款免费、开源、跨平台的量子
 ## 最新版本 v0.2.1
 
 * 增加重置量子比特门操作(Reset * q)，将某个/若干量子比特重置为0态;
-* 新增qutrunk和tensorflow结合的示例
+* 新增qutrunk和tensorflow结合的示例;
+* 新增本地GPU（支持CUDA的GPU）运行量子模拟计算;
 
 [Back to Top](#0)
 
