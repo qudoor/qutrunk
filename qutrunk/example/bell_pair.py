@@ -5,6 +5,9 @@ from qutrunk.circuit.gates import H, CNOT, Measure
 
 
 def run_bell_pair(backend=None):
+    """
+    Result: The result will always be like [{"0b00": xx}, {"0b11": xx}]
+    """
     # Create quantum circuit
     qc = QCircuit(backend=backend)
 

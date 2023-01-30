@@ -71,6 +71,9 @@ class BackendLocalPython:
         if run_mode == 'mpi':
             from .sim_distribute import SimDistribute
             self.sim = SimDistribute()
+        if run_mode == 'gpu':
+            from .sim_gpu import SimGpu
+            self.sim = SimGpu()
         self.cmds = []
         self.result = MeasureResult()
         self.run_times = 0

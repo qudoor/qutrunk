@@ -8,7 +8,10 @@ from qutrunk.circuit.ops import QPE
 
 
 def run_qpe(backend=None):
-    """Estimate T-gate phase."""
+    """Estimate T-gate phase.
+    
+    Result: The result will always be like θ = 0.125
+    """
     # allocate
     qc = QCircuit(backend=backend)
     q1, q2 = qc.allocate([3, 1])
@@ -30,7 +33,7 @@ def run_qpe(backend=None):
     # calculate the value of theta
     vals = result.get_values(q1)
     theta = vals[0] / 2 ** len(q1)
-    print("θ=", theta)
+    print("θ =", theta)
 
     return qc
 

@@ -5,6 +5,9 @@ from qutrunk.circuit.gates import H, CNOT, Measure, X, Z, I
 
 
 def run_super_dense_encoding(message, backend=None):
+    """
+    Result: The result will always be like [{"0b10": 1024}]
+    """
     # Create quantum circuit
     qc = QCircuit(backend=backend)
 
