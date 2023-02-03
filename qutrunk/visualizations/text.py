@@ -208,6 +208,11 @@ class TextDrawing:
         connection_label = None
         # condition control
         conditional = False
+        
+        condstr = ""
+        cond = op.measurecond
+        if cond and cond.enable == True:
+            condstr = "(M" + str(cond.idx) + "==" + str(cond.cond_value) + ")"
 
         def add_connected_gate(node, gates, layer, current_cons):
             for i, gate in enumerate(gates):
@@ -269,7 +274,7 @@ class TextDrawing:
             add_connected_gate(node, gates, layer, current_cons)
         # X gate
         elif isinstance(op.gate, XGate):
-            layer.set_qubit(node.qargs[0], BoxOnQuWire("X", conditional=conditional))
+            layer.set_qubit(node.qargs[0], BoxOnQuWire("X"+condstr, conditional=conditional))
         # BarrierGate gate
         elif isinstance(op.gate, BarrierGate):
             for qubit in node.qargs:
@@ -300,7 +305,7 @@ class TextDrawing:
         elif isinstance(op.gate, P):
             layer.set_qubit(node.qargs[0], BoxOnQuWire("P", conditional=conditional))
         elif isinstance(op.gate, ZGate):
-            layer.set_qubit(node.qargs[0], BoxOnQuWire("Z", conditional=conditional))
+            layer.set_qubit(node.qargs[0], BoxOnQuWire("Z"+condstr, conditional=conditional))
         elif isinstance(op.gate, R):
             label = f"R({op.gate.theta:.2},{op.gate.phi:.2})"
             layer.set_qubit(node.qargs[0], BoxOnQuWire(label, conditional=conditional))

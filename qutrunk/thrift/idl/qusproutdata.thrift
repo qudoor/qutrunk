@@ -52,6 +52,18 @@ struct Cmdex {
     2: optional Matrix mat
 }
 
+//测量执行条件
+struct MeasureCond {
+    //条件开关
+    1: required bool enable
+
+    //测量的量子比特位
+    2: required i32 idx
+
+    //条件
+    3: required i32 cond_value
+}
+
 //指令数据
 struct Cmd {
     //指令门类型
@@ -74,6 +86,9 @@ struct Cmd {
 
     //扩展命令
     7: optional Cmdex cmdex
+
+    //测量执行条件
+    8: optional MeasureCond cond
 }
 
 //指令集

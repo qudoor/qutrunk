@@ -1,6 +1,6 @@
 import numpy as np
 
-from qutrunk.circuit import Command
+from qutrunk.circuit import Command, MeasureCond
 from .basicgate import BasicGate, Observable, PauliType
 from qutrunk.circuit.qubit import QuBit
 
@@ -23,6 +23,7 @@ class XGate(BasicGate, Observable):
 
     def __init__(self):
         super().__init__()
+        self.measurecond = None
 
     def __str__(self):
         return "X"
@@ -45,7 +46,7 @@ class XGate(BasicGate, Observable):
             raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
-        cmd = Command(self, targets, inverse=self.is_inverse)
+        cmd = Command(self, targets, inverse=self.is_inverse, measurecond=self.measurecond)
         self.commit(qubit.circuit, cmd)
 
     def __mul__(self, qubit):
@@ -88,7 +89,10 @@ class XGate(BasicGate, Observable):
         gate = MCX(ctrl_cnt)
         gate.is_inverse = self.is_inverse
         return gate
-
+    
+    def condition(self, idx, cond_value):
+        self.measurecond = MeasureCond(True, idx, cond_value)
+        return self
 
 PauliX = X = NOT = XGate()
 

@@ -1,6 +1,6 @@
 """GHZ state example."""
 
-from qutrunk.circuit import QCircuit
+from qutrunk.circuit import QCircuit, MeasureCond
 from qutrunk.circuit.gates import CX, Measure, H, Barrier, All, U3, Z, X
 from qutrunk.backends import BackendQuSprout
 from qutrunk.backends import BackendQuRoot
@@ -30,14 +30,13 @@ def run_teleport(backend=None):
 
     # Apply a correction
     Barrier * qr
-    #if c0 == 1:
-    #    Z * q[2]
-    #if c1 == 1:
-    #    X * q[2]
+    Z.condition(0, 1) * qr[2]
+    X.condition(1, 1) * qr[2]
     Measure * qr[2]
 
     # Run quantum circuit with 1024 times
-    res = qc.run(shots=1024)
+    print(qc.get_statevector())
+    res = qc.run(shots=1)
 
     # Print measure results like:
     # [{"000": 527}, {"111": 497}]
@@ -51,6 +50,7 @@ def run_teleport(backend=None):
 
 if __name__ == "__main__":
     # Run locally
+    #circuit = run_teleport(backend=BackendQuSprout("cpu", "192.168.158.152", 9091))
     circuit = run_teleport()
 
     # Dram quantum circuit

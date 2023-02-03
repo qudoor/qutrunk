@@ -138,6 +138,9 @@ class BackendQuSprout(Backend):
                     )
                 cmdex = qusproutdata.Cmdex(amp=_amp, mat=_mat)
 
+            cond = None
+            if cmd.measurecond:
+                cond = qusproutdata.MeasureCond(cmd.measurecond.enable, cmd.measurecond.idx, cmd.measurecond.cond_value)
             c = qusproutdata.Cmd(
                 str(cmd.gate),
                 cmd.targets,
@@ -146,6 +149,7 @@ class BackendQuSprout(Backend):
                 cmd.qasm(),
                 cmd.inverse,
                 cmdex,
+                cond,
             )
             cmds.append(c)
 
@@ -164,6 +168,8 @@ class BackendQuSprout(Backend):
             res, elapsed = self._api_server.init(
                 circuit.num_qubits, circuit.density, exectype
             )
+            if res.base.code != 0:
+                raise Exception(f"Circuit init failed, {res.base.msg}")
             if self.circuit.counter:
                 self.circuit.counter.acc_run_time(elapsed)
 

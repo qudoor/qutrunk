@@ -34,6 +34,20 @@ class Mat:
         self.unitary = False
 
 
+class MeasureCond:
+    """Command Measure Condition.
+
+    Args:
+        enable: Function switch.
+        idx: Measure index.
+        cond_value: Condition value.
+    """
+    def __init__(self, enable=False, idx=None, cond_value=None):
+        self.enable = enable
+        self.idx = idx
+        self.cond_value = cond_value
+
+
 class CmdEx:
     """Command extension.
 
@@ -43,8 +57,8 @@ class CmdEx:
     def __init__(self, amp=None, mat=None):
         self.amp = amp
         self.mat = mat
-
-
+        
+        
 class Command:
     """Converts the quantum gate operation into a specific command.
 
@@ -64,6 +78,7 @@ class Command:
         rotation=None,
         inverse=False,
         cmdex=None,
+        measurecond=None,
     ):
         # TODO: modify controls and rotation to tuple?
         if targets is None:
@@ -95,6 +110,7 @@ class Command:
         # Command extention data
         # TODO: extra
         self.cmdex = cmdex
+        self.measurecond = measurecond
 
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""
