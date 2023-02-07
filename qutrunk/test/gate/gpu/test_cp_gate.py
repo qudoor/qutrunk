@@ -19,5 +19,3 @@ def test_cp_gate():
     result_gpu = np.array(circuit_gpu.get_statevector()).reshape(-1, 1)
 
     assert np.allclose(result, result_gpu)
-
-test_cp_gate()
