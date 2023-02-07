@@ -179,7 +179,7 @@ class SimDistribute:
             self.reg.state_vec.real[this_task] = 0
             self.reg.state_vec.imag[this_task] = 0
 
-    def __calc_prob_of_outcome(self, measure_qubit, outcome):
+    def calc_prob_of_outcome(self, measure_qubit, outcome):
         skip_values_within_rank = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, measure_qubit)
         if skip_values_within_rank:
             state_prob = self.sim_cpu.find_prob_of_zero(measure_qubit)
@@ -213,7 +213,7 @@ class SimDistribute:
                     self.__collapse_to_outcome_distributed_set_zero()
 
     def measure(self, target):
-        zero_prob = self.__calc_prob_of_outcome(target, 0)
+        zero_prob = self.calc_prob_of_outcome(target, 0)
         if self.reg.chunk_id == 0:
             outcome, outcome_prob = self.sim_cpu.generate_measure_outcome(zero_prob)
         else:
@@ -305,9 +305,9 @@ class SimDistribute:
 
     def rotate(self, target, ureal, uimag):
         """Rotate gate."""
-        self.__apply_matrix2(target, ureal, uimag)
+        self.apply_matrix2(target, ureal, uimag)
 
-    def __apply_matrix2(self, target_qubit, ureal, uimag):
+    def apply_matrix2(self, target_qubit, ureal, uimag):
         # flag to require memory exchange. 1: an entire block fits on one rank, 0: at most half a block fits on one rank
         use_local_data_only = self.__half_matrix_block_fits_in_chunk(self.reg.num_amps_per_chunk, target_qubit)
 
@@ -900,7 +900,7 @@ class SimDistribute:
     def z1(self, target: int, ureal, uimag):
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
-        self.__apply_matrix2(target, ureal, uimag)
+        self.apply_matrix2(target, ureal, uimag)
 
     def cu1(self, target_qubit1: int, target_qubit2: int, ureal, uimag):
         self.__validate_target(target_qubit1)
@@ -935,7 +935,7 @@ class SimDistribute:
     def sqrtx(self, target: int, ureal, uimag):
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
-        self.__apply_matrix2(target, ureal, uimag)
+        self.apply_matrix2(target, ureal, uimag)
 
     def ch(self, control_qubit: int, target_qubit: int, ureal, uimag):
         self.__validate_target(control_qubit)
@@ -946,7 +946,7 @@ class SimDistribute:
     def sqrtxdg(self, target: int, ureal, uimag):
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
-        self.__apply_matrix2(target, ureal, uimag)
+        self.apply_matrix2(target, ureal, uimag)
 
     def csqrtx(self, control_qubit: int, target_qubit: int, ureal, uimag):
         self.__validate_target(control_qubit)
@@ -985,10 +985,10 @@ class SimDistribute:
             self.reg.state_vec.imag[index] = imags[index + offset]
 
     def sdg(self, target_bit, ureal, uimag):
-        self.__apply_matrix2(target_bit, ureal, uimag)
+        self.apply_matrix2(target_bit, ureal, uimag)
 
     def tdg(self, target_bit, ureal, uimag):
-        self.__apply_matrix2(target_bit, ureal, uimag)
+        self.apply_matrix2(target_bit, ureal, uimag)
 
     def sqrtswap(self, target_bit0, target_bit1, ureal, uimag):
         self.__apply_matrix4(target_bit0, target_bit1, ureal, uimag)
@@ -1071,13 +1071,13 @@ class SimDistribute:
         self.sim_cpu.cz(ctrl_bits, ctrl_cnt)
 
     def u3(self, target_bit, ureal, uimag):
-        self.__apply_matrix2(target_bit, ureal, uimag)
+        self.apply_matrix2(target_bit, ureal, uimag)
 
     def u2(self, target_bit, ureal, uimag):
-        self.__apply_matrix2(target_bit, ureal, uimag)
+        self.apply_matrix2(target_bit, ureal, uimag)
 
     def u1(self, target_bit, ureal, uimag):
-        self.__apply_matrix2(target_bit, ureal, uimag)
+        self.apply_matrix2(target_bit, ureal, uimag)
 
     def crx(self, control_bit, target_bit, angle):
         unit_axis = [1, 0, 0]
@@ -1164,12 +1164,12 @@ class SimDistribute:
     def x1(self, target, ureal, uimag):
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
-        self.__apply_matrix2(target, ureal, uimag)
+        self.apply_matrix2(target, ureal, uimag)
 
     def y1(self, target, ureal, uimag):
         self.__validate_target(target)
         self.__validate_matrix(ureal, uimag, 2, 2)
-        self.__apply_matrix2(target, ureal, uimag)
+        self.apply_matrix2(target, ureal, uimag)
         
     def __multi_controlled_multi_qubit_unitary_local(self, ctrl_mask: int, targets, ureals, uimags):
         num_targs = len(targets)

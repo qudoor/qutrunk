@@ -6,7 +6,7 @@ import uuid
 
 from qutrunk.backends import Backend, BackendLocal
 from qutrunk.circuit import CBit, CReg, Counter, QuBit, SubQureg, Qureg
-from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs
+from qutrunk.circuit.gates import BarrierGate, MeasureGate, PauliCoeffs, ResetGate
 from qutrunk.circuit.parameter import Parameter
 from qutrunk.circuit.ops import AMP
 from qutrunk.exceptions import QuTrunkError
@@ -398,7 +398,7 @@ class QCircuit:
         # inverse cmd and gate
         cmds = self.cmds
         for cmd in reversed(cmds):
-            if isinstance(cmd.gate, (MeasureGate, AMP)):
+            if isinstance(cmd.gate, (MeasureGate, ResetGate, AMP)):
                 raise ValueError("The circuit cannot be inverted.")
             cmd.inverse = not cmd.inverse
             inverse_circuit.append_cmd(cmd)

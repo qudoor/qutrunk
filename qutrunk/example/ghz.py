@@ -5,6 +5,9 @@ from qutrunk.circuit.gates import CX, Measure, H, Barrier, All
 
 
 def run_ghz(backend=None):
+    """
+    Result: The result will always be like [{"0b000": xxx}, {"0b111": xxx}]
+    """
     # Create quantum circuit
     qc = QCircuit(name="ghz", backend=backend)
 

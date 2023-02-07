@@ -32,10 +32,12 @@ networkx = "^2.8"
 retworkx = "^0.11.0"
 mpi4py = { version = "^3.1.4", optional = true }
 amazon-braket-sdk = { version = "^1.32.0", optional = true }
+numba = { version = "^0.56.4", optional = true }
 
 [tool.poetry.extras]
 braket = ["amazon-braket-sdk"]
 parallel = ["mpi4py"]
+gpu = ["numba"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"
