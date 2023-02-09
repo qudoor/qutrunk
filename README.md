@@ -60,7 +60,7 @@ QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
   # 可选安装：parallel——支持多节点并行计算
   pip install 'qutrunk[parallel]'
 
-  # 可选安装：gpu——支持gpu计算加速
+  # 可选安装：gpu——支持gpu计算加速(目前支持到：cuda 11)
   pip install 'qutrunk[gpu]'
   ```
 
