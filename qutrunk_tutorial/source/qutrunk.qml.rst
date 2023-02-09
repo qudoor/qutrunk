@@ -7,6 +7,8 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   qutrunk.qml.about_spinqkit
+   qutrunk.qml.gradient
    qutrunk.qml.huawei_mindspore
    qutrunk.qml.ops_examples
    qutrunk.qml.qiskit_demo
