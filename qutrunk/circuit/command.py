@@ -170,6 +170,7 @@ class Command:
         params = []
         param_str = ""
         inv_str = ""
+        cond_str = ""
 
         # only append control bit count as param when it's more than one
         if self.cmdex and self.cmdex.mat:
@@ -195,7 +196,10 @@ class Command:
         if self.inverse:
             inv_str += ".inv()"
 
-        return name + param_str + inv_str + " * " + qubits_str
+        if self.measurecond:
+            cond_str += f".condition(q[{self.measurecond.idx}], {self.measurecond.cond_value})"
+
+        return name + param_str + inv_str + cond_str + " * " + qubits_str
 
     @property
     def name(self) -> str:

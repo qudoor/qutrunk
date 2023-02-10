@@ -90,8 +90,8 @@ class XGate(BasicGate, Observable):
         gate.is_inverse = self.is_inverse
         return gate
     
-    def condition(self, idx, cond_value):
-        self.measurecond = MeasureCond(True, idx, cond_value)
+    def condition(self, qubit, cond_value):
+        self.measurecond = MeasureCond(True, qubit.index, cond_value)
         return self
 
 PauliX = X = NOT = XGate()
