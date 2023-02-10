@@ -3,7 +3,7 @@
 from qutrunk.circuit import QCircuit, MeasureCond
 from qutrunk.circuit.gates import CX, Measure, H, Barrier, All, U3, Z, X
 from qutrunk.backends import BackendQuSprout
-from qutrunk.backends import BackendQuRoot
+# from qutrunk.backends import BackendQuRoot
 
 def run_teleport(backend=None):
     # Create quantum circuit
@@ -30,8 +30,8 @@ def run_teleport(backend=None):
 
     # Apply a correction
     Barrier * qr
-    Z.condition(0, 1) * qr[2]
-    X.condition(1, 1) * qr[2]
+    Z.condition(qr[0], 1) * qr[2]
+    X.condition(qr[1], 1) * qr[2]
     Measure * qr[2]
 
     # Run quantum circuit with 1024 times
@@ -40,6 +40,7 @@ def run_teleport(backend=None):
 
     # Print measure results like:
     # [{"000": 527}, {"111": 497}]
+    qc.print()
     print(res.get_counts())
     #print(res.get_bitstrs())
     print(res.get_measures())
