@@ -54,11 +54,14 @@ QuTrunk 已发布于 PyPI 官网，可以通过 pip 命令进行安装。
   ```shell
   pip install qutrunk
   
-  # 可选安装：AWS Braket后端，支持Braket后端计算模式
+  # 可选安装：braket——支持AWS Braket作为量子计算后端
   pip install 'qutrunk[braket]'
 
-  # 可选安装：parallel，支持多节点并行计算
+  # 可选安装：parallel——支持多节点并行计算
   pip install 'qutrunk[parallel]'
+
+  # 可选安装：gpu——支持gpu计算加速(目前支持到：cuda 11)
+  pip install 'qutrunk[gpu]'
   ```
 
 验证QuTrunk是否安装成功，打开终端进入python交互模式，执行如下语句：
