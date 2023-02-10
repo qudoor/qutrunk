@@ -52,6 +52,14 @@ qutrunk.example.grover\_distribute module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.example.grover\_gpu module
+----------------------------------
+
+.. automodule:: qutrunk.example.grover_gpu
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qutrunk.example.phase\_estimation module
 ----------------------------------------
 

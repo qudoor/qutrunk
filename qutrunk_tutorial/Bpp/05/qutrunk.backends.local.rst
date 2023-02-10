@@ -36,6 +36,14 @@ qutrunk.backends.local.sim\_distribute module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.backends.local.sim\_gpu module
+--------------------------------------
+
+.. automodule:: qutrunk.backends.local.sim_gpu
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qutrunk.backends.local.sim\_local module
 ----------------------------------------
 

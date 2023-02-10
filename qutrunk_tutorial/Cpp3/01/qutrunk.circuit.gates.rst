@@ -84,6 +84,14 @@ qutrunk.circuit.gates.r module
    :undoc-members:
    :show-inheritance:
 
+qutrunk.circuit.gates.reset module
+----------------------------------
+
+.. automodule:: qutrunk.circuit.gates.reset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qutrunk.circuit.gates.rx module
 -------------------------------
 

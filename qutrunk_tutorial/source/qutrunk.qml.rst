@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   qutrunk.qml.about_pyqanda
    qutrunk.qml.about_spinqkit
    qutrunk.qml.gradient
    qutrunk.qml.huawei_mindspore
