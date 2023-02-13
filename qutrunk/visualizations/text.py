@@ -212,7 +212,7 @@ class TextDrawing:
         condstr = ""
         cond = op.measurecond
         if cond and cond.enable == True:
-            condstr = "(M" + str(cond.idx) + "==" + str(cond.cond_value) + ")"
+            condstr = "(q[" + str(cond.idx) + "]==" + str(cond.cond_value) + ")"
 
         def add_connected_gate(node, gates, layer, current_cons):
             for i, gate in enumerate(gates):

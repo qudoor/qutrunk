@@ -224,6 +224,9 @@ struct RunCircuitReq {
 
     //运行次数
     2: required i32 shots
+
+    //释放后端
+    3: optional i32 free
 }
 
 struct RunCircuitResp {

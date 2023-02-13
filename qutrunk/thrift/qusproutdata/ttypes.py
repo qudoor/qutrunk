@@ -1808,13 +1808,15 @@ class RunCircuitReq(object):
     Attributes:
      - id
      - shots
+     - free
 
     """
 
 
-    def __init__(self, id=None, shots=None,):
+    def __init__(self, id=None, shots=None, free=None,):
         self.id = id
         self.shots = shots
+        self.free = free
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -1835,6 +1837,11 @@ class RunCircuitReq(object):
                     self.shots = iprot.readI32()
                 else:
                     iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.I32:
+                    self.free = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1852,6 +1859,10 @@ class RunCircuitReq(object):
         if self.shots is not None:
             oprot.writeFieldBegin('shots', TType.I32, 2)
             oprot.writeI32(self.shots)
+            oprot.writeFieldEnd()
+        if self.free is not None:
+            oprot.writeFieldBegin('free', TType.I32, 3)
+            oprot.writeI32(self.free)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()

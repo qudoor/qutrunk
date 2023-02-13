@@ -49,6 +49,12 @@ class BackendBraket(Backend):
         self._circuit = None
         self.task_id = uuid.uuid4().hex
 
+    def check_cmd_valid(self, circuit):
+        if circuit and circuit.cmds:
+            for cmd in circuit.cmds:
+                if cmd.measurecond and cmd.measurecond.enable:
+                    raise Exception("%s does not support condition gate." % self.name)
+                
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to Braket backend.
 
@@ -57,6 +63,7 @@ class BackendBraket(Backend):
             final: True if quantum circuit finish, default False, \
             when final==True The backend program will release the computing resources.
         """
+        self.check_cmd_valid(circuit)
         self._circuit = circuit
 
     def run(self, shots=1024):

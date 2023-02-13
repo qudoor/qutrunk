@@ -3,7 +3,6 @@
 from qutrunk.circuit import QCircuit, MeasureCond
 from qutrunk.circuit.gates import CX, Measure, H, Barrier, All, U3, Z, X
 from qutrunk.backends import BackendQuSprout
-# from qutrunk.backends import BackendQuRoot
 
 def run_teleport(backend=None):
     # Create quantum circuit
@@ -51,7 +50,6 @@ def run_teleport(backend=None):
 
 if __name__ == "__main__":
     # Run locally
-    #circuit = run_teleport(backend=BackendQuSprout("cpu", "192.168.158.152", 9091))
     circuit = run_teleport()
 
     # Dram quantum circuit
