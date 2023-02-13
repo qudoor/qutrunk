@@ -396,6 +396,91 @@ class Cmdex(object):
         return not (self == other)
 
 
+class MeasureCond(object):
+    """
+    Attributes:
+     - enable
+     - idx
+     - cond_value
+
+    """
+
+
+    def __init__(self, enable=None, idx=None, cond_value=None,):
+        self.enable = enable
+        self.idx = idx
+        self.cond_value = cond_value
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.BOOL:
+                    self.enable = iprot.readBool()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.I32:
+                    self.idx = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.I32:
+                    self.cond_value = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('MeasureCond')
+        if self.enable is not None:
+            oprot.writeFieldBegin('enable', TType.BOOL, 1)
+            oprot.writeBool(self.enable)
+            oprot.writeFieldEnd()
+        if self.idx is not None:
+            oprot.writeFieldBegin('idx', TType.I32, 2)
+            oprot.writeI32(self.idx)
+            oprot.writeFieldEnd()
+        if self.cond_value is not None:
+            oprot.writeFieldBegin('cond_value', TType.I32, 3)
+            oprot.writeI32(self.cond_value)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        if self.enable is None:
+            raise TProtocolException(message='Required field enable is unset!')
+        if self.idx is None:
+            raise TProtocolException(message='Required field idx is unset!')
+        if self.cond_value is None:
+            raise TProtocolException(message='Required field cond_value is unset!')
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 class Cmd(object):
     """
     Attributes:
@@ -406,11 +491,12 @@ class Cmd(object):
      - desc
      - inverse
      - cmdex
+     - cond
 
     """
 
 
-    def __init__(self, gate=None, targets=None, controls=None, rotation=None, desc=None, inverse=None, cmdex=None,):
+    def __init__(self, gate=None, targets=None, controls=None, rotation=None, desc=None, inverse=None, cmdex=None, cond=None,):
         self.gate = gate
         self.targets = targets
         self.controls = controls
@@ -418,6 +504,7 @@ class Cmd(object):
         self.desc = desc
         self.inverse = inverse
         self.cmdex = cmdex
+        self.cond = cond
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -479,6 +566,12 @@ class Cmd(object):
                     self.cmdex.read(iprot)
                 else:
                     iprot.skip(ftype)
+            elif fid == 8:
+                if ftype == TType.STRUCT:
+                    self.cond = MeasureCond()
+                    self.cond.read(iprot)
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -525,6 +618,10 @@ class Cmd(object):
         if self.cmdex is not None:
             oprot.writeFieldBegin('cmdex', TType.STRUCT, 7)
             self.cmdex.write(oprot)
+            oprot.writeFieldEnd()
+        if self.cond is not None:
+            oprot.writeFieldBegin('cond', TType.STRUCT, 8)
+            self.cond.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -1711,13 +1808,15 @@ class RunCircuitReq(object):
     Attributes:
      - id
      - shots
+     - free
 
     """
 
 
-    def __init__(self, id=None, shots=None,):
+    def __init__(self, id=None, shots=None, free=None,):
         self.id = id
         self.shots = shots
+        self.free = free
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -1738,6 +1837,11 @@ class RunCircuitReq(object):
                     self.shots = iprot.readI32()
                 else:
                     iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.I32:
+                    self.free = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1755,6 +1859,10 @@ class RunCircuitReq(object):
         if self.shots is not None:
             oprot.writeFieldBegin('shots', TType.I32, 2)
             oprot.writeI32(self.shots)
+            oprot.writeFieldEnd()
+        if self.free is not None:
+            oprot.writeFieldBegin('free', TType.I32, 3)
+            oprot.writeI32(self.free)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -2852,6 +2960,13 @@ Cmdex.thrift_spec = (
     (1, TType.STRUCT, 'amp', [Amplitude, None], None, ),  # 1
     (2, TType.STRUCT, 'mat', [Matrix, None], None, ),  # 2
 )
+all_structs.append(MeasureCond)
+MeasureCond.thrift_spec = (
+    None,  # 0
+    (1, TType.BOOL, 'enable', None, None, ),  # 1
+    (2, TType.I32, 'idx', None, None, ),  # 2
+    (3, TType.I32, 'cond_value', None, None, ),  # 3
+)
 all_structs.append(Cmd)
 Cmd.thrift_spec = (
     None,  # 0
@@ -2862,6 +2977,7 @@ Cmd.thrift_spec = (
     (5, TType.STRING, 'desc', 'UTF8', None, ),  # 5
     (6, TType.BOOL, 'inverse', None, None, ),  # 6
     (7, TType.STRUCT, 'cmdex', [Cmdex, None], None, ),  # 7
+    (8, TType.STRUCT, 'cond', [MeasureCond, None], None, ),  # 8
 )
 all_structs.append(Circuit)
 Circuit.thrift_spec = (

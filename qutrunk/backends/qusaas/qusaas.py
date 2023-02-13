@@ -51,6 +51,12 @@ class BackendQuSaas(Backend):
         self._api_server = QuSaasApiServer(ak, sk)
         self.task_id = self._api_server._taskid
 
+    def check_cmd_valid(self, circuit):
+        if circuit and circuit.cmds:
+            for cmd in circuit.cmds:
+                if cmd.measurecond and cmd.measurecond.enable:
+                    raise Exception("%s does not support condition gate." % self.name)
+                
     def send_circuit(self, circuit, final=False):
         """Send the quantum circuit to qusprout backend.
 
@@ -59,6 +65,8 @@ class BackendQuSaas(Backend):
             final: True if quantum circuit finish, default False, \
             when final==True The backend program will release the computing resources.
         """
+        self.check_cmd_valid(circuit)
+        
         start = circuit.cmd_cursor
         stop = len(circuit.cmds)
 
