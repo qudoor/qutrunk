@@ -21,7 +21,7 @@ class Parameter:
     def __init__(self, name):
         self.name = name
         self.value = None
-        self._host = None
+        self._hosts = []
 
     def __copy__(self):
         return self
@@ -52,18 +52,18 @@ class Parameter:
         return f"{self.__class__.__name__}({self.name})"
 
     @property
-    def host(self):
+    def hosts(self):
         """Get parameter host."""
-        return self._host
+        return self._hosts
 
-    @host.setter
-    def host(self, host):
+    @hosts.setter
+    def hosts(self, hosts):
         """Set parameter host.
-        
+
         Args:
-            host: The Host using this parameter. 
+            hosts: The Host using this parameter.
         """
-        self._host = host
+        self._hosts = hosts
 
     def update(self, value):
         """Update parameter value.
@@ -72,6 +72,6 @@ class Parameter:
             value: Parameter value.
         """
         self.value = value
-        if self._host:
-            self._host.update_parameter(self)
-
+        if self._hosts:
+            for host in self._hosts:
+                host.update_parameter(self)

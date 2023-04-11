@@ -105,7 +105,7 @@ class Command:
             if isinstance(r, Parameter):
                 # map index to parameter
                 self.parameters[i] = r
-                r.host = self
+                r.hosts.append(self)
 
         # Command extention data
         # TODO: extra
