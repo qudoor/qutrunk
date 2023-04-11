@@ -3,7 +3,7 @@
 import numpy as np
 
 from .basicgate import BasicGate, Observable, PauliType
-from qutrunk.circuit import Qureg, QuBit, Command
+from qutrunk.circuit import Qureg, QuBit, Command, MeasureCond
 
 
 class ZGate(BasicGate, Observable):
@@ -18,6 +18,7 @@ class ZGate(BasicGate, Observable):
     def __init__(self):
         """Create new Z gate."""
         super().__init__()
+        self.measurecond = None
 
     def __str__(self):
         return "Z"
@@ -40,7 +41,7 @@ class ZGate(BasicGate, Observable):
             raise TypeError("The argument must be Qubit object.")
 
         targets = [qubit.index]
-        cmd = Command(self, targets, inverse=self.is_inverse)
+        cmd = Command(self, targets, inverse=self.is_inverse, measurecond=self.measurecond)
         self.commit(qubit.circuit, cmd)
 
     def __mul__(self, qubit):
@@ -85,7 +86,11 @@ class ZGate(BasicGate, Observable):
         gate.is_inverse = self.is_inverse
         return gate
 
+    def condition(self, qubit, cond_value):
+        self.measurecond = MeasureCond(True, qubit.index, cond_value)
+        return self
 
+     
 PauliZ = Z = ZGate()
 
 

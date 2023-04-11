@@ -181,12 +181,25 @@ class BackendLocalPython:
         """
         return self.sim.get_expec_pauli_sum(oper_type_list, term_coeff_list)
 
+    def reach_measure_condition(self, cond):
+        index = self.run_times
+        if index < len(self.result.measures):
+            for idx, value in self.result.measures[index].measure.items():
+                if idx == cond.idx and value == cond.cond_value:
+                    return True
+
+        return False
+    
     def exec_cmd(self, cmd):
         # TODO: need to improve.
+        if cmd.measurecond and cmd.measurecond.enable:
+            if self.reach_measure_condition(cmd.measurecond) == False:
+                return
+
         if str(cmd.gate) == "Measure":
             res = self.sim.measure(cmd.targets[0])
-            index = self.run_times
             meassize = len(self.result.measures)
+            index = self.run_times
             if index >= meassize:
                 mrs = MeasureQubits()
                 mrs.add_measure(cmd.targets[0], res)

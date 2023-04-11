@@ -34,6 +34,20 @@ class Mat:
         self.unitary = False
 
 
+class MeasureCond:
+    """Command Measure Condition.
+
+    Args:
+        enable: Function switch.
+        idx: Measure index.
+        cond_value: Condition value.
+    """
+    def __init__(self, enable=False, idx=None, cond_value=None):
+        self.enable = enable
+        self.idx = idx
+        self.cond_value = cond_value
+
+
 class CmdEx:
     """Command extension.
 
@@ -43,8 +57,8 @@ class CmdEx:
     def __init__(self, amp=None, mat=None):
         self.amp = amp
         self.mat = mat
-
-
+        
+        
 class Command:
     """Converts the quantum gate operation into a specific command.
 
@@ -64,6 +78,7 @@ class Command:
         rotation=None,
         inverse=False,
         cmdex=None,
+        measurecond=None,
     ):
         # TODO: modify controls and rotation to tuple?
         if targets is None:
@@ -90,11 +105,12 @@ class Command:
             if isinstance(r, Parameter):
                 # map index to parameter
                 self.parameters[i] = r
-                r.host = self
+                r.hosts.append(self)
 
         # Command extention data
         # TODO: extra
         self.cmdex = cmdex
+        self.measurecond = measurecond
 
     def __eq__(self, other):
         """Two command are the same if they have the same qasm."""
@@ -154,6 +170,7 @@ class Command:
         params = []
         param_str = ""
         inv_str = ""
+        cond_str = ""
 
         # only append control bit count as param when it's more than one
         if self.cmdex and self.cmdex.mat:
@@ -179,7 +196,10 @@ class Command:
         if self.inverse:
             inv_str += ".inv()"
 
-        return name + param_str + inv_str + " * " + qubits_str
+        if self.measurecond:
+            cond_str += f".condition(q[{self.measurecond.idx}], {self.measurecond.cond_value})"
+
+        return name + param_str + inv_str + cond_str + " * " + qubits_str
 
     @property
     def name(self) -> str:
