@@ -1,8 +1,9 @@
-"""GHZ state example."""
+"""Quantum Teleportation example."""
 
-from qutrunk.circuit import QCircuit, MeasureCond
-from qutrunk.circuit.gates import CX, Measure, H, Barrier, All, U3, Z, X
 from qutrunk.backends import BackendQuSprout
+from qutrunk.circuit import MeasureCond, QCircuit
+from qutrunk.circuit.gates import CX, U3, All, Barrier, H, Measure, X, Z
+
 
 def run_teleport(backend=None):
     # Create quantum circuit
@@ -41,10 +42,10 @@ def run_teleport(backend=None):
     # [{"000": 527}, {"111": 497}]
     qc.print()
     print(res.get_counts())
-    #print(res.get_bitstrs())
+    # print(res.get_bitstrs())
     print(res.get_measures())
-    #print(res.get_values())
-    
+    # print(res.get_values())
+
     return qc
 
 
@@ -54,4 +55,3 @@ if __name__ == "__main__":
 
     # Dram quantum circuit
     circuit.draw()
-
